@@ -14,6 +14,9 @@ public class CityGenerator : MonoBehaviour
     [Header("Road Config")] 
     [SerializeField, Min(1)] private int roadMinGap;
     [SerializeField, Min(1)] private int roadMaxGap;
+
+    [Header("Voronoi")] 
+    [SerializeField] private List<ECellType> seedTypes;
     
     public CityLayout CityLayout { get; private set; }
     private Random _prng;
@@ -24,6 +27,7 @@ public class CityGenerator : MonoBehaviour
         CityLayout = new CityLayout(seed, width, height, cellSize);
         
         GenerateRoad();
+        GenerateArea();
     }
 
     private void GenerateRoad()
@@ -46,6 +50,61 @@ public class CityGenerator : MonoBehaviour
                 CityLayout.Cells[x, y] = ECellType.Road;
             }
         }
+    }
+
+    private void GenerateArea()
+    {
+        var allSeed = PlaceSeed();
+
+        for (var x = 0; x < width; ++x)
+        {
+            for (var y = 0; y < height; ++y)
+            {
+                if(CityLayout.Cells[x, y] == ECellType.Road) continue;
+
+                CityLayout.Cells[x, y] = FindNearestSeedType(new Vector2Int(x, y), allSeed);
+            }
+        }
+    }
+
+    private List<(ECellType type, Vector2Int pos)> PlaceSeed()
+    {
+        var used = new HashSet<Vector2Int>();
+        var result = new List<(ECellType type, Vector2Int pos)>();
+        
+        foreach (var type in seedTypes)
+        {
+            Vector2Int p;
+            
+            do
+            {
+                p = new Vector2Int(_prng.Next(0, width), _prng.Next(0, height));    
+            } while (used.Add(p) == false);
+            
+            result.Add((type, p));
+        }
+
+        return result;
+    }
+
+    private ECellType FindNearestSeedType(Vector2Int pos, List<(ECellType type, Vector2Int pos)> seeds)
+    {
+        var bestDic = float.MaxValue;
+        var bestType = ECellType.Empty;
+
+        foreach (var s in seeds)
+        {
+            var dx = pos.x - s.pos.x;
+            var dy = pos.y - s.pos.y;
+            var distance =  dx * dx + dy * dy;
+            
+            if(distance >= bestDic) continue;
+            
+            bestDic = distance;
+            bestType = s.type;
+        }
+
+        return bestType;
     }
     
     private List<int> ChoseRoadLine(int length)

@@ -2,5 +2,9 @@ public enum ECellType
 {
     Empty,
     Road,
-    Building
+    Residential,
+    Commercial,
+    Office,
+    Industrial,
+    Park
 }
