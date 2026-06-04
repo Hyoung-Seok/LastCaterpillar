@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = System.Random;
@@ -6,9 +7,9 @@ public class CityGenerator : MonoBehaviour
 {
     [Header("City Config")] 
     [SerializeField] private int seed;
-    [SerializeField] private int width;
-    [SerializeField] private int height;
-    [SerializeField] private int cellSize;
+    [SerializeField, Min(1)] private int width;
+    [SerializeField, Min(2)] private int height;
+    [SerializeField, Min(1)] private int cellSize;
 
     [Header("Road Config")] 
     [SerializeField, Min(1)] private int roadMinGap;
@@ -27,20 +28,20 @@ public class CityGenerator : MonoBehaviour
 
     private void GenerateRoad()
     {
-        var row = ChoseRoadLine(width);
-        var col = ChoseRoadLine(height);
+        var row = ChoseRoadLine(height);
+        var col = ChoseRoadLine(width);
 
-        foreach (var x in row)
+        foreach (var y in row)
         {
-            for (var y = 0; y < height; ++y)
+            for (var x = 0; x < width; ++x)
             {
                 CityLayout.Cells[x, y] = ECellType.Road;
             }
         }
 
-        foreach (var y in col)
+        foreach (var x in col)
         {
-            for (var x = 0; x < width; ++x)
+            for (var y = 0; y < height; ++y)
             {
                 CityLayout.Cells[x, y] = ECellType.Road;
             }
@@ -55,9 +56,17 @@ public class CityGenerator : MonoBehaviour
         while (cur < length)
         {
             result.Add(cur);
-            cur += _prng.Next(roadMinGap, roadMaxGap);
+            cur += _prng.Next(roadMinGap, roadMaxGap + 1);
         }
 
         return result;
+    }
+
+    private void OnValidate()
+    {
+        if (roadMinGap > roadMaxGap)
+        {
+            roadMinGap = roadMaxGap;
+        }
     }
 }
