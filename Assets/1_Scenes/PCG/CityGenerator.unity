@@ -462,7 +462,17 @@ MonoBehaviour:
   cellSize: 3
   roadMinGap: 4
   roadMaxGap: 8
-  seedTypes: 0200000003000000040000000500000006000000
+  seedConfigs:
+  - Type: 2
+    Weight: 0.1
+  - Type: 3
+    Weight: 0.4
+  - Type: 4
+    Weight: 0.3
+  - Type: 5
+    Weight: 0.1
+  - Type: 6
+    Weight: 0.1
   minDistance: 10
   maxAttempts: 10
   buildingBandDepth: 2

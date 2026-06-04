@@ -17,7 +17,7 @@ public class CityGenerator : MonoBehaviour
     [SerializeField, Min(1)] private int roadMaxGap;
 
     [Header("Voronoi")] 
-    [SerializeField] private List<ECellType> seedTypes;
+    [SerializeField] private List<SeedConfig> seedConfigs;
     [SerializeField] private int minDistance = 10;
     [SerializeField] private int maxAttempts = 10;
     [SerializeField, Min(1)] private int buildingBandDepth = 2;
@@ -72,11 +72,11 @@ public class CityGenerator : MonoBehaviour
         }
     }
 
-    private List<(ECellType type, Vector2Int pos)> PlaceSeed()
+    private List<(ECellType type, Vector2Int pos, float weight)> PlaceSeed()
     {
-        var result = new List<(ECellType type, Vector2Int pos)>();
+        var result = new List<(ECellType type, Vector2Int pos, float weight)>();
         
-        foreach (var type in seedTypes)
+        foreach (var s in seedConfigs)
         {
             Vector2Int p;
             var attempts = 0;
@@ -87,33 +87,35 @@ public class CityGenerator : MonoBehaviour
                 
             } while (CheckSeedMinDistance(p, result) == false
                      && attempts < maxAttempts);
-            result.Add((type, p));
+            result.Add((s.Type, p, s.Weight));
         }
 
         return result;
     }
 
-    private ECellType FindNearestSeedType(Vector2Int pos, List<(ECellType type, Vector2Int pos)> seeds)
+    private ECellType FindNearestSeedType(Vector2Int pos, List<(ECellType type, Vector2Int pos, float weight)> seeds)
     {
         var bestDist = float.MaxValue;
         var bestType = ECellType.Empty;
 
-        foreach (var s in seeds)
+        for (var i = 0; i < seeds.Count; i++)
         {
-            var dx = pos.x - s.pos.x;
-            var dy = pos.y - s.pos.y;
-            var distance =  dx * dx + dy * dy;
+            var dx = pos.x - seeds[i].pos.x;
+            var dy = pos.y - seeds[i].pos.y;
+            var distSq =  dx * dx + dy * dy;
+
+            var weighted = distSq / seeds[i].weight;
             
-            if(distance >= bestDist) continue;
+            if(weighted >= bestDist) continue;
             
-            bestDist = distance;
-            bestType = s.type;
+            bestDist = weighted;
+            bestType = seeds[i].type;
         }
 
         return bestType;
     }
 
-    private bool CheckSeedMinDistance(Vector2Int pos, List<(ECellType type, Vector2Int pos)> seeds)
+    private bool CheckSeedMinDistance(Vector2Int pos, List<(ECellType type, Vector2Int pos, float weight)> seeds)
     {
         foreach (var s in seeds)
         {
@@ -146,4 +148,11 @@ public class CityGenerator : MonoBehaviour
             roadMinGap = roadMaxGap;
         }
     }
+}
+
+[Serializable]
+public class SeedConfig
+{
+    public ECellType Type;
+    [Range(0.1f, 1f)] public float Weight = 0.1f;
 }
