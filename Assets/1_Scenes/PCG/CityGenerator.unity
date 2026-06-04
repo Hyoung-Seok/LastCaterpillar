@@ -463,6 +463,9 @@ MonoBehaviour:
   roadMinGap: 4
   roadMaxGap: 8
   seedTypes: 0200000003000000040000000500000006000000
+  minDistance: 10
+  maxAttempts: 10
+  buildingBandDepth: 2
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

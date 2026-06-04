@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Random = System.Random;
 
@@ -17,6 +18,9 @@ public class CityGenerator : MonoBehaviour
 
     [Header("Voronoi")] 
     [SerializeField] private List<ECellType> seedTypes;
+    [SerializeField] private int minDistance = 10;
+    [SerializeField] private int maxAttempts = 10;
+    [SerializeField, Min(1)] private int buildingBandDepth = 2;
     
     public CityLayout CityLayout { get; private set; }
     private Random _prng;
@@ -61,6 +65,7 @@ public class CityGenerator : MonoBehaviour
             for (var y = 0; y < height; ++y)
             {
                 if(CityLayout.Cells[x, y] == ECellType.Road) continue;
+                if(CityLayout.NearRoadDirection(x,y, buildingBandDepth, _prng) == null) continue;
 
                 CityLayout.Cells[x, y] = FindNearestSeedType(new Vector2Int(x, y), allSeed);
             }
@@ -69,18 +74,19 @@ public class CityGenerator : MonoBehaviour
 
     private List<(ECellType type, Vector2Int pos)> PlaceSeed()
     {
-        var used = new HashSet<Vector2Int>();
         var result = new List<(ECellType type, Vector2Int pos)>();
         
         foreach (var type in seedTypes)
         {
             Vector2Int p;
-            
+            var attempts = 0;
             do
             {
-                p = new Vector2Int(_prng.Next(0, width), _prng.Next(0, height));    
-            } while (used.Add(p) == false);
-            
+                p = new Vector2Int(_prng.Next(0, width), _prng.Next(0, height));
+                attempts++;
+                
+            } while (CheckSeedMinDistance(p, result) == false
+                     && attempts < maxAttempts);
             result.Add((type, p));
         }
 
@@ -89,7 +95,7 @@ public class CityGenerator : MonoBehaviour
 
     private ECellType FindNearestSeedType(Vector2Int pos, List<(ECellType type, Vector2Int pos)> seeds)
     {
-        var bestDic = float.MaxValue;
+        var bestDist = float.MaxValue;
         var bestType = ECellType.Empty;
 
         foreach (var s in seeds)
@@ -98,13 +104,25 @@ public class CityGenerator : MonoBehaviour
             var dy = pos.y - s.pos.y;
             var distance =  dx * dx + dy * dy;
             
-            if(distance >= bestDic) continue;
+            if(distance >= bestDist) continue;
             
-            bestDic = distance;
+            bestDist = distance;
             bestType = s.type;
         }
 
         return bestType;
+    }
+
+    private bool CheckSeedMinDistance(Vector2Int pos, List<(ECellType type, Vector2Int pos)> seeds)
+    {
+        foreach (var s in seeds)
+        {
+            var dis = Vector2Int.Distance(pos, s.pos);
+
+            if (dis < minDistance) return false;
+        }
+        
+        return true;
     }
     
     private List<int> ChoseRoadLine(int length)
