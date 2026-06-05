@@ -479,6 +479,8 @@ MonoBehaviour:
   buildingBandDepth: 2
   frequency: 0.08
   strength: 20
+  sparsity: 0
+  sparsityScale: 0.08
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

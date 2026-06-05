@@ -28,7 +28,8 @@ public class CityGenerator : MonoBehaviour
     [Header("Perlin Noise")] 
     [SerializeField, Range(0.01f, 0.2f)] private float frequency;
     [SerializeField, Min(0)] private float strength;
-    
+    [SerializeField, Range(0, 0.9f)] private float sparsity;
+    [SerializeField, Range(0, 0.2f)] private float sparsityScale;
     
     public CityLayout CityLayout { get; private set; }
     private Random _prng;
@@ -69,6 +70,8 @@ public class CityGenerator : MonoBehaviour
         var allSeed = PlaceSeed();
         var warpOffset = new Vector4(_prng.Next(0, 10000), _prng.Next(0, 10000)
             ,_prng.Next(0, 10000),  _prng.Next(0, 10000));
+        
+        var sparsityOffset = new Vector2(_prng.Next(0, 10000), _prng.Next(0, 10000));
 
         for (var x = 0; x < width; ++x)
         {
@@ -76,6 +79,11 @@ public class CityGenerator : MonoBehaviour
             {
                 if(CityLayout.Cells[x, y] == ECellType.Road) continue;
                 if(CityLayout.NearRoadDirection(x,y, buildingBandDepth, _prng) == null) continue;
+
+                var s = Mathf.PerlinNoise((x + sparsityOffset.x) * sparsityScale,
+                    (y + sparsityOffset.y) * sparsityScale);
+                
+                if(s <= sparsity) continue;
 
                 var p = WarpCell(x, y, warpOffset);
                 CityLayout.Cells[x, y] = FindNearestSeedType(p, allSeed);
@@ -142,7 +150,6 @@ public class CityGenerator : MonoBehaviour
 
             if (dis < minDistance) return false;
         }
-        
         
         return true;
     }
