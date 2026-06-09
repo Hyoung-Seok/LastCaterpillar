@@ -13,6 +13,10 @@ public class CityAssetLoader
         
         if(_catalog.TryGetValue((type, size), out var result) && result.Count > 0)
             return result[rng.Next(result.Count)];
+        
+        var swapped = new Vector2Int(size.y, size.x);
+        if(_catalog.TryGetValue((type, swapped), out var result2) && result2.Count > 0)
+            return  result2[rng.Next(result2.Count)];
 
         return null;
     }

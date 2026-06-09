@@ -52,7 +52,7 @@ public class CityBuilder : MonoBehaviour
                 if(type is ECellType.Road or ECellType.Empty) continue;
                 
                 var facing = layout.NearRoadDirection(x, y, _rng);
-                var size = CalculateBuildingSize(x, y, layout);
+                var size = CalculateBuildingSize(x, y, facing, layout);
                 
                 if(size == Vector2Int.zero) continue;
                 
@@ -63,17 +63,20 @@ public class CityBuilder : MonoBehaviour
         return result;
     }
 
-    private Vector2Int CalculateBuildingSize(int x, int y, CityLayout layout)
+    private Vector2Int CalculateBuildingSize(int x, int y, Vector2Int? facing, CityLayout layout)
     {
         var curType = layout.Cells[x, y];
+        var wantVertical = (facing != null && facing.Value.x != 0);
+        
         var candidateSizes = _assetLoader.GetPossibleSize(curType);
         var possibleSize = new List<Vector2Int>();
 
         foreach (var size in candidateSizes)
         {
-            if (IsFit(x, y, size, curType, layout))
+            var oriented = OrientSize(size, wantVertical);
+            if (IsFit(x, y, oriented, curType, layout))
             {
-                possibleSize.Add(size);
+                possibleSize.Add(oriented);
             }
         }
 
@@ -94,6 +97,14 @@ public class CityBuilder : MonoBehaviour
         }
 
         return chosen;
+    }
+
+    private Vector2Int OrientSize(Vector2Int size, bool wantVertical)
+    {
+        if (size.x == size.y) return size;
+        var isVertical = size.y > size.x;
+        
+        return isVertical == wantVertical ? size : new Vector2Int(size.y, size.x);
     }
 
     private bool IsFit(int x, int y, Vector2Int size, ECellType curType, CityLayout layout)
