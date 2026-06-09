@@ -6,5 +6,5 @@ public enum ECellType
     Commercial,
     Office,
     Industrial,
-    Park
+    Ruined
 }
