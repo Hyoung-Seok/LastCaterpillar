@@ -35,6 +35,8 @@ public class CityGenerator : MonoBehaviour
     [SerializeField, Range(0, 0.2f)] private float sparsityScale;
     
     public CityLayout CityLayout { get; private set; }
+    public bool LiveDebugMode => liveDebugMode;
+    
     private Random _prng;
 
     public void GenerateCity()
@@ -178,11 +180,6 @@ public class CityGenerator : MonoBehaviour
         if (roadMinGap > roadMaxGap)
         {
             roadMinGap = roadMaxGap;
-        }
-
-        if (liveDebugMode)
-        {
-            GenerateCity();   
         }
     }
 }

@@ -6,6 +6,7 @@ public class CityGeneratorEditor : Editor
 {
     public override void OnInspectorGUI()
     {
+        EditorGUI.BeginChangeCheck();
         DrawDefaultInspector();
         
         var generator = (CityGenerator)target;
@@ -16,6 +17,11 @@ public class CityGeneratorEditor : Editor
         {
             generator.GenerateCity();
             SceneView.RepaintAll();
+        }
+
+        if (EditorGUI.EndChangeCheck() && generator.LiveDebugMode)
+        {
+            EditorApplication.delayCall += () => generator.GenerateCity();
         }
     }
 }
