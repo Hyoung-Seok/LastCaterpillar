@@ -26,6 +26,14 @@ public class CityGeneratorEditor : Editor
             generator.DestroyBuilding();
             SceneView.RepaintAll();
         }
+        
+        GUILayout.Space(5);
+
+        if (GUILayout.Button("Apply Asset Data"))
+        {
+            generator.UpdateAssetData();
+            SceneView.RepaintAll();
+        }
 
         if (EditorGUI.EndChangeCheck() && generator.LiveDebugMode)
         {

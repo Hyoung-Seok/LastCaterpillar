@@ -47,6 +47,11 @@ public class CityBuilder : MonoBehaviour
         }
     }
 
+    public void UpdateAssetData()
+    {
+        _assetLoader = null;
+    }
+
     private List<BData> BuildFootPrints(CityLayout layout)
     {
         var result = new List<BData>();
