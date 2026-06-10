@@ -50,6 +50,11 @@ public class CityGenerator : MonoBehaviour
         cityBuilder.GenerateBuilding(CityLayout);
     }
 
+    public void DestroyBuilding()
+    {
+        cityBuilder.DestroyBuilding();
+    }
+
     private void GenerateRoad()
     {
         var row = ChoseRoadLine(height);

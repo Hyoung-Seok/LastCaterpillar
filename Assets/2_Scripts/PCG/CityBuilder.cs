@@ -36,6 +36,16 @@ public class CityBuilder : MonoBehaviour
             Instantiate(obj, center, rot, transform);
         }
     }
+    
+    public void DestroyBuilding()
+    {
+        if (transform.childCount == 0) return;
+
+        for (var i = transform.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(transform.GetChild(i).gameObject);
+        }
+    }
 
     private List<BData> BuildFootPrints(CityLayout layout)
     {
@@ -123,16 +133,6 @@ public class CityBuilder : MonoBehaviour
         }
         
         return true;
-    }
-
-    private void DestroyBuilding()
-    {
-        if (transform.childCount == 0) return;
-
-        for (var i = transform.childCount - 1; i >= 0; i--)
-        {
-            DestroyImmediate(transform.GetChild(i).gameObject);
-        }
     }
 }
 

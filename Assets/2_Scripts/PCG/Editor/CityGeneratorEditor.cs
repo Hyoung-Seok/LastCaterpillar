@@ -18,6 +18,14 @@ public class CityGeneratorEditor : Editor
             generator.GenerateCity();
             SceneView.RepaintAll();
         }
+        
+        GUILayout.Space(5);
+
+        if (GUILayout.Button("DestroyBuilding"))
+        {
+            generator.DestroyBuilding();
+            SceneView.RepaintAll();
+        }
 
         if (EditorGUI.EndChangeCheck() && generator.LiveDebugMode)
         {
