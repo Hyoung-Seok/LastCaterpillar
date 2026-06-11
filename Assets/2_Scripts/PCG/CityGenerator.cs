@@ -8,6 +8,7 @@ public class CityGenerator : MonoBehaviour
 {
     [Header("Debug")] 
     [SerializeField] private bool liveDebugMode;
+    [SerializeField] private bool isGenerateBuilding;
     
     [Header("Components")]
     [SerializeField] private CityBuilder cityBuilder;
@@ -47,7 +48,8 @@ public class CityGenerator : MonoBehaviour
         GenerateRoad();
         GenerateArea();
         
-        cityBuilder.GenerateBuilding(CityLayout);
+        if(isGenerateBuilding)
+            cityBuilder.GenerateBuilding(CityLayout);
     }
 
     public void DestroyBuilding()
@@ -99,8 +101,9 @@ public class CityGenerator : MonoBehaviour
 
                 var s = Mathf.PerlinNoise((x + sparsityOffset.x) * sparsityScale,
                     (y + sparsityOffset.y) * sparsityScale);
+                s = Mathf.Clamp01(s);
                 
-                if(s <= sparsity) continue;
+                if(s < sparsity) continue;
 
                 var p = WarpCell(x, y, warpOffset);
                 CityLayout.Cells[x, y] = FindNearestSeedType(p, allSeed);
