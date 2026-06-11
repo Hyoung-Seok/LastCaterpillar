@@ -64,7 +64,7 @@ public class CityBuilder : MonoBehaviour
                 if(_isVisited[x, y]) continue;
                 
                 var type = layout.Cells[x, y];
-                if(type is ECellType.Road or ECellType.Empty) continue;
+                if(type is ECellType.Road or ECellType.Empty or ECellType.CatWalk) continue;
                 
                 var facing = layout.NearRoadDirection(x, y, _rng);
                 var size = CalculateBuildingSize(x, y, facing, layout);

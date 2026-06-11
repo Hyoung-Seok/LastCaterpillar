@@ -436,14 +436,16 @@ MonoBehaviour:
   - Type: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
   - Type: 2
-    Color: {r: 1, g: 0.57489336, b: 0, a: 1}
+    Color: {r: 0.3962264, g: 0.3962264, b: 0.3962264, a: 1}
   - Type: 3
-    Color: {r: 0.07047589, g: 0.0047169924, b: 1, a: 1}
+    Color: {r: 1, g: 0.57489336, b: 0, a: 1}
   - Type: 4
-    Color: {r: 0, g: 1, b: 0.9394505, a: 1}
+    Color: {r: 0.07047589, g: 0.0047169924, b: 1, a: 1}
   - Type: 5
-    Color: {r: 1, g: 0.030630242, b: 0, a: 1}
+    Color: {r: 0, g: 1, b: 0.9394505, a: 1}
   - Type: 6
+    Color: {r: 1, g: 0.030630242, b: 0, a: 1}
+  - Type: 7
     Color: {r: 0.46678448, g: 0.26673195, b: 0.509434, a: 1}
 --- !u!114 &1403803531
 MonoBehaviour:
@@ -457,31 +459,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff0648179baa97946a9b223b94b8bb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CityGenerator
-  liveDebugMode: 0
-  isGenerateBuilding: 1
+  liveDebugMode: 1
+  isGenerateBuilding: 0
   cityBuilder: {fileID: 1403803532}
-  seed: 52
-  width: 80
-  height: 80
+  seed: 50
+  width: 100
+  height: 100
   cellSize: 4
-  roadMinGap: 6
-  roadMaxGap: 10
+  roadStartDepth: 2
+  roadMinGap: 10
+  roadMaxGap: 15
   seedConfigs:
-  - Type: 2
-    Weight: 0.1
   - Type: 3
-    Weight: 0.2
+    Weight: 0.1
   - Type: 4
-    Weight: 0.2
+    Weight: 0.1
   - Type: 5
     Weight: 0.1
   - Type: 6
+    Weight: 0.1
+  - Type: 7
     Weight: 0.1
   minDistance: 10
   maxAttempts: 10
   buildingBandDepth: 2
   frequency: 0.08
-  strength: 20
+  strength: 16
   sparsity: 0
   sparsityScale: 0.08
 --- !u!114 &1403803532

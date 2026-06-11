@@ -18,6 +18,7 @@ public class CityGenerator : MonoBehaviour
     [SerializeField, Min(1)] private int width;
     [SerializeField, Min(2)] private int height;
     [SerializeField, Min(1)] private int cellSize;
+    [SerializeField, Min(0)] private int roadStartDepth;
 
     [Header("Road Config")] 
     [SerializeField, Min(1)] private int roadMinGap;
@@ -177,9 +178,9 @@ public class CityGenerator : MonoBehaviour
     private List<int> ChoseRoadLine(int length)
     {
         var result = new List<int>();
-        var cur = 0;
+        var cur = roadStartDepth;
 
-        while (cur < length)
+        while (cur < length - roadStartDepth)
         {
             result.Add(cur);
             cur += _prng.Next(roadMinGap, roadMaxGap + 1);
