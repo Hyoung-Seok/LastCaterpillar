@@ -482,7 +482,7 @@ MonoBehaviour:
     Weight: 0.1
   minDistance: 10
   maxAttempts: 10
-  buildingBandDepth: 2
+  buildingBandDepth: 3
   frequency: 0.08
   strength: 16
   sparsity: 0

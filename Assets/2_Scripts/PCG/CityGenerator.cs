@@ -97,6 +97,32 @@ public class CityGenerator : MonoBehaviour
                 }
             }
         }
+
+        foreach (var h in horizontal)
+        {
+            for (var x = 0; x < width; ++x)
+            {
+                var up = h.startPos + h.width;
+                var down = h.startPos - 1;
+                
+                if (up < height && CityLayout.Cells[x, up] == ECellType.Empty) CityLayout.Cells[x, up] = ECellType.CatWalk;
+                if (down >= 0 && CityLayout.Cells[x, down] == ECellType.Empty) CityLayout.Cells[x, down] = ECellType.CatWalk;
+            }
+        }
+
+        foreach (var v in vertical)
+        {
+            for (var y = 0; y < height; ++y)
+            {
+                var left = v.startPos - 1;
+                var right = v.startPos + v.width;
+
+                if (left >= 0 && CityLayout.Cells[left, y] == ECellType.Empty)
+                    CityLayout.Cells[left, y] = ECellType.CatWalk;
+                if (right < width && CityLayout.Cells[right, y] == ECellType.Empty)
+                    CityLayout.Cells[right, y] = ECellType.CatWalk;
+            }
+        }
     }
 
     private void GenerateArea()
@@ -111,7 +137,7 @@ public class CityGenerator : MonoBehaviour
         {
             for (var y = 0; y < height; ++y)
             {
-                if (CityLayout.Cells[x, y] == ECellType.Road) continue;
+                if (CityLayout.Cells[x, y] is ECellType.Road or ECellType.CatWalk) continue;
                 if (CityLayout.NearRoadDirection(x, y, buildingBandDepth, _prng) == null) continue;
 
                 var s = Mathf.PerlinNoise((x + sparsityOffset.x) * sparsityScale,
