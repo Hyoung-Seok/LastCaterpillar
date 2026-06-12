@@ -65,22 +65,36 @@ public class CityGenerator : MonoBehaviour
 
     private void GenerateRoad()
     {
-        var row = ChoseRoadLine(height);
-        var col = ChoseRoadLine(width);
+        var horizontal = ChoseRoadLine(height);
+        var vertical = ChoseRoadLine(width);
 
-        foreach (var y in row)
+        foreach (var h in horizontal)
         {
-            for (var x = 0; x < width; ++x)
+            for (var w = 0; w < h.width; ++w)
             {
-                CityLayout.Cells[x, y] = ECellType.Road;
+                // y는 증가시킨 채 고정
+                var yy = h.startPos + w;
+                if(yy >= height) continue;
+
+                // x는 순회하며 도로로 지정
+                for (var x = 0; x < width; ++x)
+                {
+                    CityLayout.Cells[x, yy] = ECellType.Road;
+                }
             }
         }
 
-        foreach (var x in col)
+        foreach (var v in vertical)
         {
-            for (var y = 0; y < height; ++y)
+            for (var w = 0; w < v.width; ++w)
             {
-                CityLayout.Cells[x, y] = ECellType.Road;
+                var xx = v.startPos + w;
+                if(xx >= width) continue;
+
+                for (var y = 0; y < height; ++y)
+                {
+                    CityLayout.Cells[xx, y] = ECellType.Road;
+                }
             }
         }
     }
@@ -175,15 +189,22 @@ public class CityGenerator : MonoBehaviour
         return true;
     }
     
-    private List<int> ChoseRoadLine(int length)
+    private List<(int startPos, int width)> ChoseRoadLine(int length)
     {
-        var result = new List<int>();
+        var result = new List<(int startPos, int width)>();
         var cur = roadStartDepth;
 
         while (cur < length - roadStartDepth)
         {
-            result.Add(cur);
-            cur += _prng.Next(roadMinGap, roadMaxGap + 1);
+            var roadWidth = _prng.Next(0, 2) == 0 ? 2 : 4;
+
+            if (cur + roadWidth >= length)
+            {
+                roadWidth = 2;
+            }
+            
+            result.Add((cur, roadWidth));
+            cur += _prng.Next(roadMinGap, roadMaxGap + 1) + roadWidth;
         }
 
         return result;
