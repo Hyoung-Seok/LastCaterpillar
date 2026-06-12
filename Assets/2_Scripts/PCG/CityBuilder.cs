@@ -8,13 +8,13 @@ public class CityBuilder : MonoBehaviour
     private bool[,] _isVisited;
     private System.Random _rng;
 
-    public void GenerateBuilding(CityLayout layout)
+    public void GenerateBuilding(CityLayout layout, int depth)
     {
         DestroyBuilding();
         
         _assetLoader ??= new CityAssetLoader();
         _rng = new System.Random(layout.Seed);
-        var footPrints = BuildFootPrints(layout);
+        var footPrints = BuildFootPrints(layout, depth);
 
         foreach (var bData in footPrints)
         {
@@ -52,7 +52,7 @@ public class CityBuilder : MonoBehaviour
         _assetLoader = null;
     }
 
-    private List<BData> BuildFootPrints(CityLayout layout)
+    private List<BData> BuildFootPrints(CityLayout layout, int depth)
     {
         var result = new List<BData>();
         _isVisited = new bool[layout.Width, layout.Height];
@@ -65,8 +65,8 @@ public class CityBuilder : MonoBehaviour
                 
                 var type = layout.Cells[x, y];
                 if(type is ECellType.Road or ECellType.Empty or ECellType.CatWalk) continue;
-                
-                var facing = layout.NearRoadDirection(x, y, _rng);
+
+                var facing = layout.NearRoadDirection(x, y, depth, _rng);
                 var size = CalculateBuildingSize(x, y, facing, layout);
                 
                 if(size == Vector2Int.zero) continue;

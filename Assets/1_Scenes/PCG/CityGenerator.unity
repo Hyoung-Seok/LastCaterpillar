@@ -459,7 +459,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff0648179baa97946a9b223b94b8bb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CityGenerator
-  liveDebugMode: 1
+  liveDebugMode: 0
   isGenerateBuilding: 0
   cityBuilder: {fileID: 1403803532}
   seed: 50

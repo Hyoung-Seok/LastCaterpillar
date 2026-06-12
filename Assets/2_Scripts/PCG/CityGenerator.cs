@@ -44,13 +44,13 @@ public class CityGenerator : MonoBehaviour
     public void GenerateCity()
     {
         _prng = new Random(seed);
-        CityLayout = new CityLayout(seed, width, height, cellSize, buildingBandDepth);
+        CityLayout = new CityLayout(seed, width, height, cellSize);
         
         GenerateRoad();
         GenerateArea();
         
         if(isGenerateBuilding)
-            cityBuilder.GenerateBuilding(CityLayout);
+            cityBuilder.GenerateBuilding(CityLayout, buildingBandDepth);
     }
 
     public void DestroyBuilding()
@@ -112,7 +112,7 @@ public class CityGenerator : MonoBehaviour
             for (var y = 0; y < height; ++y)
             {
                 if (CityLayout.Cells[x, y] == ECellType.Road) continue;
-                if (CityLayout.NearRoadDirection(x, y, _prng) == null) continue;
+                if (CityLayout.NearRoadDirection(x, y, buildingBandDepth, _prng) == null) continue;
 
                 var s = Mathf.PerlinNoise((x + sparsityOffset.x) * sparsityScale,
                     (y + sparsityOffset.y) * sparsityScale);

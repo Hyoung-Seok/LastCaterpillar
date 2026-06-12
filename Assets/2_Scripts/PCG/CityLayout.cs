@@ -7,16 +7,14 @@ public class CityLayout
     public int Width { get; private set; }
     public int Height { get; private set; }
     public int CellSize { get; private set; }
-    public int BuildingBandDepth { get; private set; }
     public ECellType[,] Cells;
     
-    public CityLayout(int seed, int width, int height, int cellSize, int buildingBandDepth)
+    public CityLayout(int seed, int width, int height, int cellSize)
     {
         Seed = seed;
         Width = width;
         Height = height;
         CellSize = cellSize;
-        BuildingBandDepth = buildingBandDepth;
         
         Cells = new ECellType[width, height];
     }
@@ -26,7 +24,7 @@ public class CityLayout
         return new Vector3(x * CellSize, 0f, y * CellSize);
     }
     
-    public Vector2Int? NearRoadDirection(int x, int y, System.Random rng)
+    public Vector2Int? NearRoadDirection(int x, int y, int depth, System.Random rng)
     {
         Vector2Int[] dirs =
         {
@@ -36,7 +34,7 @@ public class CityLayout
             Vector2Int.right
         };
 
-        for (var i = 1; i <= BuildingBandDepth; ++i)
+        for (var i = 1; i <= depth; ++i)
         {
             var candidates = new List<Vector2Int>();
 
