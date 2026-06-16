@@ -6,14 +6,25 @@ using Random = System.Random;
 
 public class CityGenerator : MonoBehaviour
 {
+    public CityLayout CityLayout { get; private set; }
+    public bool LiveDebugMode => liveDebugMode;
+    public const int NormalRoadWidth = 2;
+    public const int WideRoadWidth = 4;
+    
     [Header("Debug")] 
     [SerializeField] private bool liveDebugMode;
+    [SerializeField] private bool isGenerateBuilding;
+    
+    [Header("Components")]
+    [SerializeField] private CityBuilder cityBuilder;
+    [SerializeField] private RoadGenerator roadGenerator;
     
     [Header("City Config")] 
     [SerializeField] private int seed;
     [SerializeField, Min(1)] private int width;
     [SerializeField, Min(2)] private int height;
     [SerializeField, Min(1)] private int cellSize;
+    [SerializeField, Min(0)] private int roadStartDepth;
 
     [Header("Road Config")] 
     [SerializeField, Min(1)] private int roadMinGap;
@@ -31,7 +42,6 @@ public class CityGenerator : MonoBehaviour
     [SerializeField, Range(0, 0.9f)] private float sparsity;
     [SerializeField, Range(0, 0.2f)] private float sparsityScale;
     
-    public CityLayout CityLayout { get; private set; }
     private Random _prng;
 
     public void GenerateCity()
@@ -41,28 +51,89 @@ public class CityGenerator : MonoBehaviour
         
         GenerateRoad();
         GenerateArea();
+        
+        if(isGenerateBuilding)
+            cityBuilder.GenerateBuilding(CityLayout, buildingBandDepth);
+    }
+
+    public void DestroyBuilding()
+    {
+        cityBuilder.DestroyBuilding();
+    }
+
+    public void UpdateAssetData()
+    {
+        cityBuilder.UpdateAssetData();
     }
 
     private void GenerateRoad()
     {
-        var row = ChoseRoadLine(height);
-        var col = ChoseRoadLine(width);
+        var horizontal = ChoseRoadLine(height);
+        var vertical = ChoseRoadLine(width);
 
-        foreach (var y in row)
+        var horizontalHash = new HashSet<int>();
+        var verticalHash = new HashSet<int>();
+        
+        foreach (var h in horizontal)
+        {
+            for (var w = 0; w < h.width; ++w)
+            {
+                var yy = h.startPos + w;
+                horizontalHash.Add(yy);
+                
+                if(yy >= height) continue;
+                
+                for (var x = 0; x < width; ++x)
+                {
+                    CityLayout.Cells[x, yy] = ECellType.Road;
+                }
+            }
+        }
+
+        foreach (var v in vertical)
+        {
+            for (var w = 0; w < v.width; ++w)
+            {
+                var xx = v.startPos + w;
+                verticalHash.Add(xx);
+                
+                if(xx >= width) continue;
+
+                for (var y = 0; y < height; ++y)
+                {
+                    CityLayout.Cells[xx, y] = ECellType.Road;
+                }
+            }
+        }
+
+        foreach (var h in horizontal)
         {
             for (var x = 0; x < width; ++x)
             {
-                CityLayout.Cells[x, y] = ECellType.Road;
+                var up = h.startPos + h.width;
+                var down = h.startPos - 1;
+                
+                if (up < height && CityLayout.Cells[x, up] == ECellType.Empty) CityLayout.Cells[x, up] = ECellType.CatWalk;
+                if (down >= 0 && CityLayout.Cells[x, down] == ECellType.Empty) CityLayout.Cells[x, down] = ECellType.CatWalk;
             }
         }
 
-        foreach (var x in col)
+        foreach (var v in vertical)
         {
             for (var y = 0; y < height; ++y)
             {
-                CityLayout.Cells[x, y] = ECellType.Road;
+                var left = v.startPos - 1;
+                var right = v.startPos + v.width;
+
+                if (left >= 0 && CityLayout.Cells[left, y] == ECellType.Empty)
+                    CityLayout.Cells[left, y] = ECellType.CatWalk;
+                if (right < width && CityLayout.Cells[right, y] == ECellType.Empty)
+                    CityLayout.Cells[right, y] = ECellType.CatWalk;
             }
         }
+
+        roadGenerator.GenerateRoad(horizontal, verticalHash, false, CityLayout);
+        roadGenerator.GenerateRoad(vertical, horizontalHash, true, CityLayout);
     }
 
     private void GenerateArea()
@@ -77,13 +148,14 @@ public class CityGenerator : MonoBehaviour
         {
             for (var y = 0; y < height; ++y)
             {
-                if(CityLayout.Cells[x, y] == ECellType.Road) continue;
-                if(CityLayout.NearRoadDirection(x,y, buildingBandDepth, _prng) == null) continue;
+                if (CityLayout.Cells[x, y] is ECellType.Road or ECellType.CatWalk) continue;
+                if (CityLayout.NearRoadDirection(x, y, buildingBandDepth, _prng) == null) continue;
 
                 var s = Mathf.PerlinNoise((x + sparsityOffset.x) * sparsityScale,
                     (y + sparsityOffset.y) * sparsityScale);
+                s = Mathf.Clamp01(s);
                 
-                if(s <= sparsity) continue;
+                if(s < sparsity) continue;
 
                 var p = WarpCell(x, y, warpOffset);
                 CityLayout.Cells[x, y] = FindNearestSeedType(p, allSeed);
@@ -154,15 +226,22 @@ public class CityGenerator : MonoBehaviour
         return true;
     }
     
-    private List<int> ChoseRoadLine(int length)
+    private List<(int startPos, int width)> ChoseRoadLine(int length)
     {
-        var result = new List<int>();
-        var cur = 0;
+        var result = new List<(int startPos, int width)>();
+        var cur = roadStartDepth;
 
-        while (cur < length)
+        while (cur < length - roadStartDepth)
         {
-            result.Add(cur);
-            cur += _prng.Next(roadMinGap, roadMaxGap + 1);
+            var roadWidth = _prng.Next(0, 2) == 0 ? NormalRoadWidth : WideRoadWidth;
+
+            if (cur + roadWidth > length)
+            {
+                roadWidth = NormalRoadWidth;
+            }
+            
+            result.Add((cur, roadWidth));
+            cur += _prng.Next(roadMinGap, roadMaxGap + 1) + roadWidth;
         }
 
         return result;
@@ -173,11 +252,6 @@ public class CityGenerator : MonoBehaviour
         if (roadMinGap > roadMaxGap)
         {
             roadMinGap = roadMaxGap;
-        }
-
-        if (liveDebugMode)
-        {
-            GenerateCity();   
         }
     }
 }

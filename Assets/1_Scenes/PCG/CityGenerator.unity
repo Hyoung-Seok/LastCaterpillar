@@ -393,6 +393,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1403803529}
   - component: {fileID: 1403803531}
+  - component: {fileID: 1403803533}
+  - component: {fileID: 1403803532}
   - component: {fileID: 1403803530}
   m_Layer: 0
   m_Name: CityGenerator
@@ -410,7 +412,7 @@ Transform:
   m_GameObject: {fileID: 1403803528}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0, z: -0}
+  m_LocalPosition: {x: 9.469999, y: 0, z: -10.9}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -435,15 +437,17 @@ MonoBehaviour:
   - Type: 1
     Color: {r: 1, g: 1, b: 1, a: 1}
   - Type: 2
-    Color: {r: 0, g: 0.004989147, b: 1, a: 1}
+    Color: {r: 0.3962264, g: 0.3962264, b: 0.3962264, a: 1}
   - Type: 3
-    Color: {r: 0.993973, g: 1, b: 0, a: 1}
+    Color: {r: 1, g: 0.57489336, b: 0, a: 1}
   - Type: 4
-    Color: {r: 0, g: 1, b: 0.9394505, a: 1}
+    Color: {r: 0.07047589, g: 0.0047169924, b: 1, a: 1}
   - Type: 5
-    Color: {r: 1, g: 0.030630242, b: 0, a: 1}
+    Color: {r: 0, g: 1, b: 0.9394505, a: 1}
   - Type: 6
-    Color: {r: 0.34061193, g: 1, b: 0, a: 1}
+    Color: {r: 1, g: 0.030630242, b: 0, a: 1}
+  - Type: 7
+    Color: {r: 0.46678448, g: 0.26673195, b: 0.509434, a: 1}
 --- !u!114 &1403803531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -456,31 +460,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff0648179baa97946a9b223b94b8bb54, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CityGenerator
-  liveDebugMode: 1
-  seed: 33
-  width: 50
-  height: 50
-  cellSize: 3
-  roadMinGap: 4
-  roadMaxGap: 8
+  liveDebugMode: 0
+  isGenerateBuilding: 0
+  cityBuilder: {fileID: 1403803532}
+  roadGenerator: {fileID: 1403803533}
+  seed: 50
+  width: 100
+  height: 100
+  cellSize: 4
+  roadStartDepth: 4
+  roadMinGap: 10
+  roadMaxGap: 15
   seedConfigs:
-  - Type: 2
-    Weight: 0.1
   - Type: 3
-    Weight: 0.2
+    Weight: 0.1
   - Type: 4
-    Weight: 0.2
+    Weight: 0.1
   - Type: 5
     Weight: 0.1
   - Type: 6
     Weight: 0.1
+  - Type: 7
+    Weight: 0.1
   minDistance: 10
   maxAttempts: 10
-  buildingBandDepth: 2
+  buildingBandDepth: 3
   frequency: 0.08
-  strength: 20
+  strength: 16
   sparsity: 0
   sparsityScale: 0.08
+--- !u!114 &1403803532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403803528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12177c7c44ca87a4ba3da15993dd3b17, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CityBuilder
+--- !u!114 &1403803533
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1403803528}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2d1af6536ff248e41ab28b01884e6f46, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoadGenerator
+  straightRoads:
+  - {fileID: 7012990426525927260, guid: 859f9852ccd6ed04b876f4fd3e5ce6dd, type: 3}
+  - {fileID: 2251297052504999022, guid: f5d6ee96192ed1641b177cccdd59cc9c, type: 3}
+  wideRoads:
+  - {fileID: 2930232808710053886, guid: 1d2fed9171d04834d9ed5ad3dcbe9b70, type: 3}
+  - {fileID: 742517224073889198, guid: 4e0f1719c0f445545ba5a3e600b218ba, type: 3}
+  - {fileID: 870216329023578059, guid: 312965dfbc36a4240abed4be1cbab3a9, type: 3}
+  - {fileID: 8814929829469290123, guid: 0f62b36ca23fd734fa94bee1e90d22c2, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

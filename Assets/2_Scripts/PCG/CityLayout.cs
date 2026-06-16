@@ -44,7 +44,7 @@ public class CityLayout
                 var cy = y + dir.y * i;
                 
                 if(cx < 0 || cy < 0 || cx >= Width || cy >= Height) continue;
-                if(Cells[cx, cy] == ECellType.Road) candidates.Add(dir);
+                if(Cells[cx, cy] is ECellType.Road or ECellType.CatWalk) candidates.Add(dir);
             }
             
             if(candidates.Count > 0)
