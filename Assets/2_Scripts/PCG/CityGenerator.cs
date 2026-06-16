@@ -12,6 +12,7 @@ public class CityGenerator : MonoBehaviour
     
     [Header("Components")]
     [SerializeField] private CityBuilder cityBuilder;
+    [SerializeField] private RoadGenerator roadGenerator;
     
     [Header("City Config")] 
     [SerializeField] private int seed;
@@ -68,15 +69,18 @@ public class CityGenerator : MonoBehaviour
         var horizontal = ChoseRoadLine(height);
         var vertical = ChoseRoadLine(width);
 
+        var horizontalHash = new HashSet<int>();
+        var verticalHash = new HashSet<int>();
+        
         foreach (var h in horizontal)
         {
             for (var w = 0; w < h.width; ++w)
             {
-                // y는 증가시킨 채 고정
                 var yy = h.startPos + w;
+                horizontalHash.Add(yy);
+                
                 if(yy >= height) continue;
-
-                // x는 순회하며 도로로 지정
+                
                 for (var x = 0; x < width; ++x)
                 {
                     CityLayout.Cells[x, yy] = ECellType.Road;
@@ -89,6 +93,8 @@ public class CityGenerator : MonoBehaviour
             for (var w = 0; w < v.width; ++w)
             {
                 var xx = v.startPos + w;
+                verticalHash.Add(xx);
+                
                 if(xx >= width) continue;
 
                 for (var y = 0; y < height; ++y)
@@ -123,6 +129,9 @@ public class CityGenerator : MonoBehaviour
                     CityLayout.Cells[right, y] = ECellType.CatWalk;
             }
         }
+        
+        roadGenerator.GenerateHorizontalRoad(horizontal, verticalHash, CityLayout);
+        roadGenerator.GenerateVerticalRoad(vertical, horizontalHash, CityLayout);
     }
 
     private void GenerateArea()
@@ -224,7 +233,7 @@ public class CityGenerator : MonoBehaviour
         {
             var roadWidth = _prng.Next(0, 2) == 0 ? 2 : 4;
 
-            if (cur + roadWidth >= length)
+            if (cur + roadWidth > length)
             {
                 roadWidth = 2;
             }
