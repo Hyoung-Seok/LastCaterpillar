@@ -6,6 +6,11 @@ using Random = System.Random;
 
 public class CityGenerator : MonoBehaviour
 {
+    public CityLayout CityLayout { get; private set; }
+    public bool LiveDebugMode => liveDebugMode;
+    public const int NormalRoadWidth = 2;
+    public const int WideRoadWidth = 4;
+    
     [Header("Debug")] 
     [SerializeField] private bool liveDebugMode;
     [SerializeField] private bool isGenerateBuilding;
@@ -36,9 +41,6 @@ public class CityGenerator : MonoBehaviour
     [SerializeField, Min(0)] private float strength;
     [SerializeField, Range(0, 0.9f)] private float sparsity;
     [SerializeField, Range(0, 0.2f)] private float sparsityScale;
-    
-    public CityLayout CityLayout { get; private set; }
-    public bool LiveDebugMode => liveDebugMode;
     
     private Random _prng;
 
@@ -129,9 +131,9 @@ public class CityGenerator : MonoBehaviour
                     CityLayout.Cells[right, y] = ECellType.CatWalk;
             }
         }
-        
-        roadGenerator.GenerateHorizontalRoad(horizontal, verticalHash, CityLayout);
-        roadGenerator.GenerateVerticalRoad(vertical, horizontalHash, CityLayout);
+
+        roadGenerator.GenerateRoad(horizontal, verticalHash, false, CityLayout);
+        roadGenerator.GenerateRoad(vertical, horizontalHash, true, CityLayout);
     }
 
     private void GenerateArea()
@@ -231,11 +233,11 @@ public class CityGenerator : MonoBehaviour
 
         while (cur < length - roadStartDepth)
         {
-            var roadWidth = _prng.Next(0, 2) == 0 ? 2 : 4;
+            var roadWidth = _prng.Next(0, 2) == 0 ? NormalRoadWidth : WideRoadWidth;
 
             if (cur + roadWidth > length)
             {
-                roadWidth = 2;
+                roadWidth = NormalRoadWidth;
             }
             
             result.Add((cur, roadWidth));

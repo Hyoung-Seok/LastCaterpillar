@@ -10,44 +10,26 @@ public class RoadGenerator : MonoBehaviour
     [Header("Wide Road")]
     [SerializeField] private List<GameObject> wideRoads;
 
-    public void GenerateHorizontalRoad(List<(int pos, int width)> roads, 
-        HashSet<int> verticalRoad, CityLayout layout)
+    public void GenerateRoad(List<(int pos, int width)> roads, 
+        HashSet<int> crossRoad, bool isVertical, CityLayout layout)
     {
         foreach (var road in roads)
         {
             var baseRoadObj = road.width == 2 ? straightRoads : wideRoads;
+            var length = isVertical ? layout.Height : layout.Width;
 
-            for (var x = 0; x < layout.Width; ++x)
+            for (var l = 0; l < length; ++l)
             {
-                // TODO : 나중에 교차로 처리, 여기서만 처리하면 Vertical에선 처리할 필요 없음?
-                if(verticalRoad.Contains(x)) continue;
+                if(crossRoad.Contains(l)) continue;
 
                 var index = 0;
-                for (var y = road.pos; y < road.pos + road.width; ++y)
+                for (var w = road.pos; w < road.pos + road.width; ++w)
                 {
+                    var x = isVertical ? w : l;
+                    var y = isVertical ? l : w;
+                    
                     var pos = layout.ConvertCellPosToWorld(x, y);
-                    var obj = Instantiate(baseRoadObj[index++], pos, Quaternion.identity, transform);
-                }
-            }
-        }
-    }
-
-    public void GenerateVerticalRoad(List<(int pos, int width)> roads,
-        HashSet<int> horizontalRoad, CityLayout layout)
-    {
-        foreach (var road in roads)
-        {
-            var baseRoadObj =  road.width == 2 ? straightRoads : wideRoads;
-
-            for (var y = 0; y < layout.Height; ++y)
-            {
-                if(horizontalRoad.Contains(y)) continue;
-
-                var index = 0;
-                for (var x = road.pos; x < road.pos + road.width; ++x)
-                {
-                    var pos = layout.ConvertCellPosToWorld(x, y);
-                    var obj = Instantiate(baseRoadObj[index++], pos, Quaternion.identity, transform);
+                    Instantiate(baseRoadObj[index++], pos, Quaternion.identity, transform);
                 }
             }
         }
