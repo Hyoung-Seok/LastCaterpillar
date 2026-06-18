@@ -20,6 +20,13 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField] private float turnAcceleration;
     [SerializeField] private float turnDeceleration;
 
+    [Header("Wheel Config")] 
+    [SerializeField] private LayerMask groundLayer;
+    [SerializeField] private Transform[] wheelPos;
+    [SerializeField] private float restLength = 1.4f;
+    [SerializeField] private float springStrength = 0.1f;
+    [SerializeField] private float damper = 10f;
+    
     private GameInput _gameInput;
     private InputAction _move;
     private Vector2 _moveInput;
@@ -41,11 +48,16 @@ public class PlayerMoveController : MonoBehaviour
     }
 
     private void FixedUpdate()
-    {
-        rb.linearVelocity = transform.forward * _curSpeed;
+    {        
+        WheelRay();
+        
+        var v = transform.forward * _curSpeed;
+        v.y = rb.linearVelocity.y;
+        rb.linearVelocity = v;
 
-        var angle = _curTurnSpeed * Time.fixedDeltaTime;
-        rb.MoveRotation(rb.rotation * Quaternion.Euler(0, angle, 0));
+        var av = rb.angularVelocity;
+        av.y = _curTurnSpeed * Mathf.Deg2Rad;
+        rb.angularVelocity = av;
     }
 
     private void UpdateSpeed()
@@ -98,6 +110,37 @@ public class PlayerMoveController : MonoBehaviour
         }
         
         _curTurnSpeed = Mathf.MoveTowards(_curTurnSpeed, targetSpeed, rate * Time.deltaTime);
+    }
+
+    private void WheelRay()
+    {
+        foreach (var wheel in wheelPos)
+        {
+            var hit = Physics.Raycast(wheel.position, -transform.up, 
+                out var info, restLength, groundLayer);
+
+            if (hit)
+            {
+                var force = CalculateSpringDamper(info, wheel);
+                rb.AddForceAtPosition(force * transform.up, wheel.position);
+            }
+            
+            Debug.DrawRay(wheel.position, -transform.up * restLength, hit ? Color.green : Color.red);
+        }
+    }
+
+    private float CalculateSpringDamper(RaycastHit hit, Transform wheel)
+    {
+        // 스프링 힘 계산 (compression이 양수라면, 그만큼 더 눌려있고 음수라면 들려있는 상태)
+        var compression = restLength - hit.distance;       //눌린 정도의 계산
+        var springForce = compression * springStrength;
+        
+        // 댐퍼 힘
+        var pointVel = rb.GetPointVelocity(wheel.position);     // wheel 지점의 힘을 구함
+        var springVel = Vector3.Dot(pointVel, transform.up);
+        var dampForce = springVel * damper;
+        
+        return springForce - dampForce;
     }
 
     private void OnEnable() => _gameInput.Enable();
