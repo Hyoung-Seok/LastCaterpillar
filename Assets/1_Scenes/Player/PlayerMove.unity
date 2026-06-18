@@ -567,6 +567,10 @@ MonoBehaviour:
   acceleration: 5
   breakDecel: 20
   deceleration: 10
+  turnSpeed: 40
+  turnBreakDecel: 60
+  turnAcceleration: 15
+  turnDeceleration: 30
 --- !u!1 &698245792
 GameObject:
   m_ObjectHideFlags: 0
