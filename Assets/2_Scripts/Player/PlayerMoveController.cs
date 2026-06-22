@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 public class PlayerMoveController : MonoBehaviour
 {
     [Header("Component")] 
+    [SerializeField] private InputReader inputReader;
     [SerializeField] private Rigidbody rb;
 
     [Header("Forward/Revers Config")] 
@@ -27,16 +28,15 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField] private float springStrength = 0.1f;
     [SerializeField] private float damper = 10f;
     
-    private GameInput _gameInput;
     private InputAction _move;
     private Vector2 _moveInput;
     private float _curSpeed = 0f;
     private float _curTurnSpeed = 0f;
     
-    private void Awake()
-    {
-        _gameInput = new GameInput();
-        _move = _gameInput.Player.Move;
+    private void Start()
+    {   
+        inputReader.EnableInput();
+        _move = inputReader.PlayerMove;
     }
 
     private void Update()
@@ -46,7 +46,7 @@ public class PlayerMoveController : MonoBehaviour
         UpdateSpeed();
         UpdateTurnSpeed();
     }
-
+    
     private void FixedUpdate()
     {        
         WheelRay();
@@ -131,7 +131,6 @@ public class PlayerMoveController : MonoBehaviour
 
     private float CalculateSpringDamper(RaycastHit hit, Transform wheel)
     {
-        // 스프링 힘 계산 (compression이 양수라면, 그만큼 더 눌려있고 음수라면 들려있는 상태)
         var compression = restLength - hit.distance;       //눌린 정도의 계산
         var springForce = compression * springStrength;
         
@@ -142,9 +141,4 @@ public class PlayerMoveController : MonoBehaviour
         
         return springForce - dampForce;
     }
-
-    private void OnEnable() => _gameInput.Enable();
-    
-    private void OnDisable() => _gameInput.Disable();
-    
 }
