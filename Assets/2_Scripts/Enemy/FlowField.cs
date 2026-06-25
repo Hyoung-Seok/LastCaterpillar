@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class FlowField : MonoBehaviour
 {
+    [SerializeField] private bool drawGizmos = true;
+    
     [Header("Components")]
     [SerializeField] private CityGenerator cityGenerator;
     [SerializeField] private Transform playerTf;
@@ -41,8 +43,8 @@ public class FlowField : MonoBehaviour
 
         if (playerIndex != _curPlayerCell)
         {
-            UpdateFlowField();
             _curPlayerCell = playerIndex;
+            UpdateFlowField();
         }
     }
 
@@ -103,6 +105,34 @@ public class FlowField : MonoBehaviour
                     min = _flowField[dx, dy].Cost;
                     _flowField[pNode.x, pNode.y].Direction = s;
                 }
+            }
+        }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (drawGizmos == false || _flowField == null) return;
+
+        for (var x = 0; x < _layout.Width; ++x)
+        {
+            for (var y = 0; y < _layout.Height; ++y)
+            {
+                if (_flowField[x, y].Direction == Vector2Int.zero) continue;
+
+                var center = _layout.ConvertCellPosToWorld(x, y) +
+                             new Vector3(_layout.CellSize * 0.5f, 0.1f, _layout.CellSize * 0.5f);
+                
+                var dir = _flowField[x, y].Direction;
+                var worldDir = new Vector3(dir.x, 0f, dir.y).normalized;
+                var tip = center + worldDir * (_layout.CellSize * 0.4f);
+
+                Gizmos.color = Color.cyan;
+                Gizmos.DrawLine(center, tip);
+                
+                var back1 = Quaternion.Euler(0,  150f, 0) * worldDir;
+                var back2 = Quaternion.Euler(0, -150f, 0) * worldDir;
+                Gizmos.DrawLine(tip, tip + back1 * (_layout.CellSize * 0.15f));
+                Gizmos.DrawLine(tip, tip + back2 * (_layout.CellSize * 0.15f));
             }
         }
     }
