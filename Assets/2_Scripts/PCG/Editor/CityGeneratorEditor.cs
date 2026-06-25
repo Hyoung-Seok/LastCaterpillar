@@ -23,7 +23,7 @@ public class CityGeneratorEditor : Editor
 
         if (GUILayout.Button("DestroyBuilding"))
         {
-            generator.DestroyBuilding();
+            generator.DestroyStructure();
             SceneView.RepaintAll();
         }
         

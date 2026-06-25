@@ -46,6 +46,8 @@ public class CityGenerator : MonoBehaviour
 
     public void GenerateCity()
     {
+        DestroyStructure();
+        
         _prng = new Random(seed);
         CityLayout = new CityLayout(seed, width, height, cellSize);
         
@@ -56,9 +58,14 @@ public class CityGenerator : MonoBehaviour
             cityBuilder.GenerateBuilding(CityLayout, buildingBandDepth);
     }
 
-    public void DestroyBuilding()
+    public void DestroyStructure()
     {
-        cityBuilder.DestroyBuilding();
+        if (transform.childCount == 0) return;
+
+        for (var i = transform.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(transform.GetChild(i).gameObject);
+        }
     }
 
     public void UpdateAssetData()
@@ -246,7 +253,7 @@ public class CityGenerator : MonoBehaviour
 
         return result;
     }
-
+    
     private void OnValidate()
     {
         if (roadMinGap > roadMaxGap)
