@@ -42,6 +42,16 @@ public class FlowField : MonoBehaviour
         _originCellPos = _layout.ConvertCellPosToWorld(0,0);
     }
 
+    public Vector2Int GetCurrentCellDirection(Vector3 pos)
+    {
+        if(_flowField == null)  return Vector2Int.zero;
+        
+        var col = Mathf.FloorToInt((pos.x - _originCellPos.x) / _layout.CellSize);
+        var row = Mathf.FloorToInt((pos.z - _originCellPos.z) / _layout.CellSize);
+
+        return _flowField[col, row].Direction;
+    }
+
     private void Update()
     {
         var playerIndex = FindPlayerIndex();
