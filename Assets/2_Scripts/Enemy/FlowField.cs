@@ -11,6 +11,8 @@ public class FlowField : MonoBehaviour
     [SerializeField] private Transform playerTf;
 
     private CityLayout _layout;
+    private int _width = 0;
+    private int _height = 0;
     private Node[,] _flowField;
 
     private Vector2Int _curPlayerCell;
@@ -24,11 +26,14 @@ public class FlowField : MonoBehaviour
         }
         
         _layout = cityGenerator.CityLayout;
-        _flowField = new Node[_layout.Width, _layout.Height];
+        _width = _layout.Width;
+        _height = _layout.Height;
+        
+        _flowField = new Node[_width, _height];
 
-        for (var x = 0; x < _layout.Width; ++x)
+        for (var x = 0; x < _width; ++x)
         {
-            for (var y = 0; y < _layout.Height; ++y)
+            for (var y = 0; y < _height; ++y)
             {
                 _flowField[x, y] = new Node(int.MaxValue, Vector2Int.zero);
             }
@@ -54,10 +59,10 @@ public class FlowField : MonoBehaviour
         
         var queue = new Queue<Vector2Int>();
         var passable = new List<Vector2Int>();
-        var visited = new bool[_layout.Width, _layout.Height];
+        var visited = new bool[_width * _height];
         
         queue.Enqueue(_curPlayerCell);
-        visited[_curPlayerCell.x, _curPlayerCell.y] = true;
+        visited[_curPlayerCell.x * _height + _curPlayerCell.y] = true;
         _flowField[_curPlayerCell.x, _curPlayerCell.y] = new Node(0, Vector2Int.zero);
 
         while (queue.Count > 0)
@@ -71,14 +76,14 @@ public class FlowField : MonoBehaviour
                 var sx = node.x + _searchDir[i].x;
                 var sy = node.y + _searchDir[i].y;
 
-                if (sx < 0 || sx >= _layout.Width || sy < 0 || sy >= _layout.Height) continue;
-                if (visited[sx, sy] || IsPassable(sx, sy) == false) continue;
+                if (sx < 0 || sx >= _width || sy < 0 || sy >= _height) continue;
+                if (visited[sx * _height + sy] || IsPassable(sx, sy) == false) continue;
 
                 _flowField[sx, sy].Cost = curCost + 1;
                 
                 queue.Enqueue(new Vector2Int(sx, sy));
                 passable.Add(new Vector2Int(sx, sy));
-                visited[sx, sy] = true;
+                visited[sx * _height + sy] = true;
             }
         }
         
@@ -91,7 +96,7 @@ public class FlowField : MonoBehaviour
                 var dx = pNode.x + s.x;
                 var dy = pNode.y + s.y;
                 
-                if(dx < 0 || dx >= _layout.Width || dy < 0 || dy >= _layout.Height)
+                if(dx < 0 || dx >= _width || dy < 0 || dy >= _height)
                     continue;
 
                 if (s.x != 0 && s.y != 0)
@@ -113,9 +118,9 @@ public class FlowField : MonoBehaviour
     {
         if (drawGizmos == false || _flowField == null) return;
 
-        for (var x = 0; x < _layout.Width; ++x)
+        for (var x = 0; x < _width; ++x)
         {
-            for (var y = 0; y < _layout.Height; ++y)
+            for (var y = 0; y < _height; ++y)
             {
                 if (_flowField[x, y].Direction == Vector2Int.zero) continue;
 
@@ -154,9 +159,9 @@ public class FlowField : MonoBehaviour
 
     private void ResetNode()
     {
-        for (var x = 0; x < _layout.Width; ++x)
+        for (var x = 0; x < _width; ++x)
         {
-            for (var y = 0; y < _layout.Height; ++y)
+            for (var y = 0; y < _height; ++y)
             {
                 _flowField[x, y].Cost = int.MaxValue;
                 _flowField[x, y].Direction = Vector2Int.zero;

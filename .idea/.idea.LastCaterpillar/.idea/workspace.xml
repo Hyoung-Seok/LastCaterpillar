@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FlowField.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/1_Scenes/Logic/FlowFiield.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/1_Scenes/Logic/FlowFiield.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FlowPath.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FlowPath.cs.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FlowField.cs.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/PCG/CityGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/PCG/CityGenerator.cs" afterDir="false" />
-    </list>
+    <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -116,7 +110,7 @@
       <workItem from="1781770860263" duration="15735000" />
       <workItem from="1782125555931" duration="13606000" />
       <workItem from="1782307964749" duration="2436000" />
-      <workItem from="1782372684364" duration="10977000" />
+      <workItem from="1782372684364" duration="18882000" />
     </task>
     <servers />
   </component>
@@ -148,19 +142,6 @@
           <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
           <option name="timeStamp" value="3" />
         </breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/2_Scripts/Enemy/FlowField.cs</url>
-          <line>92</line>
-          <properties documentPath="D:\_Project\LastCaterpillar\Assets\2_Scripts\Enemy\FlowField.cs" containingFunctionPresentation="메서드 'FindPlayerIndex'">
-            <startOffsets>
-              <option value="2671" />
-            </startOffsets>
-            <endOffsets>
-              <option value="2755" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
