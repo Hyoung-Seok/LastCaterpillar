@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/1_Scenes/PCG/CityGenerator.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/1_Scenes/PCG/CityGenerator.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/PCG/CityGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/PCG/CityGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/PCG/CityLayout.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/PCG/CityLayout.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/4_Model/Road/Untitled3.glb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/4_Model/Road/Untitled3.glb.meta" beforeDir="false" />
-    </list>
+    <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,7 +26,9 @@
   }
 }</component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/InputReader.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/Editor/CityGeneratorEditor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerAimController.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -52,7 +47,7 @@
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "Unity 에디터에 연결.Unity 에디터에 연결.executor": "Debug",
-    "git-widget-placeholder": "Logic/CityGenerator",
+    "git-widget-placeholder": "Logic/FlowField",
     "nodejs_package_manager_path": "npm",
     "settings.editor.selected.configurable": "preferences.pluginManager",
     "vue.rearranger.settings.migration": "true"
@@ -79,10 +74,10 @@
       <option name="MIXED_MODE_DEBUG" value="0" />
       <method v="2" />
     </configuration>
-    <configuration name="Unity 에디터에 연결" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" useMixedMode="false" ignored-value-for-modified-check="25008">
+    <configuration name="Unity 에디터에 연결" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost" useMixedMode="false" ignored-value-for-modified-check="17500">
       <option name="allowRunningInParallel" value="false" />
       <option name="listenPortForConnections" value="false" />
-      <option name="pid" value="25008" />
+      <option name="pid" value="17500" />
       <option name="projectPathOnTarget" />
       <option name="runtimes">
         <list>
@@ -112,6 +107,10 @@
       <workItem from="1781253049326" duration="3401000" />
       <workItem from="1781341694155" duration="12014000" />
       <workItem from="1781526321432" duration="1713000" />
+      <workItem from="1781770860263" duration="15735000" />
+      <workItem from="1782125555931" duration="13606000" />
+      <workItem from="1782307964749" duration="2436000" />
+      <workItem from="1782372684364" duration="18882000" />
     </task>
     <servers />
   </component>

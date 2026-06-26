@@ -10,8 +10,6 @@ public class CityBuilder : MonoBehaviour
 
     public void GenerateBuilding(CityLayout layout, int depth)
     {
-        DestroyBuilding();
-        
         _assetLoader ??= new CityAssetLoader();
         _rng = new System.Random(layout.Seed);
         var footPrints = BuildFootPrints(layout, depth);
@@ -34,16 +32,6 @@ public class CityBuilder : MonoBehaviour
             var rot = Quaternion.LookRotation(new Vector3(facing.x, 0, facing.y));
             
             Instantiate(obj, center, rot, transform);
-        }
-    }
-    
-    public void DestroyBuilding()
-    {
-        if (transform.childCount == 0) return;
-
-        for (var i = transform.childCount - 1; i >= 0; i--)
-        {
-            DestroyImmediate(transform.GetChild(i).gameObject);
         }
     }
 
