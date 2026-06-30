@@ -58,7 +58,7 @@ public class WaveManager : MonoBehaviour
                 if (dist > 0.0001f && dist < separationRadius)
                 {
                     // 가까울수록 강하게
-                    sep += away.normalized / dist;
+                    sep += away.normalized * (1 - dist / separationRadius);
                     count++;
                 }
             }

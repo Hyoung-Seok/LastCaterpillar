@@ -28,7 +28,7 @@ public class FlowField : MonoBehaviour
         _layout = cityGenerator.CityLayout;
         _width = _layout.Width;
         _height = _layout.Height;
-        
+
         _flowField = new Node[_width, _height];
 
         for (var x = 0; x < _width; ++x)
@@ -39,27 +39,77 @@ public class FlowField : MonoBehaviour
             }
         }
         
+        SetupFlowField();
         _originCellPos = _layout.ConvertCellPosToWorld(0,0);
+    }
+    
+    public Vector2Int WorldToCell(Vector3 worldPos)
+    {
+        var col = Mathf.RoundToInt((worldPos.x - _originCellPos.x) / _layout.CellSize);
+        var row = Mathf.RoundToInt((worldPos.z - _originCellPos.z) / _layout.CellSize);
+        
+        return new Vector2Int(col, row);
     }
 
     public Vector2Int GetCurrentCellDirection(Vector3 pos)
     {
         if(_flowField == null)  return Vector2Int.zero;
-        
-        var col = Mathf.FloorToInt((pos.x - _originCellPos.x) / _layout.CellSize);
-        var row = Mathf.FloorToInt((pos.z - _originCellPos.z) / _layout.CellSize);
 
-        return _flowField[col, row].Direction;
+        var index = WorldToCell(pos);
+
+        return _flowField[index.x, index.y].Direction;
+    }
+    
+    public ECellType GetCellType(Vector3 worldPos)
+    {
+        var index = WorldToCell(worldPos);
+        return _layout.Cells[index.x, index.y];
     }
 
+    public bool IsBlocked(Vector3 worldPos)
+    {
+        var c = WorldToCell(worldPos);
+
+        if (c.x < 0 || c.x >= _width || c.y < 0 || c.y >= _height) return true;
+
+        return !IsPassable(c.x, c.y);
+    }
+    
     private void Update()
     {
-        var playerIndex = FindPlayerIndex();
+        var playerIndex = WorldToCell(playerTf.position);
 
         if (playerIndex != _curPlayerCell)
         {
             _curPlayerCell = playerIndex;
             UpdateFlowField();
+        }
+    }
+
+    private void SetupFlowField()
+    {
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                if(_layout.Cells[x, y] is ECellType.CatWalk or ECellType.Road) continue;
+
+                for (var i = 0; i < 4; ++i)
+                {
+                    var dx = _searchDir[i].x;
+                    var dy = _searchDir[i].y;
+
+                    var nx = dx + x;
+                    var ny = dy + y;
+
+                    if (nx < 0 || nx >= _width || ny < 0 || ny >= _height) continue;
+                    if (_layout.Cells[nx, ny] is ECellType.CatWalk or ECellType.Road)
+                    {
+                        _flowField[x, y].Direction = _searchDir[i];
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -134,8 +184,7 @@ public class FlowField : MonoBehaviour
             {
                 if (_flowField[x, y].Direction == Vector2Int.zero) continue;
 
-                var center = _layout.ConvertCellPosToWorld(x, y) +
-                             new Vector3(_layout.CellSize * 0.5f, 0.1f, _layout.CellSize * 0.5f);
+                var center = _layout.ConvertCellPosToWorld(x, y);
                 
                 var dir = _flowField[x, y].Direction;
                 var worldDir = new Vector3(dir.x, 0f, dir.y).normalized;
@@ -151,16 +200,6 @@ public class FlowField : MonoBehaviour
             }
         }
     }
-    
-    private Vector2Int FindPlayerIndex()
-    {
-        var playerPos = playerTf.position;
-        
-        var col = Mathf.FloorToInt((playerPos.x - _originCellPos.x) / _layout.CellSize);
-        var row = Mathf.FloorToInt((playerPos.z - _originCellPos.z) / _layout.CellSize);
-        
-        return new Vector2Int(col, row);
-    }
 
     private bool IsPassable(int x, int y)
     {
@@ -173,8 +212,11 @@ public class FlowField : MonoBehaviour
         {
             for (var y = 0; y < _height; ++y)
             {
-                _flowField[x, y].Cost = int.MaxValue;
-                _flowField[x, y].Direction = Vector2Int.zero;
+                if (IsPassable(x,y))
+                {
+                    _flowField[x, y].Cost = int.MaxValue;
+                    _flowField[x, y].Direction = Vector2Int.zero;
+                }
             }
         }
     }
