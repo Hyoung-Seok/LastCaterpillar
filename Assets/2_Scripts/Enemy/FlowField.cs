@@ -59,12 +59,6 @@ public class FlowField : MonoBehaviour
 
         return _flowField[index.x, index.y].Direction;
     }
-    
-    public ECellType GetCellType(Vector3 worldPos)
-    {
-        var index = WorldToCell(worldPos);
-        return _layout.Cells[index.x, index.y];
-    }
 
     public bool IsBlocked(Vector3 worldPos)
     {
@@ -212,11 +206,10 @@ public class FlowField : MonoBehaviour
         {
             for (var y = 0; y < _height; ++y)
             {
-                if (IsPassable(x,y))
-                {
-                    _flowField[x, y].Cost = int.MaxValue;
-                    _flowField[x, y].Direction = Vector2Int.zero;
-                }
+                if (!IsPassable(x,y)) continue;
+                
+                _flowField[x, y].Cost = int.MaxValue;
+                _flowField[x, y].Direction = Vector2Int.zero;
             }
         }
     }
