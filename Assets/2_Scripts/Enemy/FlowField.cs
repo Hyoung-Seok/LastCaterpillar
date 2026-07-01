@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,22 +41,16 @@ public class FlowField : MonoBehaviour
         SetupFlowField();
         _originCellPos = _layout.ConvertCellPosToWorld(0,0);
     }
-    
-    public Vector2Int WorldToCell(Vector3 worldPos)
-    {
-        var col = Mathf.RoundToInt((worldPos.x - _originCellPos.x) / _layout.CellSize);
-        var row = Mathf.RoundToInt((worldPos.z - _originCellPos.z) / _layout.CellSize);
-        
-        return new Vector2Int(col, row);
-    }
 
     public Vector2Int GetCurrentCellDirection(Vector3 pos)
     {
         if(_flowField == null)  return Vector2Int.zero;
 
         var index = WorldToCell(pos);
-
-        return _flowField[index.x, index.y].Direction;
+        
+        return (index.x < 0 || index.x >= _width || index.y < 0 || index.y >= _height)
+            ? Vector2Int.zero
+            : _flowField[index.x, index.y].Direction;
     }
 
     public bool IsBlocked(Vector3 worldPos)
@@ -65,7 +58,6 @@ public class FlowField : MonoBehaviour
         var c = WorldToCell(worldPos);
 
         if (c.x < 0 || c.x >= _width || c.y < 0 || c.y >= _height) return true;
-
         return !IsPassable(c.x, c.y);
     }
     
@@ -193,6 +185,14 @@ public class FlowField : MonoBehaviour
                 Gizmos.DrawLine(tip, tip + back2 * (_layout.CellSize * 0.15f));
             }
         }
+    }
+    
+    private Vector2Int WorldToCell(Vector3 worldPos)
+    {
+        var col = Mathf.RoundToInt((worldPos.x - _originCellPos.x) / _layout.CellSize);
+        var row = Mathf.RoundToInt((worldPos.z - _originCellPos.z) / _layout.CellSize);
+        
+        return new Vector2Int(col, row);
     }
 
     private bool IsPassable(int x, int y)
