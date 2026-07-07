@@ -6,6 +6,7 @@ public class RoadGenerator : MonoBehaviour
 {
     [Header("Normal Road")] 
     [SerializeField] private List<GameObject> straightRoads;
+    [SerializeField] private GameObject catWalk;
     
     [Header("Wide Road")]
     [SerializeField] private List<GameObject> wideRoads;
@@ -32,6 +33,15 @@ public class RoadGenerator : MonoBehaviour
                     Instantiate(baseRoadObj[index++], pos, Quaternion.identity, transform);
                 }
             }
+        }
+    }
+
+    public void GenerateCatWalk(List<Vector2Int> list, CityLayout layout)
+    {
+        foreach (var i in list)
+        {
+            var pos = layout.ConvertCellPosToWorld(i.x, i.y);
+            var obj = Instantiate(catWalk, pos, Quaternion.identity, transform);
         }
     }
 }

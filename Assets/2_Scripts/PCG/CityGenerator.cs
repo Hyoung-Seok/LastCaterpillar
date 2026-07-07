@@ -80,6 +80,7 @@ public class CityGenerator : MonoBehaviour
 
         var horizontalHash = new HashSet<int>();
         var verticalHash = new HashSet<int>();
+        var catWalk = new List<Vector2Int>();
         
         foreach (var h in horizontal)
         {
@@ -120,8 +121,13 @@ public class CityGenerator : MonoBehaviour
                 var up = h.startPos + h.width;
                 var down = h.startPos - 1;
                 
-                if (up < height && CityLayout.Cells[x, up] == ECellType.Empty) CityLayout.Cells[x, up] = ECellType.CatWalk;
-                if (down >= 0 && CityLayout.Cells[x, down] == ECellType.Empty) CityLayout.Cells[x, down] = ECellType.CatWalk;
+                if (up < height && CityLayout.Cells[x, up] == ECellType.Empty) 
+                    CityLayout.Cells[x, up] = ECellType.CatWalk;
+                if (down >= 0 && CityLayout.Cells[x, down] == ECellType.Empty)
+                    CityLayout.Cells[x, down] = ECellType.CatWalk;
+                
+                catWalk.Add(new Vector2Int(x, up));
+                catWalk.Add(new Vector2Int(x, down));
             }
         }
 
@@ -136,11 +142,15 @@ public class CityGenerator : MonoBehaviour
                     CityLayout.Cells[left, y] = ECellType.CatWalk;
                 if (right < width && CityLayout.Cells[right, y] == ECellType.Empty)
                     CityLayout.Cells[right, y] = ECellType.CatWalk;
+                
+                catWalk.Add(new Vector2Int(left, y));
+                catWalk.Add(new Vector2Int(right, y));
             }
         }
 
         roadGenerator.GenerateRoad(horizontal, verticalHash, false, CityLayout);
         roadGenerator.GenerateRoad(vertical, horizontalHash, true, CityLayout);
+        roadGenerator.GenerateCatWalk(catWalk, CityLayout);
     }
 
     private void GenerateArea()

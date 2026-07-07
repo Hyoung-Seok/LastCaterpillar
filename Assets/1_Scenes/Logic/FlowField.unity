@@ -63784,7 +63784,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2eb7286ce5a37454a97e8e007220c37a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CityGizmoDrawer
-  isDrawing: 1
+  isDrawing: 0
   fillRatio: 0.9
   height: 0.1
   typeColors:
@@ -63829,6 +63829,7 @@ MonoBehaviour:
   straightRoads:
   - {fileID: 7012990426525927260, guid: 859f9852ccd6ed04b876f4fd3e5ce6dd, type: 3}
   - {fileID: 2251297052504999022, guid: f5d6ee96192ed1641b177cccdd59cc9c, type: 3}
+  catWalk: {fileID: 2251297052504999022, guid: 2c599a528cbf14749a6a806dc4f10d4d, type: 3}
   wideRoads:
   - {fileID: 2930232808710053886, guid: 1d2fed9171d04834d9ed5ad3dcbe9b70, type: 3}
   - {fileID: 742517224073889198, guid: 4e0f1719c0f445545ba5a3e600b218ba, type: 3}
