@@ -7917,6 +7917,7 @@ GameObject:
   - component: {fileID: 44228205}
   - component: {fileID: 44228204}
   - component: {fileID: 44228203}
+  - component: {fileID: 44228207}
   m_Layer: 0
   m_Name: Cube (3)
   m_TagString: Untagged
@@ -8017,6 +8018,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1683392702}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &44228207
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 44228202}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  influenceRadius: 1.5
 --- !u!1 &45337016
 GameObject:
   m_ObjectHideFlags: 0
@@ -45810,6 +45824,7 @@ GameObject:
   - component: {fileID: 273058504}
   - component: {fileID: 273058503}
   - component: {fileID: 273058502}
+  - component: {fileID: 273058506}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -45910,6 +45925,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1683392702}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &273058506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 273058501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  influenceRadius: 1.5
 --- !u!1 &273121593
 GameObject:
   m_ObjectHideFlags: 0
@@ -94759,6 +94787,7 @@ GameObject:
   - component: {fileID: 555475108}
   - component: {fileID: 555475107}
   - component: {fileID: 555475106}
+  - component: {fileID: 555475110}
   m_Layer: 0
   m_Name: Cube (2)
   m_TagString: Untagged
@@ -94859,6 +94888,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1683392702}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &555475110
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 555475105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  influenceRadius: 1.5
 --- !u!1 &555526539
 GameObject:
   m_ObjectHideFlags: 0
@@ -146327,6 +146369,7 @@ GameObject:
   - component: {fileID: 888382094}
   - component: {fileID: 888382093}
   - component: {fileID: 888382092}
+  - component: {fileID: 888382096}
   m_Layer: 0
   m_Name: Cube (4)
   m_TagString: Untagged
@@ -146427,6 +146470,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1683392702}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &888382096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 888382091}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  influenceRadius: 1.5
 --- !u!1 &888894710
 GameObject:
   m_ObjectHideFlags: 0
@@ -158682,6 +158738,7 @@ GameObject:
   - component: {fileID: 956862616}
   - component: {fileID: 956862615}
   - component: {fileID: 956862614}
+  - component: {fileID: 956862618}
   m_Layer: 0
   m_Name: Cube (1)
   m_TagString: Untagged
@@ -158782,6 +158839,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1683392702}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &956862618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 956862613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Obstacle
+  influenceRadius: 1.5
 --- !u!1 &957421997
 GameObject:
   m_ObjectHideFlags: 0
@@ -250530,8 +250600,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   flowField: {fileID: 2126865062}
   obstacleParent: {fileID: 1683392702}
-  separationRadius: 2.5
-  obstacleRadius: 2
   enemy: {fileID: 1435957205494231151, guid: e5c2538696d1bbc4994fa8d744956beb, type: 3}
 --- !u!4 &1505553490
 Transform:

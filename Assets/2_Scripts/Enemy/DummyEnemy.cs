@@ -1,11 +1,15 @@
 using UnityEngine;
 
-public class DummyEnemy : MonoBehaviour
+public class DummyEnemy : MonoBehaviour, ISpatialItem
 {
+    public Vector3 Position => transform.position;
+    public float Radius => separationRadius;
+
     [HideInInspector] public Vector3 Separation;
     [HideInInspector] public Vector3 ObstacleForce;
     [HideInInspector] public FlowField FlowField;
     
+    [SerializeField] private float separationRadius = 0.5f;
     [SerializeField] private float maxSeparation = 0.4f;
     [SerializeField] private float maxObstacleForce = 0.8f;
     

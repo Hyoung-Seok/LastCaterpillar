@@ -6,21 +6,25 @@ public class WaveManager : MonoBehaviour
 {
     [SerializeField] private FlowField flowField;
     [SerializeField] private Transform obstacleParent;
-    [SerializeField] private float separationRadius;
-    [SerializeField] private float obstacleRadius = 2.0f;
     [SerializeField] private DummyEnemy enemy;
     
     private List<DummyEnemy> _waveEnemies;
-    private SpatialHash _spatialHash;
+    
+    private SpatialHash<DummyEnemy> _enemyHash;
+    private SpatialHash<Obstacle> _obstacleHash;
+    
     private List<DummyEnemy> _rangeBuffer;
-    private List<Vector3> _obstacleBuffer;
+    private List<Obstacle> _obstacleBuffer;
 
     public void Start()
     {
         _waveEnemies = new List<DummyEnemy>();
-        _spatialHash = new SpatialHash(4);
+        
+        _enemyHash = new SpatialHash<DummyEnemy>(4);
+        _obstacleHash = new SpatialHash<Obstacle>(4);
+        
         _rangeBuffer = new List<DummyEnemy>();
-        _obstacleBuffer = new List<Vector3>();
+        _obstacleBuffer = new List<Obstacle>();
         
         for (var i = 0; i < 100; ++i)
         {
@@ -34,23 +38,23 @@ public class WaveManager : MonoBehaviour
 
         for (var i = 0; i < obstacleParent.childCount; ++i)
         {
-            _spatialHash.Insert(obstacleParent.GetChild(i).position);
+            _obstacleHash.Insert(obstacleParent.GetChild(i).GetComponent<Obstacle>());
         }
     }
 
     private void Update()
     {
-        _spatialHash.Clear();
+        _enemyHash.Clear();
 
         foreach (var wave in _waveEnemies)
         {
-            _spatialHash.Insert(wave);
+            _enemyHash.Insert(wave);
         }
 
         foreach (var self in _waveEnemies)
         {
-            _spatialHash.Query(self.transform.position, _rangeBuffer);
-            _spatialHash.Query(self.transform.position, _obstacleBuffer);
+            _enemyHash.Query(self.transform.position, _rangeBuffer);
+            _obstacleHash.Query(self.transform.position, _obstacleBuffer);
             
             var selfPos = self.transform.position;
             var sep = Vector3.zero;
@@ -61,25 +65,13 @@ public class WaveManager : MonoBehaviour
             {
                 if(other == self) continue;
                 
-                var away = selfPos - other.transform.position;
-                away.y = 0f;
-                var dist = away.magnitude;
-
-                if (dist > 0.0001f && dist < separationRadius)
-                {
-                    sep += away.normalized * (1 - dist / separationRadius);
+                if (AccumulateRepulsion(selfPos, other, ref sep))
                     count++;
-                }
             }
 
             foreach (var obs in _obstacleBuffer)
             {
-                var away = selfPos - obs;
-                away.y = 0f;
-                var dist = away.magnitude;
-                
-                if(dist > 0.0001f && dist < obstacleRadius)
-                    obsForce += away.normalized * (1 - dist / obstacleRadius);
+                AccumulateRepulsion(selfPos, obs, ref obsForce);
             }
             
             if(count > 0)
@@ -88,5 +80,20 @@ public class WaveManager : MonoBehaviour
             self.Separation = sep;
             self.ObstacleForce = obsForce;
         }
+    }
+
+    private bool AccumulateRepulsion(Vector3 selfPos, ISpatialItem item, ref Vector3 separation)
+    {
+        var away = selfPos - item.Position;
+        away.y = 0f;
+        var dist = away.magnitude;
+
+        if (dist > 0.0001f && dist < item.Radius)
+        {
+            separation += away.normalized * (1 - dist / item.Radius);
+            return true;
+        }
+
+        return false;
     }
 }

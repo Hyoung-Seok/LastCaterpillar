@@ -48,9 +48,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DummyEnemy
   Separation: {x: 0, y: 0, z: 0}
-  flowWeight: 1
-  separationWeight: 0.5
-  flowField: {fileID: 0}
+  ObstacleForce: {x: 0, y: 0, z: 0}
+  FlowField: {fileID: 0}
+  separationRadius: 1.2
+  maxSeparation: 0.4
+  maxObstacleForce: 0.8
   cc: {fileID: 5134850907784253784}
   speed: 5
 --- !u!33 &5669835609206484165
