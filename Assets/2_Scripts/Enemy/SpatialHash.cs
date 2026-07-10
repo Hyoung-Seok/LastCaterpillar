@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SpatialHash
+public class SpatialHash<T> where T : ISpatialItem
 {
     private readonly int _cellSize;
-    private readonly Dictionary<long, List<DummyEnemy>> _buckets = new();
-
+    private readonly Dictionary<long, List<T>> _buckets = new();
+    
     public SpatialHash(int size)
     {
         _cellSize = size;
@@ -19,9 +19,9 @@ public class SpatialHash
         }
     }
 
-    public void Insert(DummyEnemy agent)
+    public void Insert(T agent)
     {
-        var pos = agent.transform.position;
+        var pos = agent.Position;
         
         var cx = Mathf.FloorToInt(pos.x / _cellSize);
         var cy = Mathf.FloorToInt(pos.z / _cellSize);
@@ -29,14 +29,14 @@ public class SpatialHash
 
         if (!_buckets.TryGetValue(key, out var list))
         {
-            list = new List<DummyEnemy>();
+            list = new List<T>();
             _buckets.Add(key, list);
         }
         
         list.Add(agent);
     }
 
-    public void Query(Vector3 pos, List<DummyEnemy> result)
+    public void Query(Vector3 pos, List<T> result)
     {
         result.Clear();
         
@@ -52,6 +52,6 @@ public class SpatialHash
             }
         }
     }
-    
+
     private long Key(int cx, int cy) => ((long)cx << 32) | (uint)cy;
 }

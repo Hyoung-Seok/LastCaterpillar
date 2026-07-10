@@ -27,8 +27,10 @@
 }</component>
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Enemy/DummyEnemy.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Enemy/ISpatialItem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Enemy/SpatialHash.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/InputReader.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Obstacle.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/Editor/CityGeneratorEditor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerAimController.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -113,6 +115,10 @@
       <workItem from="1782372684364" duration="18882000" />
       <workItem from="1782729462135" duration="8551000" />
       <workItem from="1782807103050" duration="9754000" />
+      <workItem from="1782890550435" duration="13296000" />
+      <workItem from="1782979475373" duration="11339000" />
+      <workItem from="1783428031987" duration="4062000" />
+      <workItem from="1783496150981" duration="11607000" />
     </task>
     <servers />
   </component>

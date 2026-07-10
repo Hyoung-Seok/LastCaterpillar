@@ -1,11 +1,17 @@
 using UnityEngine;
 
-public class DummyEnemy : MonoBehaviour
+public class DummyEnemy : MonoBehaviour, ISpatialItem
 {
+    public Vector3 Position => transform.position;
+    public float Radius => separationRadius;
+
     [HideInInspector] public Vector3 Separation;
+    [HideInInspector] public Vector3 ObstacleForce;
     [HideInInspector] public FlowField FlowField;
     
+    [SerializeField] private float separationRadius = 0.5f;
     [SerializeField] private float maxSeparation = 0.4f;
+    [SerializeField] private float maxObstacleForce = 0.8f;
     
     [SerializeField] private CharacterController cc;
     [SerializeField] private float speed = 5f;
@@ -30,7 +36,10 @@ public class DummyEnemy : MonoBehaviour
             return;
         }
 
-        var desired = (flowVec + Vector3.ClampMagnitude(Separation, maxSeparation)).normalized * step;
+        var force = Vector3.ClampMagnitude(Separation, maxSeparation) +
+                    Vector3.ClampMagnitude(ObstacleForce, maxObstacleForce);
+        
+        var desired = (flowVec + force).normalized * step;
         cc.Move(SlideAlongWalls(pos, desired));
     }
 
