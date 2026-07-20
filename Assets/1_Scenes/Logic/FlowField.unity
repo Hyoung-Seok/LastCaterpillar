@@ -250668,7 +250668,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   flowField: {fileID: 2126865062}
   obstacleParent: {fileID: 582584156}
-  enemy: {fileID: 1435957205494231151, guid: e5c2538696d1bbc4994fa8d744956beb, type: 3}
+  enemy: {fileID: 3823153393316996903, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
 --- !u!4 &1505553490
 Transform:
   m_ObjectHideFlags: 0

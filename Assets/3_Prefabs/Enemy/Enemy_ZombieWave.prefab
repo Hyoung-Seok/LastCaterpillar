@@ -788,6 +788,7 @@ MonoBehaviour:
   maxObstacleForce: 0.8
   cc: {fileID: 4784076233751003337}
   speed: 5
+  turnSpeed: 200
 --- !u!143 &4784076233751003337
 CharacterController:
   m_ObjectHideFlags: 0
