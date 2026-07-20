@@ -8,6 +8,7 @@ public class FlowField : MonoBehaviour
     [Header("Components")]
     [SerializeField] private CityGenerator cityGenerator;
     [SerializeField] private Transform playerTf;
+    [SerializeField] private Transform obstacleParent;
 
     private CityLayout _layout;
     private int _width = 0;
@@ -16,6 +17,8 @@ public class FlowField : MonoBehaviour
 
     private Vector2Int _curPlayerCell;
     private Vector3 _originCellPos;
+    
+    private HashSet<Vector2Int> _obstacleIndex;
 
     private void Start()
     {
@@ -38,8 +41,9 @@ public class FlowField : MonoBehaviour
             }
         }
         
-        SetupFlowField();
         _originCellPos = _layout.ConvertCellPosToWorld(0,0);
+        GetObstaclePositions();
+        SetupFlowField();
     }
 
     public Vector2Int GetCurrentCellDirection(Vector3 pos)
@@ -78,7 +82,7 @@ public class FlowField : MonoBehaviour
         {
             for (var y = 0; y < _height; ++y)
             {
-                if(_layout.Cells[x, y] is ECellType.CatWalk or ECellType.Road) continue;
+                if (IsPassable(x, y)) continue;
 
                 for (var i = 0; i < 4; ++i)
                 {
@@ -89,7 +93,7 @@ public class FlowField : MonoBehaviour
                     var ny = dy + y;
 
                     if (nx < 0 || nx >= _width || ny < 0 || ny >= _height) continue;
-                    if (_layout.Cells[nx, ny] is ECellType.CatWalk or ECellType.Road)
+                    if (IsPassable(nx, ny))
                     {
                         _flowField[x, y].Direction = _searchDir[i];
                         break;
@@ -197,7 +201,8 @@ public class FlowField : MonoBehaviour
 
     private bool IsPassable(int x, int y)
     {
-        return _layout.Cells[x, y] is ECellType.CatWalk or ECellType.Road;
+        return _layout.Cells[x, y] is ECellType.CatWalk or ECellType.Road
+               && !_obstacleIndex.Contains(new Vector2Int(x, y));
     }
 
     private void ResetNode()
@@ -210,6 +215,26 @@ public class FlowField : MonoBehaviour
                 
                 _flowField[x, y].Cost = int.MaxValue;
                 _flowField[x, y].Direction = Vector2Int.zero;
+            }
+        }
+    }
+
+    private void GetObstaclePositions()
+    {
+        _obstacleIndex = new HashSet<Vector2Int>();
+
+        foreach (Transform child in obstacleParent)
+        {
+            var b = child.GetComponent<BoxCollider>().bounds;
+            var minCell = WorldToCell(b.min);
+            var maxCell = WorldToCell(b.max);
+
+            for (var x = minCell.x; x <= maxCell.x; x++)
+            {
+                for (var y = minCell.y; y <= maxCell.y; y++)
+                {
+                    _obstacleIndex.Add(new Vector2Int(x, y));
+                }
             }
         }
     }
