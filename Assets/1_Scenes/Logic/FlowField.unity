@@ -347704,6 +347704,7 @@ MonoBehaviour:
   cityGenerator: {fileID: 398626086}
   playerTf: {fileID: 905533047}
   obstacleParent: {fileID: 134461691}
+  sub: 2
 --- !u!1 &2127497285
 GameObject:
   m_ObjectHideFlags: 0

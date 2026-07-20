@@ -10,9 +10,13 @@ public class FlowField : MonoBehaviour
     [SerializeField] private Transform playerTf;
     [SerializeField] private Transform obstacleParent;
 
+    [Header("Setting")] 
+    [SerializeField, Min(1)] private int sub = 1;
+
     private CityLayout _layout;
     private int _width = 0;
     private int _height = 0;
+    private float _cellSize = 0f;
     private Node[,] _flowField;
 
     private Vector2Int _curPlayerCell;
@@ -28,8 +32,9 @@ public class FlowField : MonoBehaviour
         }
         
         _layout = cityGenerator.CityLayout;
-        _width = _layout.Width;
-        _height = _layout.Height;
+        _width = _layout.Width * sub;
+        _height = _layout.Height * sub;
+        _cellSize = _layout.CellSize / (float)sub;
 
         _flowField = new Node[_width, _height];
 
@@ -40,8 +45,11 @@ public class FlowField : MonoBehaviour
                 _flowField[x, y] = new Node(int.MaxValue, Vector2Int.zero);
             }
         }
+
+        var half = _layout.CellSize * 0.5f;
+        // 셀의 피봇을 중심이 아닌 좌하단으로 잡음.
+        _originCellPos = _layout.ConvertCellPosToWorld(0,0) - new Vector3(half, 0, half);
         
-        _originCellPos = _layout.ConvertCellPosToWorld(0,0);
         GetObstaclePositions();
         SetupFlowField();
     }
@@ -174,34 +182,35 @@ public class FlowField : MonoBehaviour
             {
                 if (_flowField[x, y].Direction == Vector2Int.zero) continue;
 
-                var center = _layout.ConvertCellPosToWorld(x, y);
+                // 중앙을 좌하단으로 맞췄으니까, 다시 중앙으로 맞춤.
+                var center = _originCellPos + new Vector3((x + 0.5f) * _cellSize, 0f, (y + 0.5f) * _cellSize);
                 
                 var dir = _flowField[x, y].Direction;
                 var worldDir = new Vector3(dir.x, 0f, dir.y).normalized;
-                var tip = center + worldDir * (_layout.CellSize * 0.4f);
+                var tip = center + worldDir * (_cellSize * 0.4f);
 
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawLine(center, tip);
                 
                 var back1 = Quaternion.Euler(0,  150f, 0) * worldDir;
                 var back2 = Quaternion.Euler(0, -150f, 0) * worldDir;
-                Gizmos.DrawLine(tip, tip + back1 * (_layout.CellSize * 0.15f));
-                Gizmos.DrawLine(tip, tip + back2 * (_layout.CellSize * 0.15f));
+                Gizmos.DrawLine(tip, tip + back1 * (_cellSize * 0.15f));
+                Gizmos.DrawLine(tip, tip + back2 * (_cellSize * 0.15f));
             }
         }
     }
     
     private Vector2Int WorldToCell(Vector3 worldPos)
     {
-        var col = Mathf.RoundToInt((worldPos.x - _originCellPos.x) / _layout.CellSize);
-        var row = Mathf.RoundToInt((worldPos.z - _originCellPos.z) / _layout.CellSize);
+        var col = Mathf.FloorToInt((worldPos.x - _originCellPos.x) / _cellSize);
+        var row = Mathf.FloorToInt((worldPos.z - _originCellPos.z) / _cellSize);
         
         return new Vector2Int(col, row);
     }
 
     private bool IsPassable(int x, int y)
     {
-        return _layout.Cells[x, y] is ECellType.CatWalk or ECellType.Road
+        return _layout.Cells[x / sub, y / sub] is ECellType.CatWalk or ECellType.Road
                && !_obstacleIndex.Contains(new Vector2Int(x, y));
     }
 
