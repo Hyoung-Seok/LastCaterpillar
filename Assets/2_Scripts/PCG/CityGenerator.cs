@@ -150,7 +150,7 @@ public class CityGenerator : MonoBehaviour
 
         roadGenerator.GenerateRoad(horizontal, verticalHash, false, CityLayout);
         roadGenerator.GenerateRoad(vertical, horizontalHash, true, CityLayout);
-        roadGenerator.GenerateCatWalk(catWalk, CityLayout);
+        roadGenerator.GenerateCrossRoad(horizontal, vertical, CityLayout);
     }
 
     private void GenerateArea()
