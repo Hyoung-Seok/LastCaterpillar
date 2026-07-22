@@ -23,6 +23,11 @@ public class CityLayout
     {
         return new Vector3(x * CellSize, 0f, y * CellSize);
     }
+
+    public static Vector3 ConvertCellPosToWorld(int x, int y, int cellSize)
+    {
+        return new Vector3(x * cellSize, 0f, y * cellSize);
+    }
     
     public Vector2Int? NearRoadDirection(int x, int y, int depth, System.Random rng)
     {

@@ -15,6 +15,7 @@ public class DummyEnemy : MonoBehaviour, ISpatialItem
     
     [SerializeField] private CharacterController cc;
     [SerializeField] private float speed = 5f;
+    [SerializeField] private float turnSpeed = 200f;
 
     private float _radius;
     
@@ -41,6 +42,9 @@ public class DummyEnemy : MonoBehaviour, ISpatialItem
         
         var desired = (flowVec + force).normalized * step;
         cc.Move(SlideAlongWalls(pos, desired));
+        
+        if(flowVec.sqrMagnitude > 0.0001f)
+            RotationMoveDir(flowVec);
     }
 
     private Vector3 SlideAlongWalls(Vector3 pos, Vector3 desired)
@@ -55,6 +59,13 @@ public class DummyEnemy : MonoBehaviour, ISpatialItem
         if (blockZ) desired.z = 0;
 
         return desired;
+    }
+
+    private void RotationMoveDir(Vector3 dir)
+    {
+        var target = Quaternion.LookRotation(dir);
+        transform.rotation = Quaternion.RotateTowards
+            (transform.rotation, target, Time.deltaTime * turnSpeed);
     }
     
     private Vector3 ProbeOffset(float dx, float dz)

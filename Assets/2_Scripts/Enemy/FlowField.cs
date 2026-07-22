@@ -8,14 +8,21 @@ public class FlowField : MonoBehaviour
     [Header("Components")]
     [SerializeField] private CityGenerator cityGenerator;
     [SerializeField] private Transform playerTf;
+    [SerializeField] private Transform obstacleParent;
+
+    [Header("Setting")] 
+    [SerializeField, Min(1)] private int sub = 1;
 
     private CityLayout _layout;
     private int _width = 0;
     private int _height = 0;
+    private float _cellSize = 0f;
     private Node[,] _flowField;
 
     private Vector2Int _curPlayerCell;
     private Vector3 _originCellPos;
+    
+    private HashSet<Vector2Int> _obstacleIndex;
 
     private void Start()
     {
@@ -25,8 +32,9 @@ public class FlowField : MonoBehaviour
         }
         
         _layout = cityGenerator.CityLayout;
-        _width = _layout.Width;
-        _height = _layout.Height;
+        _width = _layout.Width * sub;
+        _height = _layout.Height * sub;
+        _cellSize = _layout.CellSize / (float)sub;
 
         _flowField = new Node[_width, _height];
 
@@ -37,9 +45,13 @@ public class FlowField : MonoBehaviour
                 _flowField[x, y] = new Node(int.MaxValue, Vector2Int.zero);
             }
         }
+
+        var half = _layout.CellSize * 0.5f;
+        // 셀의 피봇을 중심이 아닌 좌하단으로 잡음.
+        _originCellPos = _layout.ConvertCellPosToWorld(0,0) - new Vector3(half, 0, half);
         
+        GetObstaclePositions();
         SetupFlowField();
-        _originCellPos = _layout.ConvertCellPosToWorld(0,0);
     }
 
     public Vector2Int GetCurrentCellDirection(Vector3 pos)
@@ -78,7 +90,7 @@ public class FlowField : MonoBehaviour
         {
             for (var y = 0; y < _height; ++y)
             {
-                if(_layout.Cells[x, y] is ECellType.CatWalk or ECellType.Road) continue;
+                if (IsPassable(x, y)) continue;
 
                 for (var i = 0; i < 4; ++i)
                 {
@@ -89,7 +101,7 @@ public class FlowField : MonoBehaviour
                     var ny = dy + y;
 
                     if (nx < 0 || nx >= _width || ny < 0 || ny >= _height) continue;
-                    if (_layout.Cells[nx, ny] is ECellType.CatWalk or ECellType.Road)
+                    if (IsPassable(nx, ny))
                     {
                         _flowField[x, y].Direction = _searchDir[i];
                         break;
@@ -170,34 +182,36 @@ public class FlowField : MonoBehaviour
             {
                 if (_flowField[x, y].Direction == Vector2Int.zero) continue;
 
-                var center = _layout.ConvertCellPosToWorld(x, y);
+                // 중앙을 좌하단으로 맞췄으니까, 다시 중앙으로 맞춤.
+                var center = _originCellPos + new Vector3((x + 0.5f) * _cellSize, 0f, (y + 0.5f) * _cellSize);
                 
                 var dir = _flowField[x, y].Direction;
                 var worldDir = new Vector3(dir.x, 0f, dir.y).normalized;
-                var tip = center + worldDir * (_layout.CellSize * 0.4f);
+                var tip = center + worldDir * (_cellSize * 0.4f);
 
                 Gizmos.color = Color.cyan;
                 Gizmos.DrawLine(center, tip);
                 
                 var back1 = Quaternion.Euler(0,  150f, 0) * worldDir;
                 var back2 = Quaternion.Euler(0, -150f, 0) * worldDir;
-                Gizmos.DrawLine(tip, tip + back1 * (_layout.CellSize * 0.15f));
-                Gizmos.DrawLine(tip, tip + back2 * (_layout.CellSize * 0.15f));
+                Gizmos.DrawLine(tip, tip + back1 * (_cellSize * 0.15f));
+                Gizmos.DrawLine(tip, tip + back2 * (_cellSize * 0.15f));
             }
         }
     }
     
     private Vector2Int WorldToCell(Vector3 worldPos)
     {
-        var col = Mathf.RoundToInt((worldPos.x - _originCellPos.x) / _layout.CellSize);
-        var row = Mathf.RoundToInt((worldPos.z - _originCellPos.z) / _layout.CellSize);
+        var col = Mathf.FloorToInt((worldPos.x - _originCellPos.x) / _cellSize);
+        var row = Mathf.FloorToInt((worldPos.z - _originCellPos.z) / _cellSize);
         
         return new Vector2Int(col, row);
     }
 
     private bool IsPassable(int x, int y)
     {
-        return _layout.Cells[x, y] is ECellType.CatWalk or ECellType.Road;
+        return _layout.Cells[x / sub, y / sub] is ECellType.CatWalk or ECellType.Road
+               && !_obstacleIndex.Contains(new Vector2Int(x, y));
     }
 
     private void ResetNode()
@@ -210,6 +224,26 @@ public class FlowField : MonoBehaviour
                 
                 _flowField[x, y].Cost = int.MaxValue;
                 _flowField[x, y].Direction = Vector2Int.zero;
+            }
+        }
+    }
+
+    private void GetObstaclePositions()
+    {
+        _obstacleIndex = new HashSet<Vector2Int>();
+
+        foreach (Transform child in obstacleParent)
+        {
+            var b = child.GetComponent<BoxCollider>().bounds;
+            var minCell = WorldToCell(b.min);
+            var maxCell = WorldToCell(b.max);
+
+            for (var x = minCell.x; x <= maxCell.x; x++)
+            {
+                for (var y = minCell.y; y <= maxCell.y; y++)
+                {
+                    _obstacleIndex.Add(new Vector2Int(x, y));
+                }
             }
         }
     }
