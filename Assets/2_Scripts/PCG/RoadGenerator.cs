@@ -48,7 +48,7 @@ public class RoadGenerator : MonoBehaviour
     }
 
     public void GenerateCrossRoad(List<(int pos, int width)> horizontal, 
-        List<(int pos, int width)> vertical, CityLayout layout)
+        List<(int pos, int width)> vertical, int cellSize)
     {
         var roadWidth = CityGenerator.NormalRoadWidth;
         
@@ -65,7 +65,7 @@ public class RoadGenerator : MonoBehaviour
                 {
                     for (var cy = rowStart; cy < rowEnd; cy += roadWidth)
                     {
-                        var pos = layout.ConvertCellPosToWorld(cx, cy);
+                        var pos = CityLayout.ConvertCellPosToWorld(cx, cy, cellSize);
                         Instantiate(crossRoadObj, pos, Quaternion.identity, transform);
                     }
                 }
