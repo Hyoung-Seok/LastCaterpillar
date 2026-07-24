@@ -17,6 +17,11 @@ public class RoadGenerator : MonoBehaviour
     [SerializeField] private GameObject horizontalWideRoad;
     [SerializeField] private GameObject verticalWideRoad;
     
+    [Header("CatWalk")]
+    [SerializeField] private GameObject horizontalCatWalk;
+    [SerializeField] private GameObject verticalCatWalk;
+    [SerializeField] private GameObject cornerCatWalk;
+    
     public void GenerateRoad(List<(int pos, int width)> roads, 
         HashSet<int> crossRoad, bool isVertical, CityLayout layout)
     {
@@ -71,6 +76,59 @@ public class RoadGenerator : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void GenerateCatWalk(CityLayout cityLayout)
+    {
+        var width = cityLayout.Width;
+        var height = cityLayout.Height;
+
+        var table = new Dictionary<int, (GameObject prefab, float yRot)>(15);
+        table[1] = (horizontalCatWalk, 0);
+        table[4] = (horizontalCatWalk, 0);
+        table[2] = (verticalCatWalk, 0);
+        table[8] = (verticalCatWalk, 0);
+        table[6] = (cornerCatWalk, 0);      // right down
+        table[12] = (cornerCatWalk, 90);    // left down
+        table[9] = (cornerCatWalk, 180);    // left top
+        table[3] = (cornerCatWalk, 270);   // right top
+        table[5] = (horizontalCatWalk, 0);
+        table[10] = (verticalCatWalk, 0);
+        
+        for (var x = 0; x < width; ++x)
+        {
+            for (var y = 0; y < height; ++y)
+            {
+                if(cityLayout.Cells[x, y] != ECellType.CatWalk) continue;
+                
+                var mask = GetRoadMask(x, y, cityLayout);
+                var pos = cityLayout.ConvertCellPosToWorld(x, y);
+                
+                if (table.TryGetValue(mask, out var tile))
+                {
+                    Instantiate(tile.prefab, pos, Quaternion.Euler(0, tile.yRot, 0), transform);
+                }
+            }
+        }
+    }
+
+    private bool IsRoad(int x, int y, CityLayout layout)
+    {
+        if(x < 0 || x >= layout.Width || y < 0 || y >= layout.Height) return false;
+        
+        return layout.Cells[x, y] is ECellType.Road;
+    }
+
+    private int GetRoadMask(int x, int y, CityLayout layout)
+    {
+        var m = 0;
+
+        if (IsRoad(x, y + 1, layout)) m |= 1;   // up
+        if (IsRoad(x + 1, y, layout)) m |= 2;   // right
+        if (IsRoad(x, y - 1, layout)) m |= 4;   // down
+        if (IsRoad(x - 1, y, layout)) m |= 8;   // left
+
+        return m;
     }
 
     private GameObject GetRoadType(bool isVertical, int width)
