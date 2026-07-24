@@ -4,6 +4,9 @@ using UnityEngine;
 [RequireComponent(typeof(CityGenerator))]
 public class CityBuilder : MonoBehaviour
 {
+    public Transform BuildingParent => buildingParent;
+    [SerializeField] private Transform buildingParent;
+    
     private CityAssetLoader _assetLoader;
     private bool[,] _isVisited;
     private System.Random _rng;

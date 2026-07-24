@@ -4,6 +4,11 @@ using UnityEngine;
 [RequireComponent(typeof(CityGenerator))]
 public class RoadGenerator : MonoBehaviour
 {
+    public Transform RoadParent => roadParent;
+    
+    [Header("Parent")]
+    [SerializeField] private Transform roadParent;
+    
     [Header("Road")] 
     [SerializeField] private GameObject horizontalSmallRoad;
     [SerializeField] private GameObject verticalSmallRoad;
@@ -41,13 +46,13 @@ public class RoadGenerator : MonoBehaviour
                 if (IsCrossWalk(l, length, road.width, crossRoad))
                 {
                     var crossWalk = isVertical
-                        ? Instantiate(verticalCrossWalk, pos, rot, transform)
-                        : Instantiate(horizontalCrossWalk, pos, rot, transform);
+                        ? Instantiate(verticalCrossWalk, pos, rot, roadParent)
+                        : Instantiate(horizontalCrossWalk, pos, rot, roadParent);
                     
                     continue;
                 }
                 
-                var obj = Instantiate(baseRoadObj, pos, rot, transform);
+                var obj = Instantiate(baseRoadObj, pos, rot, roadParent);
             }
         }
     }
@@ -71,7 +76,7 @@ public class RoadGenerator : MonoBehaviour
                     for (var cy = rowStart; cy < rowEnd; cy += roadWidth)
                     {
                         var pos = CityLayout.ConvertCellPosToWorld(cx, cy, cellSize);
-                        Instantiate(crossRoadObj, pos, Quaternion.identity, transform);
+                        Instantiate(crossRoadObj, pos, Quaternion.identity, roadParent);
                     }
                 }
             }
@@ -106,7 +111,7 @@ public class RoadGenerator : MonoBehaviour
                 
                 if (table.TryGetValue(mask, out var tile))
                 {
-                    Instantiate(tile.prefab, pos, Quaternion.Euler(0, tile.yRot, 0), transform);
+                    Instantiate(tile.prefab, pos, Quaternion.Euler(0, tile.yRot, 0), roadParent);
                 }
             }
         }

@@ -52,11 +52,17 @@ public class CityGenerator : MonoBehaviour
 
     public void DestroyStructure()
     {
-        if (transform.childCount == 0) return;
+        var roadParent = roadGenerator.RoadParent;
+        var buildingParent = cityBuilder.BuildingParent;
 
-        for (var i = transform.childCount - 1; i >= 0; i--)
+        for (var i = roadParent.childCount - 1; i >= 0; i--)
         {
-            DestroyImmediate(transform.GetChild(i).gameObject);
+            DestroyImmediate(roadParent.GetChild(i).gameObject);
+        }
+
+        for (var i = buildingParent.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(buildingParent.GetChild(i).gameObject);
         }
     }
 
