@@ -31,6 +31,8 @@
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Enemy/SpatialHash.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/InputReader.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Obstacle.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/AreaConfig.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/AreaGenerator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/Editor/CityGeneratorEditor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerAimController.cs" root0="FORCE_HIGHLIGHTING" />
   </component>
@@ -122,6 +124,7 @@
       <workItem from="1783674021867" duration="9171000" />
       <workItem from="1784531753262" duration="12177000" />
       <workItem from="1784638228385" duration="3204000" />
+      <workItem from="1784880556827" duration="13606000" />
     </task>
     <servers />
   </component>
