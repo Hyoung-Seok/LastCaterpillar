@@ -2,19 +2,22 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(PlayerManager))]
 public class PlayerAimController : MonoBehaviour
 {
-    [SerializeField] private InputReader inputReader;
     [SerializeField] private Transform turret;
     [SerializeField] private float rotationSpeed;
 
+    private InputReader _inputReader;
     private InputAction _aim;
     private Camera _camera;
     private Plane _aimPlane;
     
     private void Start()
     {
-        _aim = inputReader.PlayerAim;
+        _inputReader = GetComponent<PlayerManager>().InputReader;
+        
+        _aim = _inputReader.PlayerAim;
         _camera = Camera.main;
         _aimPlane = new Plane(Vector3.up, transform.position);
     }
@@ -26,8 +29,8 @@ public class PlayerAimController : MonoBehaviour
 
         if (_aimPlane.Raycast(ray, out var dist))
         {
-            var hit = ray.GetPoint(dist);
-            var dir = hit - turret.position;
+            _inputReader.AimPoint = ray.GetPoint(dist);
+            var dir = _inputReader.AimPoint - turret.position;
             dir.y = 0;
 
             if (dir.sqrMagnitude > 0.001f)
