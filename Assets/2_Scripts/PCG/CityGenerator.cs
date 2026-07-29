@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Random = System.Random;
 
@@ -18,7 +17,7 @@ public class CityGenerator : MonoBehaviour
     [Header("Components")]
     [SerializeField] private CityBuilder cityBuilder;
     [SerializeField] private RoadGenerator roadGenerator;
-    
+
     [Header("City Config")] 
     [SerializeField] private int seed;
     [SerializeField, Min(1)] private int width;
@@ -29,18 +28,10 @@ public class CityGenerator : MonoBehaviour
     [Header("Road Config")] 
     [SerializeField, Min(1)] private int roadMinGap;
     [SerializeField, Min(1)] private int roadMaxGap;
+    [SerializeField, Min(1)] private int buildingBandDepth = 3;
 
-    [Header("Voronoi")] 
-    [SerializeField] private List<SeedConfig> seedConfigs;
-    [SerializeField] private int minDistance = 10;
-    [SerializeField] private int maxAttempts = 10;
-    [SerializeField, Min(1)] private int buildingBandDepth = 2;
-
-    [Header("Perlin Noise")] 
-    [SerializeField, Range(0.01f, 0.2f)] private float frequency;
-    [SerializeField, Min(0)] private float strength;
-    [SerializeField, Range(0, 0.9f)] private float sparsity;
-    [SerializeField, Range(0, 0.2f)] private float sparsityScale;
+    [Header("Area Config")]
+    [SerializeField] private AreaConfig areaConfig;
     
     private Random _prng;
 
@@ -50,9 +41,10 @@ public class CityGenerator : MonoBehaviour
         
         _prng = new Random(seed);
         CityLayout = new CityLayout(seed, width, height, cellSize);
+        var areaGenerator = new AreaGenerator(_prng, CityLayout, areaConfig, buildingBandDepth);
         
         GenerateRoad();
-        GenerateArea();
+        areaGenerator.GenerateArea();
         
         if(isGenerateBuilding)
             cityBuilder.GenerateBuilding(CityLayout, buildingBandDepth);
@@ -60,11 +52,17 @@ public class CityGenerator : MonoBehaviour
 
     public void DestroyStructure()
     {
-        if (transform.childCount == 0) return;
+        var roadParent = roadGenerator.RoadParent;
+        var buildingParent = cityBuilder.BuildingParent;
 
-        for (var i = transform.childCount - 1; i >= 0; i--)
+        for (var i = roadParent.childCount - 1; i >= 0; i--)
         {
-            DestroyImmediate(transform.GetChild(i).gameObject);
+            DestroyImmediate(roadParent.GetChild(i).gameObject);
+        }
+
+        for (var i = buildingParent.childCount - 1; i >= 0; i--)
+        {
+            DestroyImmediate(buildingParent.GetChild(i).gameObject);
         }
     }
 
@@ -80,7 +78,6 @@ public class CityGenerator : MonoBehaviour
 
         var horizontalHash = new HashSet<int>();
         var verticalHash = new HashSet<int>();
-        var catWalk = new List<Vector2Int>();
         
         foreach (var h in horizontal)
         {
@@ -125,9 +122,6 @@ public class CityGenerator : MonoBehaviour
                     CityLayout.Cells[x, up] = ECellType.CatWalk;
                 if (down >= 0 && CityLayout.Cells[x, down] == ECellType.Empty)
                     CityLayout.Cells[x, down] = ECellType.CatWalk;
-                
-                catWalk.Add(new Vector2Int(x, up));
-                catWalk.Add(new Vector2Int(x, down));
             }
         }
 
@@ -142,106 +136,15 @@ public class CityGenerator : MonoBehaviour
                     CityLayout.Cells[left, y] = ECellType.CatWalk;
                 if (right < width && CityLayout.Cells[right, y] == ECellType.Empty)
                     CityLayout.Cells[right, y] = ECellType.CatWalk;
-                
-                catWalk.Add(new Vector2Int(left, y));
-                catWalk.Add(new Vector2Int(right, y));
             }
         }
 
         roadGenerator.GenerateRoad(horizontal, verticalHash, false, CityLayout);
         roadGenerator.GenerateRoad(vertical, horizontalHash, true, CityLayout);
         roadGenerator.GenerateCrossRoad(horizontal, vertical, cellSize);
+        roadGenerator.GenerateCatWalk(CityLayout);
     }
 
-    private void GenerateArea()
-    {
-        var allSeed = PlaceSeed();
-        var warpOffset = new Vector4(_prng.Next(0, 10000), _prng.Next(0, 10000)
-            ,_prng.Next(0, 10000),  _prng.Next(0, 10000));
-        
-        var sparsityOffset = new Vector2(_prng.Next(0, 10000), _prng.Next(0, 10000));
-
-        for (var x = 0; x < width; ++x)
-        {
-            for (var y = 0; y < height; ++y)
-            {
-                if (CityLayout.Cells[x, y] is ECellType.Road or ECellType.CatWalk) continue;
-                if (CityLayout.NearRoadDirection(x, y, buildingBandDepth, _prng) == null) continue;
-
-                var s = Mathf.PerlinNoise((x + sparsityOffset.x) * sparsityScale,
-                    (y + sparsityOffset.y) * sparsityScale);
-                s = Mathf.Clamp01(s);
-                
-                if(s < sparsity) continue;
-
-                var p = WarpCell(x, y, warpOffset);
-                CityLayout.Cells[x, y] = FindNearestSeedType(p, allSeed);
-            }
-        }
-    }
-
-    private Vector2 WarpCell(int x, int y, Vector4 warpOffset)
-    {
-        var wx = (Mathf.PerlinNoise(x * frequency + warpOffset.x, y * frequency + warpOffset.y) - 0.5f) * strength;
-        var wy = (Mathf.PerlinNoise(x * frequency + warpOffset.w, y * frequency + warpOffset.z) - 0.5f) * strength;
-        
-        return new Vector2(wx + x, wy + y);
-    }
-
-    private List<(ECellType type, Vector2Int pos, float weight)> PlaceSeed()
-    {
-        var result = new List<(ECellType type, Vector2Int pos, float weight)>();
-        
-        foreach (var s in seedConfigs)
-        {
-            Vector2Int p;
-            var attempts = 0;
-            do
-            {
-                p = new Vector2Int(_prng.Next(0, width), _prng.Next(0, height));
-                attempts++;
-                
-            } while (CheckSeedMinDistance(p, result) == false
-                     && attempts < maxAttempts);
-            result.Add((s.Type, p, s.Weight));
-        }
-
-        return result;
-    }
-
-    private ECellType FindNearestSeedType(Vector2 pos, List<(ECellType type, Vector2Int pos, float weight)> seeds)
-    {
-        var bestDist = float.MaxValue;
-        var bestType = ECellType.Empty;
-
-        for (var i = 0; i < seeds.Count; i++)
-        {
-            var dx = pos.x - seeds[i].pos.x;
-            var dy = pos.y - seeds[i].pos.y;
-            var distSq =  dx * dx + dy * dy;
-
-            var weighted = distSq / seeds[i].weight;
-            
-            if(weighted >= bestDist) continue;
-            
-            bestDist = weighted;
-            bestType = seeds[i].type;
-        }
-
-        return bestType;
-    }
-
-    private bool CheckSeedMinDistance(Vector2Int pos, List<(ECellType type, Vector2Int pos, float weight)> seeds)
-    {
-        foreach (var s in seeds)
-        {
-            var dis = Vector2Int.Distance(pos, s.pos);
-
-            if (dis < minDistance) return false;
-        }
-        
-        return true;
-    }
     
     private List<(int startPos, int width)> ChoseRoadLine(int length)
     {
