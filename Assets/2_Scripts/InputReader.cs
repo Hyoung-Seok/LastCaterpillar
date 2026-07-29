@@ -4,8 +4,13 @@ using UnityEngine.InputSystem;
 [CreateAssetMenu(fileName = "InputReader", menuName = "Scriptable Objects/InputReader")]
 public class InputReader : ScriptableObject
 {
+    // Input Action
     public InputAction PlayerMove => GameInput.Player.Move;
     public InputAction PlayerAim => GameInput.Player.Aim;
+    public InputAction PlayerFire => GameInput.Player.Fire;
+    
+    // Global Value
+    public Vector3 AimPoint;
     
     private GameInput _gameInput;
 

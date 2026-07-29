@@ -218,8 +218,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 128184003}
+  - component: {fileID: 128184008}
   - component: {fileID: 128184006}
   - component: {fileID: 128184005}
+  - component: {fileID: 128184007}
   - component: {fileID: 128184004}
   m_Layer: 0
   m_Name: Player
@@ -283,7 +285,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0df7777818551348a7e384464564023, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAimController
-  inputReader: {fileID: 11400000, guid: 2666b3e6a7396e948a0f1900bdb4cb2c, type: 2}
   turret: {fileID: 1880915234}
   rotationSpeed: 60
 --- !u!114 &128184006
@@ -298,7 +299,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e748763e6ced5438242816b12e4c1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMoveController
-  inputReader: {fileID: 11400000, guid: 2666b3e6a7396e948a0f1900bdb4cb2c, type: 2}
   rb: {fileID: 128184004}
   forwardMaxSpeed: 20
   reverseMaxSpeed: -10
@@ -322,6 +322,35 @@ MonoBehaviour:
   restLength: 1.4
   springStrength: 12
   damper: 3.5
+--- !u!114 &128184007
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 128184002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d391b1f41699254fb6e21ae615d5b5f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainTurrent
+  turret: {fileID: 1880915234}
+  firePos: {fileID: 608438472}
+  shell: {fileID: 4242723857853475229, guid: fc39e6eeba347b24b88f267cbbdabe74, type: 3}
+  reloadTime: 4
+--- !u!114 &128184008
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 128184002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f1ff9394198cdf4da4d00fbd6f344e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
+  inputReader: {fileID: 11400000, guid: 2666b3e6a7396e948a0f1900bdb4cb2c, type: 2}
 --- !u!1 &375180982
 GameObject:
   m_ObjectHideFlags: 0
@@ -593,6 +622,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &608438471
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 608438472}
+  m_Layer: 0
+  m_Name: FirePos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &608438472
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 608438471}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.51}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 671470879}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &645201866
 GameObject:
   m_ObjectHideFlags: 0
@@ -714,7 +774,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 2, z: 3.55}
   m_LocalScale: {x: 0.14, y: 0.3, z: 5.3}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 608438472}
   m_Father: {fileID: 1880915234}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &671470880
