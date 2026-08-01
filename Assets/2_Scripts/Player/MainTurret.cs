@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,17 +6,20 @@ public class MainTurret : MonoBehaviour
 {
     [Header("Components")] 
     [SerializeField] private ReticleController reticle;
-    [SerializeField] private Transform turret;
     [SerializeField] private Transform firePos;
     
     [Header("Shell")]
-    [SerializeField] private Shell shell;
+    [SerializeField] private LoadoutEntry[] loadOut;
     [SerializeField] private float reloadTime = 4.0f;
     [SerializeField] private float fireThreshold = 0.995f;
     
     private InputReader _inputReader;
     private InputAction _fire;
-    private Shell _currentLoadedShell;
+    
+    private AmmoSlot[] _slots;
+    private ShellData LoadedShell => _slots[_curShellIndex].ShellData;
+    private AmmoSlot CurSlot =>  _slots[_curShellIndex];
+    private int _curShellIndex;
 
     private bool _isReloading = false;
     private float _curReloadTime = 0f;
@@ -31,7 +33,7 @@ public class MainTurret : MonoBehaviour
         _fire.performed += FireMainTurret;
         pm.OnDisableTurret += OnDisableTurret;
         
-        _currentLoadedShell = shell;
+        InitSlot();
     }
 
     private void Update()
@@ -49,9 +51,12 @@ public class MainTurret : MonoBehaviour
         }
     }
 
-    public void ChangeShell()
+    public void ChangeShell(int index)
     {
-        
+        if (index >= _slots.Length || index < 0)
+            return;
+
+        _curShellIndex = index;
     }
     
     private void FireMainTurret(InputAction.CallbackContext context)
@@ -60,20 +65,21 @@ public class MainTurret : MonoBehaviour
 
         _isReloading = true;
 
-        var s = Instantiate(_currentLoadedShell, firePos.position, Quaternion.identity);
-        s.OnStartFire(firePos.position, _inputReader.AimPoint);
+        var s = Instantiate(LoadedShell.ShellPrefab, firePos.position, Quaternion.identity);
+        s.OnStartFire(LoadedShell, firePos.position, _inputReader.AimPoint);
+        CurSlot.Consume();
     }
 
     private bool IsCanFire()
     {
         // 현재 장전된 탄약이 없거나 장전중이라면 false
-        if (_currentLoadedShell == null || _isReloading)
+        if (LoadedShell == null || _isReloading || CurSlot.CurrentAmmo <= 0)
             return false;
 
         var toAim = _inputReader.AimPoint - firePos.position;
         toAim.y = 0;
 
-        var minDist = _currentLoadedShell.MinFireDistance;
+        var minDist = LoadedShell.MinFireDistance;
         // 포탄이 너무 가까우면 
         if (toAim.sqrMagnitude < minDist * minDist)
             return false;
@@ -85,8 +91,46 @@ public class MainTurret : MonoBehaviour
         return dot > fireThreshold;
     }
 
+    private void InitSlot()
+    {
+        if (loadOut.Length <= 0)
+        {
+            Debug.LogWarning("Loadout is empty");
+            enabled = false;
+        }
+        
+        _slots = new AmmoSlot[loadOut.Length];
+        for (var i = 0; i < loadOut.Length; i++)
+        {
+            _slots[i] = new AmmoSlot(loadOut[i]);
+        }
+
+        ChangeShell(0);
+    }
+
     private void OnDisableTurret()
     {
         _fire.performed -= FireMainTurret;
+    }
+}
+
+public class AmmoSlot
+{
+    public ShellData ShellData { get; private set; }
+    public int MaxAmmo { get; private set; }
+    public int CurrentAmmo { get; private set; }
+
+    public AmmoSlot(LoadoutEntry entry)
+    {
+        ShellData = entry.ShellData;
+        CurrentAmmo = MaxAmmo = entry.MaxAmmo;
+    }
+
+    public void Consume()
+    {
+        if (CurrentAmmo <= 0)
+            return;
+        
+        CurrentAmmo--;
     }
 }
