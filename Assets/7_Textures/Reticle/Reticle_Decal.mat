@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Raticle_Decal
+  m_Name: Reticle_Decal
   m_Shader: {fileID: -6465566751694194690, guid: c8c90aa991add3748a6bd45dc6f367f0, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
