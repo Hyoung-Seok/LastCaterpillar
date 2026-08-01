@@ -153,4 +153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5c24ad4c462748248b7874fe9c1d02d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HE
+  blastRadius: 20
   velocity: 150
+  minFireDistance: 10
