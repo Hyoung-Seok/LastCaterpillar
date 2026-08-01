@@ -26,7 +26,7 @@ public class ReticleController : MonoBehaviour
         
         _enableMat.SetColor(COLOR, enableColor);
         _disableMat.SetColor(COLOR, disableColor);
-        
+
         decal.material = _disableMat;
     }
 
@@ -44,7 +44,7 @@ public class ReticleController : MonoBehaviour
         decal.material = isEnable ? _enableMat : _disableMat;
     }
 
-    public void SetReticleSize(float radius)
+    public void SetReticleRadius(float radius)
     {
         var s = decal.size;
         s.x = s.y = radius * 2f;

@@ -335,7 +335,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainTurrent
   reticle: {fileID: 1119691725}
-  turret: {fileID: 1880915234}
   firePos: {fileID: 608438472}
   loadOut:
   - data: {fileID: 11400000, guid: 06b70e90b02246c49afbb2ac0d50152c, type: 2}

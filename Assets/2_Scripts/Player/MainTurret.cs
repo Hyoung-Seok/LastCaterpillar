@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -29,11 +30,11 @@ public class MainTurret : MonoBehaviour
         var pm = GetComponent<PlayerManager>();
         _inputReader = pm.InputReader;
         
+        InitSlot();
+        
         _fire = _inputReader.PlayerFire;
         _fire.performed += FireMainTurret;
         pm.OnDisableTurret += OnDisableTurret;
-        
-        InitSlot();
     }
 
     private void Update()
@@ -57,6 +58,7 @@ public class MainTurret : MonoBehaviour
             return;
 
         _curShellIndex = index;
+        reticle.SetReticleRadius(LoadedShell.BlastRadius);
     }
     
     private void FireMainTurret(InputAction.CallbackContext context)
@@ -95,13 +97,23 @@ public class MainTurret : MonoBehaviour
     {
         if (loadOut.Length <= 0)
         {
-            Debug.LogWarning("Loadout is empty");
+            Debug.LogWarning("Loadout is empty", this);
             enabled = false;
+
+            return;
         }
         
         _slots = new AmmoSlot[loadOut.Length];
         for (var i = 0; i < loadOut.Length; i++)
         {
+            if (loadOut[i].ShellData == null)
+            {
+                Debug.LogError($"[MainTurret] loadOut[{i}]의 ShellData가 비어 있습니다.", this);
+                enabled = false;
+                
+                return;
+            }
+            
             _slots[i] = new AmmoSlot(loadOut[i]);
         }
 
@@ -111,6 +123,15 @@ public class MainTurret : MonoBehaviour
     private void OnDisableTurret()
     {
         _fire.performed -= FireMainTurret;
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        if (_slots == null || _inputReader == null)
+            return;
+        
+        Gizmos.color = Color.crimson;
+        Gizmos.DrawWireSphere(_inputReader.AimPoint, CurSlot.ShellData.BlastRadius);
     }
 }
 
