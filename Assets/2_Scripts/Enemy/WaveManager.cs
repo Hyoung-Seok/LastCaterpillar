@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -7,6 +8,9 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private FlowField flowField;
     [SerializeField] private Transform obstacleParent;
     [SerializeField] private DummyEnemy enemy;
+
+    public static WaveManager Instance;
+    public SpatialHash<DummyEnemy> EnemyHash => _enemyHash;
     
     private List<DummyEnemy> _waveEnemies;
     
@@ -15,6 +19,11 @@ public class WaveManager : MonoBehaviour
     
     private List<DummyEnemy> _rangeBuffer;
     private List<Obstacle> _obstacleBuffer;
+
+    public void Awake()
+    {
+        Instance = this;
+    }
 
     public void Start()
     {
@@ -25,15 +34,16 @@ public class WaveManager : MonoBehaviour
         
         _rangeBuffer = new List<DummyEnemy>();
         _obstacleBuffer = new List<Obstacle>();
-        
+
         for (var i = 0; i < 100; ++i)
         {
             var obj = Instantiate(enemy);
-            
+
             obj.FlowField = flowField;
-            obj.transform.position = transform.position + 
+            obj.transform.position = transform.position +
                                      new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
             _waveEnemies.Add(obj);
+            obj.OnDead += RemoveEnemy;
         }
 
         for (var i = 0; i < obstacleParent.childCount; ++i)
@@ -95,5 +105,10 @@ public class WaveManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void RemoveEnemy(DummyEnemy e)
+    {
+        _waveEnemies.Remove(e);
     }
 }

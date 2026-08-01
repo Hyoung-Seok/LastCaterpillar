@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class DummyEnemy : MonoBehaviour, ISpatialItem
@@ -16,7 +17,8 @@ public class DummyEnemy : MonoBehaviour, ISpatialItem
     [SerializeField] private CharacterController cc;
     [SerializeField] private float speed = 5f;
     [SerializeField] private float turnSpeed = 200f;
-
+    
+    public event Action<DummyEnemy> OnDead;
     private float _radius;
     
     private void Start()
@@ -45,6 +47,12 @@ public class DummyEnemy : MonoBehaviour, ISpatialItem
         
         if(flowVec.sqrMagnitude > 0.0001f)
             RotationMoveDir(flowVec);
+    }
+
+    public void Dead()
+    {
+        OnDead?.Invoke(this);
+        Destroy(gameObject);
     }
 
     private Vector3 SlideAlongWalls(Vector3 pos, Vector3 desired)
