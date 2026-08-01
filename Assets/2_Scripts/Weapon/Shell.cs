@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class Shell : MonoBehaviour
 {
-    protected ShellData ShellData;   
+    protected ShellData _shellData;   
     private Vector3 _impactPoint;
     private IEnumerator _shellFireRoutine;
     
@@ -11,7 +11,7 @@ public abstract class Shell : MonoBehaviour
 
     public void OnStartFire(ShellData data, Vector3 start, Vector3 end)
     {
-        ShellData = data;
+        _shellData = data;
         
         transform.position = start;
         _impactPoint = end;
@@ -31,7 +31,7 @@ public abstract class Shell : MonoBehaviour
         while (Vector3.Distance(transform.position, _impactPoint) > 0.001f)
         {
             transform.position = Vector3.MoveTowards(transform.position, _impactPoint, 
-                ShellData.Velocity * Time.deltaTime);
+                _shellData.Velocity * Time.deltaTime);
             
             yield return new WaitForEndOfFrame();
         }
