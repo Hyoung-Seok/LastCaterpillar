@@ -1,23 +1,18 @@
 using System.Collections;
 using UnityEngine;
 
-public enum ShellType
-{
-    HE,
-    AP
-}
-
 public abstract class Shell : MonoBehaviour
 {
-    [SerializeField] protected float velocity;
-    
+    protected ShellData ShellData;   
     private Vector3 _impactPoint;
     private IEnumerator _shellFireRoutine;
     
     public abstract void OnHit();
 
-    public void OnStartFire(Vector3 start, Vector3 end)
+    public void OnStartFire(ShellData data, Vector3 start, Vector3 end)
     {
+        ShellData = data;
+        
         transform.position = start;
         _impactPoint = end;
         _shellFireRoutine = OnFire();
@@ -36,7 +31,7 @@ public abstract class Shell : MonoBehaviour
         while (Vector3.Distance(transform.position, _impactPoint) > 0.001f)
         {
             transform.position = Vector3.MoveTowards(transform.position, _impactPoint, 
-                velocity * Time.deltaTime);
+                ShellData.Velocity * Time.deltaTime);
             
             yield return new WaitForEndOfFrame();
         }
