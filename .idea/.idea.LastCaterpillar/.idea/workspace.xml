@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Weapon/Shell.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Weapon/Shell.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Settings/PC_Renderer.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/PC_Renderer.asset" afterDir="false" />
-    </list>
+    <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -41,12 +36,13 @@
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/AreaConfig.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/AreaGenerator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/Editor/CityGeneratorEditor.cs" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/MainTurrent.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerAimController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Weapon/HE.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Weapon/ReticleController.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Weapon/ShellData.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.inputsystem@57d0e36f6123/InputSystem/Utilities/DelegateHelpers.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.render-pipelines.universal@37e0d4fc2503/Runtime/Decal/DecalProjector.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
@@ -139,6 +135,7 @@
       <workItem from="1784880556827" duration="13606000" />
       <workItem from="1785333643307" duration="10656000" />
       <workItem from="1785415032987" duration="1784000" />
+      <workItem from="1785571898875" duration="19499000" />
     </task>
     <servers />
   </component>

@@ -9,7 +9,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField] private Transform obstacleParent;
     [SerializeField] private DummyEnemy enemy;
 
-    public static WaveManager Instance;
+    public static WaveManager Instance { get; private set; }
     public SpatialHash<DummyEnemy> EnemyHash => _enemyHash;
     
     private List<DummyEnemy> _waveEnemies;
@@ -110,5 +110,11 @@ public class WaveManager : MonoBehaviour
     private void RemoveEnemy(DummyEnemy e)
     {
         _waveEnemies.Remove(e);
+    }
+
+    private void OnDestroy()
+    {
+        if(Instance == this)
+            Instance = null;
     }
 }
