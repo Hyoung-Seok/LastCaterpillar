@@ -4,7 +4,7 @@ using UnityEngine;
 public class DummyEnemy : MonoBehaviour, ISpatialItem
 {
     public Vector3 Position => transform.position;
-    public float Radius => separationRadius;
+    public float InfluenceRadius => separationRadius;
 
     [HideInInspector] public Vector3 Separation;
     [HideInInspector] public Vector3 ObstacleForce;

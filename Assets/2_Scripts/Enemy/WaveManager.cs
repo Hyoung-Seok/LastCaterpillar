@@ -98,9 +98,9 @@ public class WaveManager : MonoBehaviour
         away.y = 0f;
         var dist = away.magnitude;
 
-        if (dist > 0.0001f && dist < item.Radius)
+        if (dist > 0.0001f && dist < item.InfluenceRadius)
         {
-            separation += away.normalized * (1 - dist / item.Radius);
+            separation += away.normalized * (1 - dist / item.InfluenceRadius);
             return true;
         }
 
