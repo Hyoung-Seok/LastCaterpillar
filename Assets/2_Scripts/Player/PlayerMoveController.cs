@@ -2,10 +2,10 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[RequireComponent(typeof(PlayerManager))]
 public class PlayerMoveController : MonoBehaviour
 {
     [Header("Component")] 
-    [SerializeField] private InputReader inputReader;
     [SerializeField] private Rigidbody rb;
 
     [Header("Forward/Revers Config")] 
@@ -35,8 +35,7 @@ public class PlayerMoveController : MonoBehaviour
     
     private void Start()
     {   
-        inputReader.EnableInput();
-        _move = inputReader.PlayerMove;
+        _move = GetComponent<PlayerManager>().InputReader.PlayerMove;
     }
 
     private void Update()

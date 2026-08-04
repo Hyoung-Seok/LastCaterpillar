@@ -53,5 +53,35 @@ public class SpatialHash<T> where T : ISpatialItem
         }
     }
 
+    public void QueryForRadius(Vector3 center, float radius, List<T> result)
+    {
+        result.Clear();
+        var sqrRadius = radius * radius;
+        
+        var minCx = Mathf.FloorToInt((center.x - radius) / _cellSize);
+        var maxCx = Mathf.FloorToInt((center.x + radius) / _cellSize);
+        var minCy = Mathf.FloorToInt((center.z - radius) / _cellSize);
+        var maxCy = Mathf.FloorToInt((center.z + radius) / _cellSize);
+
+        for (var cx = minCx; cx <= maxCx; ++cx)
+        {
+            for (var cy = minCy; cy <= maxCy; ++cy)
+            {
+                if(!_buckets.TryGetValue(Key(cx, cy), out var list)) continue;
+
+                foreach (var item in list)
+                {
+                    var d = item.Position - center;
+                    d.y = 0;
+
+                    if (d.sqrMagnitude <= sqrRadius)
+                    {
+                        result.Add(item);
+                    }
+                }
+            }
+        }
+    }
+
     private long Key(int cx, int cy) => ((long)cx << 32) | (uint)cy;
 }
