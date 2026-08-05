@@ -741,7 +741,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2339354792892301553}
-  - component: {fileID: 3823153393316996903}
+  - component: {fileID: 5795572266117386044}
   - component: {fileID: 4784076233751003337}
   - component: {fileID: 783345900526783121}
   m_Layer: 0
@@ -768,7 +768,7 @@ Transform:
   - {fileID: 7032364606512245806}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3823153393316996903
+--- !u!114 &5795572266117386044
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -777,18 +777,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 3491858150334395627}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: acbfeee9d5f088a47a74353c812130a8, type: 3}
+  m_Script: {fileID: 11500000, guid: 8a54c061545d6cf41b4ea7a46b0334f0, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DummyEnemy
-  Separation: {x: 0, y: 0, z: 0}
-  ObstacleForce: {x: 0, y: 0, z: 0}
+  m_EditorClassIdentifier: Assembly-CSharp::SwarmEnemy
+  hp: 100
+  speed: 5
+  rotationSpeed: 200
+  influenceRadius: 1.2
   FlowField: {fileID: 0}
-  separationRadius: 1.2
   maxSeparation: 0.4
   maxObstacleForce: 0.8
   cc: {fileID: 4784076233751003337}
-  speed: 5
-  turnSpeed: 200
 --- !u!143 &4784076233751003337
 CharacterController:
   m_ObjectHideFlags: 0
