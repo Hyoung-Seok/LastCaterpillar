@@ -1,0 +1,157 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class EnemyRegister : MonoBehaviour
+{
+    [SerializeField] private Transform obstacleParent;
+    
+    private List<Enemy> _enemyList;
+    private List<IRepulsionReceiver> _repulsions;
+    private SpatialHash<Enemy> _enemyHash;
+    private SpatialHash<Obstacle> _obstacleHash;
+
+    private List<Enemy> _enemyBuffer;
+    private List<Obstacle> _obstacleBuffer;
+
+    private List<Enemy> _pendingRemove;
+
+    private static EnemyRegister _instance;
+
+    public static EnemyRegister Instance
+    {
+        get
+        {
+            if (_instance == null)
+                _instance = FindAnyObjectByType<EnemyRegister>();
+            
+            _instance.EnsureInit();
+            return _instance;
+        }
+    }
+
+    public void RegisterEnemy(Enemy enemy)
+    {
+        _enemyList.Add(enemy);
+        
+        if(enemy is IRepulsionReceiver r)
+            _repulsions.Add(r);
+    }
+
+    public void UnRegisterEnemy(Enemy enemy)
+    {
+        _pendingRemove.Add(enemy);
+    }
+
+    public void QueryForRadius(Vector3 center, float radius, List<Enemy> buffer)
+    {
+        _enemyHash.QueryForRadius(center, radius, buffer);   
+    }
+
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        _instance = this;
+        EnsureInit();
+    }
+
+    private void Update()
+    {
+        _enemyHash.Clear();
+        FlushPending();
+
+        foreach (var e in _enemyList)
+        {
+            _enemyHash.Insert(e);
+        }
+
+        foreach (var self in _repulsions)
+        {
+            _enemyHash.Query(self.Position, _enemyBuffer);
+            _obstacleHash.Query(self.Position, _obstacleBuffer);
+            
+            var selfPos = self.Position;
+            var sep = Vector3.zero;
+            var obsForce = Vector3.zero;
+            var count = 0;
+
+            foreach (var other in _enemyBuffer)
+            {
+                if(other == self) continue;
+                
+                if (AccumulateRepulsion(selfPos, other, ref sep))
+                    count++;
+            }
+
+            foreach (var obs in _obstacleBuffer)
+            {
+                AccumulateRepulsion(selfPos, obs, ref obsForce);
+            }
+            
+            if(count > 0)
+                sep /= count;
+
+            self.ApplyRepulsion(sep, obsForce);
+        }
+
+        foreach (var e in _enemyList)
+        {
+            if(!e.IsDead)
+                e.Move(Time.deltaTime);
+        }
+        
+        FlushPending();
+    }
+
+    private bool AccumulateRepulsion(Vector3 selfPos, ISpatialItem item, ref Vector3 separation)
+    {
+        var away = selfPos - item.Position;
+        away.y = 0f;
+        var dist = away.magnitude;
+
+        if (dist > 0.0001f && dist < item.InfluenceRadius)
+        {
+            separation += away.normalized * (1 - dist / item.InfluenceRadius);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void FlushPending()
+    {
+        foreach (var e in _pendingRemove)
+        {
+            _enemyList.Remove(e);
+            if(e is IRepulsionReceiver r) _repulsions.Remove(r);
+        }
+        
+        _pendingRemove.Clear();
+    }
+    
+    private void EnsureInit()
+    {
+        if (_enemyList != null) return;
+        
+        _enemyList = new List<Enemy>();
+        _repulsions = new List<IRepulsionReceiver>();
+        _pendingRemove = new List<Enemy>();
+
+        // CellSize를 매직넘버로 넘기는게 맞나?
+        _enemyHash = new SpatialHash<Enemy>(4);
+        _obstacleHash = new SpatialHash<Obstacle>(4);
+
+        _enemyBuffer = new List<Enemy>();
+        _obstacleBuffer = new List<Obstacle>();
+
+        for (var i = 0; i < obstacleParent.childCount; ++i)
+        {
+            _obstacleHash.Insert(obstacleParent.GetChild(i).GetComponent<Obstacle>());
+        }
+    }
+}
