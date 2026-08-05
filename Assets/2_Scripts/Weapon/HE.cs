@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 public class HE : Shell
 {
@@ -13,7 +11,7 @@ public class HE : Shell
 
     public override void OnHit()
     {
-        EnemyRegister.Instance.EnemyHash.QueryForRadius(transform.position, _shellData.BlastRadius, _rangeBuffer);
+        EnemyRegister.Instance.QueryForRadius(transform.position, _shellData.BlastRadius, _rangeBuffer);
 
         if (_rangeBuffer.Count <= 0) return;
 

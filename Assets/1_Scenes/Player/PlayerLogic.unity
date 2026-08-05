@@ -303350,6 +303350,7 @@ MonoBehaviour:
   flowField: {fileID: 1804001333}
   obstacleParent: {fileID: 1546713544}
   enemy: {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
+  spawnCount: 100
 --- !u!4 &1831126513
 Transform:
   m_ObjectHideFlags: 0

@@ -3,10 +3,12 @@ using UnityEngine;
 public class SwarmEnemy : Enemy, IRepulsionReceiver
 {
     [HideInInspector] public FlowField FlowField;
-    
-    [SerializeField] private CharacterController cc;
+        
     [SerializeField] private float maxSeparation = 0.4f;
     [SerializeField] private float maxObstacleForce = 0.8f;
+    
+    [Header("Components")]
+    [SerializeField] private CharacterController cc;
     
     private float _bodyRadius;
     private Vector3 _separation;
@@ -18,16 +20,16 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         _obstacleForce = obsForce;
     }
 
-    private void Start()
+    private void Awake()
     {
         _bodyRadius = cc.radius;
     }
 
-    private void Update()
+    public override void Move(float dt)
     {
         var cellDir = FlowField.GetCurrentCellDirection(transform.position);
         var flowVec = new Vector3(cellDir.x, 0, cellDir.y).normalized;
-        var step = speed * Time.deltaTime;
+        var step = speed * dt;
         var pos = transform.position;
         
         if (FlowField.IsBlocked(pos))
@@ -43,7 +45,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         cc.Move(SlideAlongWalls(pos, desired));
         
         if(flowVec.sqrMagnitude > 0.0001f)
-            RotationMoveDir(flowVec);
+            RotationMoveDir(flowVec, dt);
     }
 
     private Vector3 SlideAlongWalls(Vector3 pos, Vector3 desired)
@@ -60,11 +62,11 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         return desired;
     }
 
-    private void RotationMoveDir(Vector3 dir)
+    private void RotationMoveDir(Vector3 dir, float dt)
     {
         var target = Quaternion.LookRotation(dir);
         transform.rotation = Quaternion.RotateTowards
-            (transform.rotation, target, Time.deltaTime * rotationSpeed);
+            (transform.rotation, target, dt * rotationSpeed);
     }
     
     private Vector3 ProbeOffset(float dx, float dz)
