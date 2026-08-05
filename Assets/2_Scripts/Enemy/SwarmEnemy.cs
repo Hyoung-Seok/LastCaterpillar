@@ -1,9 +1,7 @@
 using UnityEngine;
 
-public class SwarmEnemy : Enemy
+public class SwarmEnemy : Enemy, IRepulsionReceiver
 {
-    [HideInInspector] public Vector3 Separation;
-    [HideInInspector] public Vector3 ObstacleForce;
     [HideInInspector] public FlowField FlowField;
     
     [SerializeField] private CharacterController cc;
@@ -11,7 +9,15 @@ public class SwarmEnemy : Enemy
     [SerializeField] private float maxObstacleForce = 0.8f;
     
     private float _bodyRadius;
-    
+    private Vector3 _separation;
+    private Vector3 _obstacleForce;
+
+    public void ApplyRepulsion(Vector3 sep, Vector3 obsForce)
+    {
+        _separation = sep;
+        _obstacleForce = obsForce;
+    }
+
     private void Start()
     {
         _bodyRadius = cc.radius;
@@ -30,8 +36,8 @@ public class SwarmEnemy : Enemy
             return;
         }
 
-        var force = Vector3.ClampMagnitude(Separation, maxSeparation) +
-                    Vector3.ClampMagnitude(ObstacleForce, maxObstacleForce);
+        var force = Vector3.ClampMagnitude(_separation, maxSeparation) +
+                    Vector3.ClampMagnitude(_obstacleForce, maxObstacleForce);
         
         var desired = (flowVec + force).normalized * step;
         cc.Move(SlideAlongWalls(pos, desired));
