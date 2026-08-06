@@ -51,7 +51,11 @@ public abstract class Enemy : MonoBehaviour, ISpatialItem
 
     private void OnDisable()
     {
-        EnemyRegister.Instance.UnRegisterEnemy(this);
+        var register = EnemyRegister.Instance;
+        
+        if(register != null)
+            register.UnRegisterEnemy(this);
+        
         OnDespawned();
     }
 }
