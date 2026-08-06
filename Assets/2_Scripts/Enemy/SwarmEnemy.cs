@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class SwarmEnemy : Enemy, IRepulsionReceiver
 {
-    [HideInInspector] public FlowField FlowField;
-        
     [SerializeField] private float maxSeparation = 0.4f;
     [SerializeField] private float maxObstacleForce = 0.8f;
     
@@ -27,12 +25,16 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 
     public override void Move(float dt)
     {
-        var cellDir = FlowField.GetCurrentCellDirection(transform.position);
+        var f = FlowField.Instance;
+        if (f == null)
+            return;
+        
+        var cellDir = f.GetCurrentCellDirection(transform.position);
         var flowVec = new Vector3(cellDir.x, 0, cellDir.y).normalized;
         var step = speed * dt;
         var pos = transform.position;
         
-        if (FlowField.IsBlocked(pos))
+        if (f.IsBlocked(pos))
         {
             cc.Move(flowVec * step);
             return;
@@ -42,19 +44,19 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
                     Vector3.ClampMagnitude(_obstacleForce, maxObstacleForce);
         
         var desired = (flowVec + force).normalized * step;
-        cc.Move(SlideAlongWalls(pos, desired));
+        cc.Move(SlideAlongWalls(pos, desired, f));
         
         if(flowVec.sqrMagnitude > 0.0001f)
             RotationMoveDir(flowVec, dt);
     }
 
-    private Vector3 SlideAlongWalls(Vector3 pos, Vector3 desired)
+    private Vector3 SlideAlongWalls(Vector3 pos, Vector3 desired, FlowField f)
     {
         var probeX = pos + ProbeOffset(desired.x, 0);
         var probeZ = pos + ProbeOffset(0, desired.z);
         
-        var blockX = FlowField.IsBlocked(probeX);
-        var blockZ = FlowField.IsBlocked(probeZ);
+        var blockX = f.IsBlocked(probeX);
+        var blockZ = f.IsBlocked(probeZ);
 
         if (blockX) desired.x = 0;
         if (blockZ) desired.z = 0;
