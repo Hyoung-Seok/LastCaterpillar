@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyRegister : MonoBehaviour
 {
-    [SerializeField] private Transform obstacleParent;
+    [SerializeField] private Transform smallObstacleParent;
     
     private List<Enemy> _enemyList;
     private List<IRepulsionReceiver> _repulsions;
@@ -17,13 +16,25 @@ public class EnemyRegister : MonoBehaviour
     private List<Enemy> _pendingRemove;
 
     private static EnemyRegister _instance;
+    private static bool _isDestroy = false;
 
     public static EnemyRegister Instance
     {
         get
         {
+            if (_isDestroy)
+                return null;
+            
             if (_instance == null)
+            {
                 _instance = FindAnyObjectByType<EnemyRegister>();
+                
+                if (_instance == null)
+                {
+                    Debug.LogError($"{nameof(EnemyRegister)} not found.");
+                    return null;
+                }
+            }
             
             _instance.EnsureInit();
             return _instance;
@@ -52,10 +63,11 @@ public class EnemyRegister : MonoBehaviour
     {
         if (_instance != null && _instance != this)
         {
-            Destroy(gameObject);
+            Debug.LogError("EnemyRegister 씬에 둘 이상 존재.");
             return;
         }
-
+        
+        _isDestroy = false;
         _instance = this;
         EnsureInit();
     }
@@ -149,9 +161,24 @@ public class EnemyRegister : MonoBehaviour
         _enemyBuffer = new List<Enemy>();
         _obstacleBuffer = new List<Obstacle>();
 
-        for (var i = 0; i < obstacleParent.childCount; ++i)
+        if (smallObstacleParent != null)
         {
-            _obstacleHash.Insert(obstacleParent.GetChild(i).GetComponent<Obstacle>());
+            for (var i = 0; i < smallObstacleParent.childCount; ++i)
+            {
+                if (smallObstacleParent.GetChild(i).TryGetComponent(out Obstacle obstacle))
+                {
+                    _obstacleHash.Insert(obstacle);
+                }
+            }
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+        {
+            _instance = null;
+            _isDestroy = true;
         }
     }
 }

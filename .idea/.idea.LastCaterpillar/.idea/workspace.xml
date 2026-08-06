@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/SwarmEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/SwarmEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/WaveManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/WaveManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyRegister.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyRegister.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -146,7 +143,7 @@
       <workItem from="1785333643307" duration="10656000" />
       <workItem from="1785415032987" duration="1784000" />
       <workItem from="1785571898875" duration="19499000" />
-      <workItem from="1785921694891" duration="11699000" />
+      <workItem from="1785921694891" duration="16490000" />
     </task>
     <servers />
   </component>
@@ -178,19 +175,6 @@
           <properties exception="System.Threading.ThreadAbortException" breakIfHandledByOtherCode="false" displayValue="System.Threading.ThreadAbortException" />
           <option name="timeStamp" value="3" />
         </breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs</url>
-          <line>48</line>
-          <properties documentPath="D:\_Project\LastCaterpillar\Assets\2_Scripts\Enemy\Enemy.cs" containingFunctionPresentation="메서드 'OnDisable'">
-            <startOffsets>
-              <option value="1135" />
-            </startOffsets>
-            <endOffsets>
-              <option value="1164" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
