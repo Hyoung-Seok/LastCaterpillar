@@ -86,28 +86,30 @@ public class EnemyRegister : MonoBehaviour
         {
             _enemyHash.Query(self.Position, _enemyBuffer);
             _obstacleHash.Query(self.Position, _obstacleBuffer);
-            
+
             var selfPos = self.Position;
             var sep = Vector3.zero;
             var obsForce = Vector3.zero;
-            var count = 0;
-
+            
             foreach (var other in _enemyBuffer)
             {
-                if(other == self) continue;
-                
-                if (AccumulateRepulsion(selfPos, other, ref sep))
-                    count++;
+                if(ReferenceEquals(other, self)) continue;
+
+                if (TryCalculateRepulsion(selfPos, other, out var f))
+                {
+                    var w = RepulsionWeight(self.Mass, other.Mass);
+                    sep += f * w;
+                }
             }
 
             foreach (var obs in _obstacleBuffer)
             {
-                AccumulateRepulsion(selfPos, obs, ref obsForce);
+                if(TryCalculateRepulsion(selfPos, obs, out var f))
+                {
+                    obsForce += f;
+                }
             }
             
-            if(count > 0)
-                sep /= count;
-
             self.ApplyRepulsion(sep, obsForce);
         }
 
@@ -120,20 +122,23 @@ public class EnemyRegister : MonoBehaviour
         FlushPending();
     }
 
-    private bool AccumulateRepulsion(Vector3 selfPos, ISpatialItem item, ref Vector3 separation)
+    private bool TryCalculateRepulsion(Vector3 selfPos, ISpatialItem item, out Vector3 force)
     {
         var away = selfPos - item.Position;
         away.y = 0f;
         var dist = away.magnitude;
 
-        if (dist > 0.0001f && dist < item.InfluenceRadius)
+        if (dist < 0.0001f || dist >= item.InfluenceRadius)
         {
-            separation += away.normalized * (1 - dist / item.InfluenceRadius);
-            return true;
+            force = Vector3.zero;
+            return false;
         }
-
-        return false;
+        
+        force = away.normalized * (1 - dist / item.InfluenceRadius);
+        return true;
     }
+
+    private float RepulsionWeight(float selfMass, float otherMass) => 2 * otherMass / (selfMass + otherMass);
 
     private void FlushPending()
     {

@@ -210676,7 +210676,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c3cc29af5767848b06e88a5ee0fcaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRegister
-  obstacleParent: {fileID: 1546713544}
+  smallObstacleParent: {fileID: 1546713544}
 --- !u!4 &1281527529
 Transform:
   m_ObjectHideFlags: 0
@@ -299974,7 +299974,7 @@ MonoBehaviour:
   drawGizmos: 1
   cityGenerator: {fileID: 2088994207}
   playerTf: {fileID: 128184003}
-  obstacleParent: {fileID: 269040874}
+  blockingObstacleParent: {fileID: 269040874}
   sub: 2
 --- !u!4 &1804001334
 Transform:
@@ -303347,7 +303347,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 564f328ab09b2a446b94878ae33f0e12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  flowField: {fileID: 1804001333}
   enemy: {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
   spawnCount: 100
 --- !u!4 &1831126513

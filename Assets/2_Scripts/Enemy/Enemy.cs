@@ -5,12 +5,14 @@ public abstract class Enemy : MonoBehaviour, ISpatialItem
 {
     public Vector3 Position => transform.position;
     public float InfluenceRadius => influenceRadius;
+    public float Mass => mass;
     public bool IsDead => _isDead;
 
     [Header("Config")] 
     [SerializeField] protected float maxHp = 100;
     [SerializeField] protected float speed;
     [SerializeField] protected float rotationSpeed;
+    [SerializeField, Tooltip("반발 저항 가중치"), Min(0.1f)] private float mass;
     
     [Header("Spatial config")]
     [SerializeField] protected float influenceRadius;
@@ -41,6 +43,7 @@ public abstract class Enemy : MonoBehaviour, ISpatialItem
         _isDead = false; 
         _curHp = maxHp;
     }
+    
     protected virtual void OnDespawned() { _isDead = true; }
 
     private void OnEnable()
