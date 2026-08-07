@@ -122,7 +122,7 @@ public class EnemyRegister : MonoBehaviour
         FlushPending();
     }
 
-    private bool TryCalculateRepulsion(Vector3 selfPos, ISpatialItem item, out Vector3 force)
+    private bool TryCalculateRepulsion(Vector3 selfPos, IRepulsionSource item, out Vector3 force)
     {
         var away = selfPos - item.Position;
         away.y = 0f;

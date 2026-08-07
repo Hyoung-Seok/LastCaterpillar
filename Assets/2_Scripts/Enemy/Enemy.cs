@@ -1,7 +1,6 @@
-using System;
 using UnityEngine;
 
-public abstract class Enemy : MonoBehaviour, ISpatialItem
+public abstract class Enemy : MonoBehaviour, IRepulsionSource
 {
     public Vector3 Position => transform.position;
     public float InfluenceRadius => influenceRadius;

@@ -1,9 +1,10 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class WaveManager : MonoBehaviour
 {
     [Header("Components")]
-    [SerializeField] private Enemy enemy;
+    [SerializeField] private List<Enemy> enemy;
 
     [Header("Config")] 
     [SerializeField] private int spawnCount;
@@ -17,7 +18,8 @@ public class WaveManager : MonoBehaviour
     {
         for (var i = 0; i < spawnCount; ++i)
         {
-            var e = Instantiate(enemy, transform);
+            var index = Random.Range(0, enemy.Count);
+            var e = Instantiate(enemy[index], transform);
             
             e.transform.position = transform.position + new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
             e.gameObject.SetActive(true);

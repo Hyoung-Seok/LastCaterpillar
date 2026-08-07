@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class Obstacle : MonoBehaviour, ISpatialItem
+public class Obstacle : MonoBehaviour, IRepulsionSource
 {
     public Vector3 Position => transform.position;
     public float InfluenceRadius => influenceRadius;
