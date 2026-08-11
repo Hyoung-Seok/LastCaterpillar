@@ -40,8 +40,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
             return;
         }
 
-        var force = Vector3.ClampMagnitude(_separation, maxSeparation) +
-                    Vector3.ClampMagnitude(_obstacleForce, maxObstacleForce);
+        var force = Vector3.ClampMagnitude(Vector3.ClampMagnitude(_separation, maxSeparation) +
+                    Vector3.ClampMagnitude(_obstacleForce, maxObstacleForce), 0.9f);
         
         var desired = (flowVec + force).normalized * step;
         cc.Move(SlideAlongWalls(pos, desired, f));

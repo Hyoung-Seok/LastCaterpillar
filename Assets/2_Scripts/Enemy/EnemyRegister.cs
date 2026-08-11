@@ -6,7 +6,7 @@ public class EnemyRegister : MonoBehaviour
     [SerializeField] private Transform smallObstacleParent;
     
     private List<Enemy> _enemyList;
-    private List<IRepulsionReceiver> _repulsions;
+    private List<IRepulsionReceiver> _repulsionsReceivers;
     private SpatialHash<Enemy> _enemyHash;
     private SpatialHash<Obstacle> _obstacleHash;
 
@@ -46,7 +46,7 @@ public class EnemyRegister : MonoBehaviour
         _enemyList.Add(enemy);
         
         if(enemy is IRepulsionReceiver r)
-            _repulsions.Add(r);
+            _repulsionsReceivers.Add(r);
     }
 
     public void UnRegisterEnemy(Enemy enemy)
@@ -82,7 +82,7 @@ public class EnemyRegister : MonoBehaviour
             _enemyHash.Insert(e);
         }
 
-        foreach (var self in _repulsions)
+        foreach (var self in _repulsionsReceivers)
         {
             _enemyHash.Query(self.Position, _enemyBuffer);
             _obstacleHash.Query(self.Position, _obstacleBuffer);
@@ -145,7 +145,7 @@ public class EnemyRegister : MonoBehaviour
         foreach (var e in _pendingRemove)
         {
             _enemyList.Remove(e);
-            if(e is IRepulsionReceiver r) _repulsions.Remove(r);
+            if(e is IRepulsionReceiver r) _repulsionsReceivers.Remove(r);
         }
         
         _pendingRemove.Clear();
@@ -156,7 +156,7 @@ public class EnemyRegister : MonoBehaviour
         if (_enemyList != null) return;
         
         _enemyList = new List<Enemy>();
-        _repulsions = new List<IRepulsionReceiver>();
+        _repulsionsReceivers = new List<IRepulsionReceiver>();
         _pendingRemove = new List<Enemy>();
 
         // CellSize를 매직넘버로 넘기는게 맞나?
