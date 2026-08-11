@@ -34,9 +34,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 
         if (f.IsBlocked(pos))
         {
-            var flowDir = f.GetCurrentCellDirection(pos);
-
-            cc.Move(new Vector3(flowDir.x, 0f, flowDir.y) * step);
+            cc.Move(ToFlowVector(f.GetCurrentCellDirection(pos)) * step);
             return;
         }
         
@@ -55,8 +53,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     /// dir = 단위벡터 또는 영벡터(크기를 태우지 말 것), speedScale = 0~1
     protected virtual (Vector3 dir, float speedScale) GetDesiredMove(Vector3 pos, FlowField f)
     {
-        var dir = f.GetCurrentCellDirection(pos);
-        return (new Vector3(dir.x, 0, dir.y).normalized, 1f);
+        return (ToFlowVector(f.GetCurrentCellDirection(pos)), 1f);
     }
 
     private Vector3 SlideAlongWalls(Vector3 pos, Vector3 desired, FlowField f)
@@ -87,4 +84,6 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
             0,
             dz != 0 ? Mathf.Sign(dz) * (Mathf.Abs(dz) + _bodyRadius) : 0);
     }
+    
+    private Vector3 ToFlowVector(Vector2Int vec) => new Vector3(vec.x, 0, vec.y).normalized;
 }
