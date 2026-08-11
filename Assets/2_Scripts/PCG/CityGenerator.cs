@@ -35,6 +35,11 @@ public class CityGenerator : MonoBehaviour
     
     private Random _prng;
 
+    private void Awake()
+    {
+        GenerateCity();
+    }
+
     public void GenerateCity()
     {
         DestroyStructure();

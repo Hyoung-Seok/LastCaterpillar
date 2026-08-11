@@ -8,11 +8,14 @@ public class FlowField : MonoBehaviour
     [Header("Components")]
     [SerializeField] private CityGenerator cityGenerator;
     [SerializeField] private Transform playerTf;
-    [SerializeField] private Transform obstacleParent;
+    [SerializeField] private Transform blockingObstacleParent;
 
     [Header("Setting")] 
     [SerializeField, Min(1)] private int sub = 1;
 
+    public static FlowField Instance => _instance;
+    private static FlowField _instance;
+    
     private CityLayout _layout;
     private int _width = 0;
     private int _height = 0;
@@ -24,11 +27,26 @@ public class FlowField : MonoBehaviour
     
     private HashSet<Vector2Int> _obstacleIndex;
 
+    private void Awake()
+    {
+        if (_instance != null && _instance != this)
+        {
+            Debug.LogError("FlowField가 씬에 둘 이상 존재.");
+            return;
+        }
+
+        _instance = this;
+    }
+
     private void Start()
     {
         if (cityGenerator.CityLayout == null)
         {
-            cityGenerator.GenerateCity();
+            Debug.LogError("CityLayout is NULL");
+            _instance = null;
+            enabled = false;
+            
+            return;
         }
         
         _layout = cityGenerator.CityLayout;
@@ -232,7 +250,7 @@ public class FlowField : MonoBehaviour
     {
         _obstacleIndex = new HashSet<Vector2Int>();
 
-        foreach (Transform child in obstacleParent)
+        foreach (Transform child in blockingObstacleParent)
         {
             var b = child.GetComponent<BoxCollider>().bounds;
             var minCell = WorldToCell(b.min);
@@ -255,6 +273,12 @@ public class FlowField : MonoBehaviour
         new Vector2Int(-1, 1), new Vector2Int(1, 1), // 좌상, 우상
         new Vector2Int(-1, -1), new Vector2Int(1, -1)  // 좌하, 우하
     };
+
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
+    }
 }
 
 public struct Node

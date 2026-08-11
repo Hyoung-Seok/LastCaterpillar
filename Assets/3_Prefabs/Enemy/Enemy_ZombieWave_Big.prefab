@@ -745,7 +745,7 @@ GameObject:
   - component: {fileID: 4784076233751003337}
   - component: {fileID: 783345900526783121}
   m_Layer: 0
-  m_Name: Enemy_ZombieWave
+  m_Name: Enemy_ZombieWave_Big
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -761,7 +761,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1241650290864457256}
@@ -783,10 +783,10 @@ MonoBehaviour:
   maxHp: 100
   speed: 5
   rotationSpeed: 200
-  mass: 1
-  influenceRadius: 1.2
-  maxSeparation: 0.8
-  maxObstacleForce: 0.9
+  mass: 3
+  influenceRadius: 2
+  maxSeparation: 1
+  maxObstacleForce: 0.8
   cc: {fileID: 4784076233751003337}
 --- !u!143 &4784076233751003337
 CharacterController:

@@ -16311,13 +16311,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 101148242}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 108.08, y: 0.44, z: 81.91}
-  m_LocalScale: {x: 6.1163, y: 1, z: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 403.91, y: 0.44, z: 257.23}
+  m_LocalScale: {x: 10.21, y: 1.89, z: 2.06}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 269040874}
-  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &101148244
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -37219,9 +37219,9 @@ Transform:
   m_GameObject: {fileID: 209722183}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 135.94, y: 0.23, z: 107.92}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalPosition: {x: 380.93, y: 0.23, z: 253.03}
+  m_LocalScale: {x: 1.47, y: 1.47, z: 1.47}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1546713544}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -37237,7 +37237,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
-  influenceRadius: 1.5
+  influenceRadius: 1.83
 --- !u!65 &209722186
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -39132,7 +39132,7 @@ Transform:
   m_GameObject: {fileID: 221568544}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 128.62, y: 0.23, z: 105.81}
+  m_LocalPosition: {x: 377.19998, y: 0.23, z: 250.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -39150,7 +39150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
-  influenceRadius: 1.5
+  influenceRadius: 1.3
 --- !u!65 &221568547
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -136960,7 +136960,7 @@ Transform:
   m_GameObject: {fileID: 817634195}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 128.62, y: 0.23, z: 102.31}
+  m_LocalPosition: {x: 377.19998, y: 0.23, z: 247.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -136978,7 +136978,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
-  influenceRadius: 1.5
+  influenceRadius: 1.3
 --- !u!65 &817634198
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -210647,6 +210647,51 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1280720971}
   m_Mesh: {fileID: -325222679304359609, guid: 1924c966b5d07bc40addfd86d20b5e9d, type: 3}
+--- !u!1 &1281527527
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1281527529}
+  - component: {fileID: 1281527528}
+  m_Layer: 0
+  m_Name: EnemyRegister
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1281527528
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281527527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c3cc29af5767848b06e88a5ee0fcaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyRegister
+  smallObstacleParent: {fileID: 1546713544}
+--- !u!4 &1281527529
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1281527527}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1282458273
 GameObject:
   m_ObjectHideFlags: 0
@@ -232173,7 +232218,7 @@ Transform:
   m_GameObject: {fileID: 1415681859}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 131.74, y: 0.23, z: 100.02}
+  m_LocalPosition: {x: 380.32, y: 0.23, z: 245.13}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -232191,7 +232236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
-  influenceRadius: 1.5
+  influenceRadius: 1.3
 --- !u!65 &1415681862
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -232749,7 +232794,7 @@ Transform:
   m_GameObject: {fileID: 1417893147}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 131.76, y: 0.23, z: 103.85}
+  m_LocalPosition: {x: 379.08, y: 0.23, z: 249.09}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -232767,7 +232812,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a28fbb112fb87814e8967dcd1556cbce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
-  influenceRadius: 1.5
+  influenceRadius: 1.3
 --- !u!65 &1417893150
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -299929,7 +299974,7 @@ MonoBehaviour:
   drawGizmos: 1
   cityGenerator: {fileID: 2088994207}
   playerTf: {fileID: 128184003}
-  obstacleParent: {fileID: 269040874}
+  blockingObstacleParent: {fileID: 269040874}
   sub: 2
 --- !u!4 &1804001334
 Transform:
@@ -303302,9 +303347,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 564f328ab09b2a446b94878ae33f0e12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  flowField: {fileID: 1804001333}
-  obstacleParent: {fileID: 1546713544}
-  enemy: {fileID: 3823153393316996903, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
+  enemy:
+  - {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
+  spawnCount: 500
 --- !u!4 &1831126513
 Transform:
   m_ObjectHideFlags: 0
@@ -303314,7 +303359,7 @@ Transform:
   m_GameObject: {fileID: 1831126511}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 26.8, y: -0, z: 47.8}
+  m_LocalPosition: {x: 419.8, y: -0, z: 276.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -360191,3 +360236,4 @@ SceneRoots:
   - {fileID: 1831126513}
   - {fileID: 1804001334}
   - {fileID: 1434859508}
+  - {fileID: 1281527529}
