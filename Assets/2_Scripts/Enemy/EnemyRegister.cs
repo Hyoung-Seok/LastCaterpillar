@@ -7,6 +7,8 @@ public class EnemyRegister : MonoBehaviour
     
     private List<Enemy> _enemyList;
     private List<IRepulsionReceiver> _repulsionsReceivers;
+    private List<EnemyGroup> _fieldEnemyGroup;
+    
     private SpatialHash<Enemy> _enemyHash;
     private SpatialHash<Obstacle> _obstacleHash;
 
@@ -54,6 +56,11 @@ public class EnemyRegister : MonoBehaviour
         _pendingRemove.Add(enemy);
     }
 
+    public void RegisterFieldEnemyGroup(EnemyGroup group)
+    {
+        _fieldEnemyGroup.Add(group);
+    }
+
     public void QueryForRadius(Vector3 center, float radius, List<Enemy> buffer)
     {
         _enemyHash.QueryForRadius(center, radius, buffer);   
@@ -76,6 +83,11 @@ public class EnemyRegister : MonoBehaviour
     {
         _enemyHash.Clear();
         FlushPending();
+
+        foreach (var group in _fieldEnemyGroup)
+        {
+            group.Tick(Time.time);
+        }
 
         foreach (var e in _enemyList)
         {
@@ -157,6 +169,8 @@ public class EnemyRegister : MonoBehaviour
         
         _enemyList = new List<Enemy>();
         _repulsionsReceivers = new List<IRepulsionReceiver>();
+        _fieldEnemyGroup = new List<EnemyGroup>();
+        
         _pendingRemove = new List<Enemy>();
 
         // CellSize를 매직넘버로 넘기는게 맞나?
