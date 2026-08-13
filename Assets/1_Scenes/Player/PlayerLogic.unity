@@ -134329,6 +134329,7 @@ MonoBehaviour:
   maxFieldSpawnCount: 20
   radiusScale: 0.4
   maxAttemptsCount: 10
+  groupConfig: {fileID: 11400000, guid: bbbb8ee9a9c41524c9c22682e925a039, type: 2}
 --- !u!4 &804130251
 Transform:
   m_ObjectHideFlags: 0

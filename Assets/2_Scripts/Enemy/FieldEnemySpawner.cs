@@ -13,8 +13,12 @@ public class FieldEnemySpawner : MonoBehaviour
     [SerializeField, Min(2)] private int maxFieldSpawnCount;
     [SerializeField] private float radiusScale = 0.4f;
     [SerializeField, Min(1)] private int maxAttemptsCount;
+    
+    [Header("Enemy Group Transition Config")]
+    [SerializeField] private GroupConfig groupConfig;
 
     private CityLayout _layout;
+    private EnemyRegister _enemyRegister;
     private List<Vector2Int> _spawnPoints = new List<Vector2Int>();
     
     private const float GoldenAngleRad = 2.39996f; 
@@ -22,10 +26,17 @@ public class FieldEnemySpawner : MonoBehaviour
     private void Start()
     {
         var cityGenerator = FindAnyObjectByType<CityGenerator>();
+        _enemyRegister = FindAnyObjectByType<EnemyRegister>();
 
         if (cityGenerator == null)
         {
             Debug.LogError($"{nameof(CityGenerator)} could not be found.");
+            return;
+        }
+
+        if (_enemyRegister == null)
+        {
+            Debug.LogError($"{nameof(EnemyRegister)} could not be found.");
             return;
         }
         
@@ -46,6 +57,7 @@ public class FieldEnemySpawner : MonoBehaviour
             {
                 if (!TryGetSpawnCellIndex(out sp))
                 {
+                    Debug.LogWarning("Failed to find spawn point within the specified count");
                     continue;
                 }
                 
@@ -61,7 +73,6 @@ public class FieldEnemySpawner : MonoBehaviour
                 Debug.LogWarning($"클러스터 {i} 배치 실패");
                 continue;
             }
-
             
             _spawnPoints.Add(sp);
             CreateClusters(sp);
@@ -75,10 +86,16 @@ public class FieldEnemySpawner : MonoBehaviour
         
         var pos = CityLayout.ConvertCellPosToWorld(spawnPoint.x, spawnPoint.y, _layout.CellSize);
         var spawnCount = Random.Range(minFieldSpawnCount, maxFieldSpawnCount + 1);
+        
+        // 여기서 EnemyGroup 만들고 
+        var group = new EnemyGroup(groupConfig, Time.time);
+        _enemyRegister.RegisterFieldEnemyGroup(group);
 
         for (var i = 0; i < spawnCount; i++)
         {
             var obj = Instantiate(fieldEnemies[Random.Range(0, fieldEnemies.Count)], parent.transform);
+            // 각 FieldEnemy에 EnemyGroup 참조 연결
+            obj.Init(group, group.GetRelayDelay(i, spawnCount));
 
             var angle = i * GoldenAngleRad;
             var radius = Mathf.Sqrt(i) * radiusScale;
@@ -106,7 +123,6 @@ public class FieldEnemySpawner : MonoBehaviour
         }
         
         spawnPoint = default;
-        Debug.LogWarning("Failed to find spawn point within the specified count");
         return false;
     }
 
