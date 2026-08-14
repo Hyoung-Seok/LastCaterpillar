@@ -14,7 +14,7 @@ public class GroupConfig : ScriptableObject
     [Header("Cluster movement settings")] 
     [SerializeField, Min(0.1f)] private float biasStartDistance = 10f;
     [SerializeField, Min(0.1f)] private float biasFullDistance = 30f;
-    [SerializeField] private float progressCheckInterval = 4f;
+    [SerializeField, Min(0.1f)] private float progressCheckInterval = 4f;
     [SerializeField, Min(0.1f)] private float minProgressPerCheck = 2.4f;   // 5(speed) × 0.4(scale) × 4(interval) × 0.3
 
     public float IdleDurationMinTime => idleDurationMinTime;
