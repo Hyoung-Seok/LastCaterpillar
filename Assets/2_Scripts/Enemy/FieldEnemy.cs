@@ -13,9 +13,11 @@ public class FieldEnemy : SwarmEnemy
     
     protected override (Vector3 dir, float speedScale) GetDesiredMove(Vector3 pos, FlowField f)
     {
+        _enemyGroup.ReportPosition(pos);
+        
         if(_enemyGroup.State == EGroupState.Chase)
             return base.GetDesiredMove(pos, f);
-
+        
         return _enemyGroup.GetMoveFor(_delayTime, Time.time);
     }
 }

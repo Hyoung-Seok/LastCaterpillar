@@ -3,19 +3,26 @@ using UnityEngine;
 public class EnemyGroup
 {
     public EGroupState State { get; private set; }
+    public void ReportPosition(Vector3 pos) => _lastKnownPos = pos;
 
     private readonly GroupConfig _groupConfig;
+    
+    private readonly Vector3 _homeCenter;
+    private Vector3 _lastKnownPos;
+    
     private float _transitionTime;
     private float _nextTransitionAt;
     private EGroupState _prevState;
     private Vector3 _moveDir;
 
-    public EnemyGroup(GroupConfig groupConfig, float time)
+    public EnemyGroup(GroupConfig groupConfig, Vector3 center, float now)
     {
         _groupConfig = groupConfig;
+        _homeCenter = center;
+        _lastKnownPos = _homeCenter;
         
         State = Random.value < 0.5f ? EGroupState.Idle : EGroupState.Move;
-        EnterState(time);
+        EnterState(now);
     }
     
     public void Tick(float now)
@@ -46,7 +53,24 @@ public class EnemyGroup
     private void PickMoveDir()
     {
         var angle = Random.Range(0f, Mathf.PI * 2f);
-        _moveDir = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+        var randDir = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+        
+        var toSpawn = _homeCenter -  _lastKnownPos;
+        toSpawn.y = 0f;
+        var d = toSpawn.magnitude;
+
+        var returnChance = Mathf.InverseLerp(_groupConfig.BiasStartDistance, _groupConfig.BiasFullDistance, d);
+        
+        if (Random.value < returnChance)
+        {
+            var centerDir = toSpawn.normalized;
+            var randomAngle = Random.Range(-60f, 60f);
+            _moveDir = Quaternion.Euler(0f, randomAngle, 0f) * centerDir;
+        }
+        else
+        {
+            _moveDir = randDir;
+        }
     }
 
     private void EnterState(float now)

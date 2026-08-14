@@ -88,7 +88,7 @@ public class FieldEnemySpawner : MonoBehaviour
         var spawnCount = Random.Range(minFieldSpawnCount, maxFieldSpawnCount + 1);
         
         // 여기서 EnemyGroup 만들고 
-        var group = new EnemyGroup(groupConfig, Time.time);
+        var group = new EnemyGroup(groupConfig, pos, Time.time);
         _enemyRegister.RegisterFieldEnemyGroup(group);
 
         for (var i = 0; i < spawnCount; i++)
