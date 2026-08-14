@@ -19,3 +19,7 @@ MonoBehaviour:
   minDelayTime: 0
   maxDelayTime: 1.2
   moveSpeedScale: 0.4
+  biasStartDistance: 10
+  biasFullDistance: 30
+  progressCheckInterval: 2
+  minProgressPerCheck: 2.4

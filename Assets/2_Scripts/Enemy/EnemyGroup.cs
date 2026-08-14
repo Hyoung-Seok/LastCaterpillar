@@ -9,6 +9,8 @@ public class EnemyGroup
     
     private readonly Vector3 _homeCenter;
     private Vector3 _lastKnownPos;
+    private Vector3 _checkPoint;
+    private float _nextProgressCheckAt;
     
     private float _transitionTime;
     private float _nextTransitionAt;
@@ -18,7 +20,7 @@ public class EnemyGroup
     public EnemyGroup(GroupConfig groupConfig, Vector3 center, float now)
     {
         _groupConfig = groupConfig;
-        _homeCenter = center;
+        _homeCenter = center; 
         _lastKnownPos = _homeCenter;
         
         State = Random.value < 0.5f ? EGroupState.Idle : EGroupState.Move;
@@ -29,6 +31,21 @@ public class EnemyGroup
     {
         if (State == EGroupState.Chase)
             return;
+
+        if (State == EGroupState.Move && now >= _nextProgressCheckAt)
+        {
+            var progress = Vector3.Dot(_lastKnownPos - _checkPoint, _moveDir);
+            
+            if (progress < _groupConfig.MinProgressPerCheck)
+            {
+                _nextTransitionAt = now;   
+            }
+            else
+            {
+                _checkPoint = _lastKnownPos;
+                _nextProgressCheckAt = now + _groupConfig.ProgressCheckInterval;
+            }
+        }
 
         if (now < _nextTransitionAt) return;
 
@@ -83,6 +100,8 @@ public class EnemyGroup
         
         _transitionTime = now;
         _nextTransitionAt = _transitionTime + rnd;
+        _checkPoint = _lastKnownPos;
+        _nextProgressCheckAt = now + _groupConfig.ProgressCheckInterval;
     }
     
 }
