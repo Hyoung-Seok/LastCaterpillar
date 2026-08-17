@@ -134292,6 +134292,59 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 803706038}
   m_Mesh: {fileID: -325222679304359609, guid: 1924c966b5d07bc40addfd86d20b5e9d, type: 3}
+--- !u!1 &804130249
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 804130251}
+  - component: {fileID: 804130250}
+  m_Layer: 0
+  m_Name: FieldEnemySpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &804130250
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 804130249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68d9d7385c7225c4bad99cc95bdd690a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FieldEnemySpawner
+  fieldEnemies:
+  - {fileID: 588079569933089530, guid: 22c6cc63e183dab4c88e5bbb47d3a173, type: 3}
+  clusterCount: 10
+  minDistanceClusters: 10
+  minFieldSpawnCount: 15
+  maxFieldSpawnCount: 20
+  radiusScale: 0.4
+  maxAttemptsCount: 10
+  groupConfig: {fileID: 11400000, guid: bbbb8ee9a9c41524c9c22682e925a039, type: 2}
+--- !u!4 &804130251
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 804130249}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &804547427
 GameObject:
   m_ObjectHideFlags: 0
@@ -303334,7 +303387,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1831126512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -303349,7 +303402,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   enemy:
   - {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
-  spawnCount: 500
+  spawnCount: 300
 --- !u!4 &1831126513
 Transform:
   m_ObjectHideFlags: 0
@@ -360237,3 +360290,4 @@ SceneRoots:
   - {fileID: 1804001334}
   - {fileID: 1434859508}
   - {fileID: 1281527529}
+  - {fileID: 804130251}

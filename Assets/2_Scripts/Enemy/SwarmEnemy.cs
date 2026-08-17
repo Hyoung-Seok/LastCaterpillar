@@ -29,25 +29,31 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         if (f == null)
             return;
         
-        var cellDir = f.GetCurrentCellDirection(transform.position);
-        var flowVec = new Vector3(cellDir.x, 0, cellDir.y).normalized;
-        var step = speed * dt;
         var pos = transform.position;
-        
+        var step = speed * dt;
+
         if (f.IsBlocked(pos))
         {
-            cc.Move(flowVec * step);
+            cc.Move(ToFlowVector(f.GetCurrentCellDirection(pos)) * step);
             return;
         }
-
+        
+        var (dir, speedScale) = GetDesiredMove(pos, f);
+        
         var force = Vector3.ClampMagnitude(Vector3.ClampMagnitude(_separation, maxSeparation) +
                     Vector3.ClampMagnitude(_obstacleForce, maxObstacleForce), 0.9f);
         
-        var desired = (flowVec + force).normalized * step;
+        var desired = (dir + force).normalized * (step * speedScale);
         cc.Move(SlideAlongWalls(pos, desired, f));
         
-        if(flowVec.sqrMagnitude > 0.0001f)
-            RotationMoveDir(flowVec, dt);
+        if(dir.sqrMagnitude > 0.0001f)
+            RotationMoveDir(dir, dt);
+    }
+
+    /// dir = 단위벡터 또는 영벡터(크기를 태우지 말 것), speedScale = 0~1
+    protected virtual (Vector3 dir, float speedScale) GetDesiredMove(Vector3 pos, FlowField f)
+    {
+        return (ToFlowVector(f.GetCurrentCellDirection(pos)), 1f);
     }
 
     private Vector3 SlideAlongWalls(Vector3 pos, Vector3 desired, FlowField f)
@@ -78,4 +84,6 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
             0,
             dz != 0 ? Mathf.Sign(dz) * (Mathf.Abs(dz) + _bodyRadius) : 0);
     }
+    
+    private Vector3 ToFlowVector(Vector2Int vec) => new Vector3(vec.x, 0, vec.y).normalized;
 }

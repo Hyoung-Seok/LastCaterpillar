@@ -30,7 +30,7 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource
     }
 
     public abstract void Move(float dt);
-    
+
     protected virtual void OnDead()
     {
         _isDead = true;
