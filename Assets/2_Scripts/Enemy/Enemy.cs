@@ -31,6 +31,8 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource
 
     public abstract void Move(float dt);
 
+    public virtual void OnHeardNoise(Vector3 pos, float now) { }
+
     protected virtual void OnDead()
     {
         _isDead = true;

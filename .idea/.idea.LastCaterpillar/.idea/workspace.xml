@@ -3,8 +3,12 @@
   <component name="ChangeListManager">
     <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyGroup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyGroup.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/GroupConfig.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/GroupConfig.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FieldEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FieldEnemy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerMoveController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerMoveController.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,6 +53,7 @@
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/AreaConfig.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/AreaGenerator.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/PCG/Editor/CityGeneratorEditor.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/NoiseSystem.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerAimController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/2_Scripts/Weapon/HE.cs" root0="FORCE_HIGHLIGHTING" />
@@ -155,7 +160,9 @@
       <workItem from="1786179915964" duration="7741000" />
       <workItem from="1786435579791" duration="19117000" />
       <workItem from="1786613067922" duration="12976000" />
-      <workItem from="1786697984587" duration="5959000" />
+      <workItem from="1786697984587" duration="6657000" />
+      <workItem from="1786956628202" duration="6259000" />
+      <workItem from="1787041429378" duration="8744000" />
     </task>
     <servers />
   </component>
