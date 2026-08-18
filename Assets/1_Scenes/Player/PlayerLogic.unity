@@ -21644,7 +21644,6 @@ MonoBehaviour:
   damper: 3.5
   idlingSoundRadius: 10
   maxMoveSoundRadius: 20
-  maxReversSoundRadius: 15
   noiseCheckInterval: 0.2
 --- !u!114 &128184007
 MonoBehaviour:

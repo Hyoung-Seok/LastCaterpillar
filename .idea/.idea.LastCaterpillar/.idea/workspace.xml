@@ -5,10 +5,14 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyGroup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyGroup.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FieldEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FieldEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerMoveController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Player/PlayerMoveController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/3_Prefabs/Enemy/Enemy_FieldEnemy.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/3_Prefabs/Enemy/Enemy_FieldEnemy.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/3_Prefabs/Enemy/Enemy_ZombieWave.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/3_Prefabs/Enemy/Enemy_ZombieWave.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/5_Animations/Enemy/WaveZombie.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/5_Animations/Enemy/WaveZombie/Injured Run.fbx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/5_Animations/Enemy/WaveZombie/Injured Run.fbx.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/5_Animations/Enemy/WaveZombie/WaveZombie.controller" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/5_Animations/Enemy/WaveZombie/WaveZombie.controller.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +166,7 @@
       <workItem from="1786613067922" duration="12976000" />
       <workItem from="1786697984587" duration="6657000" />
       <workItem from="1786956628202" duration="6259000" />
-      <workItem from="1787041429378" duration="8744000" />
+      <workItem from="1787041429378" duration="11221000" />
     </task>
     <servers />
   </component>

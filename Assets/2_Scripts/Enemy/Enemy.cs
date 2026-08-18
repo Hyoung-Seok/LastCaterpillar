@@ -6,6 +6,9 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource
     public float InfluenceRadius => influenceRadius;
     public float Mass => mass;
     public bool IsDead => _isDead;
+    
+    [Header("Components")]
+    [SerializeField] protected Animator animator;
 
     [Header("Config")] 
     [SerializeField] protected float maxHp = 100;

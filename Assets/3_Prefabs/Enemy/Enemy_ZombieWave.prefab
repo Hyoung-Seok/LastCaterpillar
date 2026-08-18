@@ -780,6 +780,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a54c061545d6cf41b4ea7a46b0334f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwarmEnemy
+  animator: {fileID: 783345900526783121}
   maxHp: 100
   speed: 5
   rotationSpeed: 200

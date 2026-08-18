@@ -871,6 +871,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 084b5c39c25632d42937d5c405503793, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FieldEnemy
+  animator: {fileID: 1111244535478273401}
   maxHp: 100
   speed: 5
   rotationSpeed: 200
