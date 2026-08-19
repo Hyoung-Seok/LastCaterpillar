@@ -10,7 +10,7 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField] private Rigidbody rb;
 
     [Header("Forward/Revers Config")] 
-    [SerializeField] private float forwardMaxSpeed;
+    [SerializeField, Min(1f)] private float forwardMaxSpeed = 10f;
     [SerializeField, Range(-100, -1)] private float reverseMaxSpeed;
     [SerializeField] private float acceleration;
     [SerializeField] private float breakDecel;
@@ -30,8 +30,8 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField] private float damper = 10f;
 
     [Header("Sound Config")] 
-    [SerializeField, Min(0.1f)] private float idlingSoundRadius;
-    [SerializeField, Min(0.1f)] private float maxMoveSoundRadius;
+    [SerializeField, Min(0.1f)] private float idlingSoundRadius = 10f;
+    [SerializeField, Min(0.1f)] private float maxMoveSoundRadius = 20f;
     [SerializeField, Min(0.1f)] private float noiseCheckInterval = 0.2f;
     
     private InputAction _move;
