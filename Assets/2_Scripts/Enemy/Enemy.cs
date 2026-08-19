@@ -1,14 +1,19 @@
 using UnityEngine;
 
-public abstract class Enemy : MonoBehaviour, IRepulsionSource
+public abstract class Enemy : MonoBehaviour, IRepulsionSource, IDamageable
 {
     public Vector3 Position => transform.position;
     public float InfluenceRadius => influenceRadius;
     public float Mass => mass;
     public bool IsDead => _isDead;
+    
+    [Header("Components")]
+    [SerializeField] protected Animator animator;
 
     [Header("Config")] 
     [SerializeField] protected float maxHp = 100;
+    [SerializeField, Min(0.1f)] protected float damage = 50f;
+    [SerializeField, Min(0.1f)] protected float contactDistance = 3f;
     [SerializeField] protected float speed;
     [SerializeField] protected float rotationSpeed;
     [SerializeField, Tooltip("반발 저항 가중치"), Min(0.1f)] private float mass;
@@ -19,17 +24,21 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource
     private bool _isDead = false;
     private float _curHp;
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float dmg)
     {
         if(_isDead) return;
         
-        _curHp -= damage;
+        _curHp -= dmg;
         if (_curHp > 0) return;
         
         OnDead();
     }
 
     public abstract void Move(float dt);
+
+    public virtual void OnHeardNoise(Vector3 pos, float now) { }
+
+    public virtual void OnPlayerContact(Vector3 pos, IDamageable target) { }
 
     protected virtual void OnDead()
     {

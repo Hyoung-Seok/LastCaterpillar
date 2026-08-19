@@ -15,5 +15,6 @@ MonoBehaviour:
   shellPrefab: {fileID: 4242723857853475229, guid: fc39e6eeba347b24b88f267cbbdabe74, type: 3}
   shellName: "70mm \uACE0\uD3ED\uD0C4"
   blastRadius: 10
+  noiseRadius: 30
   velocity: 150
   minFireDistance: 10

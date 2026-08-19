@@ -70,6 +70,8 @@ public class MainTurret : MonoBehaviour
         var s = Instantiate(LoadedShell.ShellPrefab, firePos.position, Quaternion.identity);
         s.OnStartFire(LoadedShell, firePos.position, _inputReader.AimPoint);
         CurSlot.Consume();
+        
+        NoiseSystem.Instance.Emit(transform.position, CurSlot.ShellData.NoiseRadius);
     }
 
     private bool IsCanFire()
@@ -124,14 +126,14 @@ public class MainTurret : MonoBehaviour
     {
         _fire.performed -= FireMainTurret;
     }
-
+    
     private void OnDrawGizmosSelected()
     {
-        if (_slots == null || _inputReader == null)
+        if (_slots == null || _slots[_curShellIndex] == null)
             return;
         
-        Gizmos.color = Color.crimson;
-        Gizmos.DrawWireSphere(_inputReader.AimPoint, CurSlot.ShellData.BlastRadius);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(transform.position, LoadedShell.NoiseRadius);
     }
 }
 

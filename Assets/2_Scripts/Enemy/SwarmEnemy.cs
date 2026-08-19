@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SwarmEnemy : Enemy, IRepulsionReceiver
@@ -21,6 +22,20 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private void Awake()
     {
         _bodyRadius = cc.radius;
+    }
+
+    public override void OnPlayerContact(Vector3 pos, IDamageable target)
+    {
+        if (IsDead) return;
+
+        var distance = pos - Position;
+        distance.y = 0;
+        
+        if (distance.sqrMagnitude > contactDistance * contactDistance)
+            return;
+        
+        target.TakeDamage(damage);
+        OnDead();
     }
 
     public override void Move(float dt)
@@ -86,4 +101,10 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     }
     
     private Vector3 ToFlowVector(Vector2Int vec) => new Vector3(vec.x, 0, vec.y).normalized;
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.brown;
+        Gizmos.DrawWireSphere(transform.position, contactDistance);
+    }
 }

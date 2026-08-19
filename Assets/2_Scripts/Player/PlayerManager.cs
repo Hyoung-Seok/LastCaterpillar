@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerManager : MonoBehaviour
 {
+    [Header("Components")]
     [SerializeField] private InputReader inputReader;
     
     public InputReader InputReader => inputReader;

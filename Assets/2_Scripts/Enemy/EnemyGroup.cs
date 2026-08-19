@@ -3,7 +3,11 @@ using UnityEngine;
 public class EnemyGroup
 {
     public EGroupState State { get; private set; }
+    public EGroupState EffectiveStateFor(float delay, float now) 
+        => now >= _transitionTime + delay ? State : _prevState;
     public void ReportPosition(Vector3 pos) => _lastKnownPos = pos;
+    public Vector3 MoveDir { get; private set; }
+    public float MoveSpeedScale => _groupConfig.MoveSpeedScale;
 
     private readonly GroupConfig _groupConfig;
     
@@ -15,7 +19,6 @@ public class EnemyGroup
     private float _transitionTime;
     private float _nextTransitionAt;
     private EGroupState _prevState;
-    private Vector3 _moveDir;
 
     public EnemyGroup(GroupConfig groupConfig, Vector3 center, float now)
     {
@@ -34,7 +37,7 @@ public class EnemyGroup
 
         if (State == EGroupState.Move && now >= _nextProgressCheckAt)
         {
-            var progress = Vector3.Dot(_lastKnownPos - _checkPoint, _moveDir);
+            var progress = Vector3.Dot(_lastKnownPos - _checkPoint, MoveDir);
             
             if (progress < _groupConfig.MinProgressPerCheck)
             {
@@ -55,16 +58,20 @@ public class EnemyGroup
         EnterState(now);
     }
 
-    public (Vector3 dir, float speedScale) GetMoveFor(float delay, float now)
-    {
-        var s = (now >= _transitionTime + delay) ? State : _prevState;
-        return s == EGroupState.Idle ? (Vector3.zero, 0f) : (_moveDir, _groupConfig.MoveSpeedScale);
-    }
-
     public float GetRelayDelay(int index, int count)
     {
         return count > 1 ? Mathf.Lerp(_groupConfig.MinDelayTime, _groupConfig.MaxDelayTime, (float)index / (count - 1))
                 : 0f;
+    }
+
+    public void OnHeardNoise(float now)
+    {
+        if (State == EGroupState.Chase) return;
+        
+        _prevState = State;
+        State = EGroupState.Chase;
+        
+        _transitionTime = now;
     }
 
     private void PickMoveDir()
@@ -82,11 +89,11 @@ public class EnemyGroup
         {
             var centerDir = toSpawn.normalized;
             var randomAngle = Random.Range(-60f, 60f);
-            _moveDir = Quaternion.Euler(0f, randomAngle, 0f) * centerDir;
+            MoveDir = Quaternion.Euler(0f, randomAngle, 0f) * centerDir;
         }
         else
         {
-            _moveDir = randDir;
+            MoveDir = randDir;
         }
     }
 

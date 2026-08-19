@@ -9,7 +9,7 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField] private Rigidbody rb;
 
     [Header("Forward/Revers Config")] 
-    [SerializeField] private float forwardMaxSpeed;
+    [SerializeField, Min(1f)] private float forwardMaxSpeed = 10f;
     [SerializeField, Range(-100, -1)] private float reverseMaxSpeed;
     [SerializeField] private float acceleration;
     [SerializeField] private float breakDecel;
@@ -27,15 +27,26 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField] private float restLength = 1.4f;
     [SerializeField] private float springStrength = 0.1f;
     [SerializeField] private float damper = 10f;
+
+    [Header("Sound Config")] 
+    [SerializeField, Min(0.1f)] private float idlingSoundRadius = 10f;
+    [SerializeField, Min(0.1f)] private float maxMoveSoundRadius = 20f;
+    [SerializeField, Min(0.1f)] private float noiseCheckInterval = 0.2f;
     
     private InputAction _move;
     private Vector2 _moveInput;
     private float _curSpeed = 0f;
     private float _curTurnSpeed = 0f;
     
+    private float _curSoundRadius;
+    private float _curNoiseCheckTime;
+    
     private void Start()
     {   
         _move = GetComponent<PlayerManager>().InputReader.PlayerMove;
+        
+        _curSoundRadius = idlingSoundRadius;
+        _curNoiseCheckTime = 0f;
     }
 
     private void Update()
@@ -44,6 +55,14 @@ public class PlayerMoveController : MonoBehaviour
         
         UpdateSpeed();
         UpdateTurnSpeed();
+        
+        _curNoiseCheckTime += Time.deltaTime;
+
+        if (_curNoiseCheckTime >= noiseCheckInterval)
+        {
+            _curNoiseCheckTime -= noiseCheckInterval;
+            NoiseSystem.Instance.Emit(transform.position, _curSoundRadius);
+        }
     }
     
     private void FixedUpdate()
@@ -65,7 +84,7 @@ public class PlayerMoveController : MonoBehaviour
         var speedDir = Math.Sign(_curSpeed);
         var rate = 0f;
         var targetSpeed = 0f;
-        
+
         if (inputDir == 0)
         {
             targetSpeed = 0f;
@@ -83,6 +102,8 @@ public class PlayerMoveController : MonoBehaviour
         }
         
         _curSpeed = Mathf.MoveTowards(_curSpeed, targetSpeed, rate * Time.deltaTime);
+        _curSoundRadius = Mathf.Lerp(idlingSoundRadius, maxMoveSoundRadius, 
+            Mathf.Abs(_curSpeed) / forwardMaxSpeed);
     }
 
     private void UpdateTurnSpeed()
@@ -139,5 +160,11 @@ public class PlayerMoveController : MonoBehaviour
         var dampForce = springVel * damper;
         
         return springForce - dampForce;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, _curSoundRadius);
     }
 }
