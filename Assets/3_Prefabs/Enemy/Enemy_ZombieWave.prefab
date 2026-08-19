@@ -783,7 +783,7 @@ MonoBehaviour:
   animator: {fileID: 783345900526783121}
   maxHp: 100
   damage: 50
-  contactDis: 5
+  contactDistance: 1
   speed: 5
   rotationSpeed: 200
   mass: 1

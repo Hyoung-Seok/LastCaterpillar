@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class SwarmEnemy : Enemy, IRepulsionReceiver
@@ -100,4 +101,10 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     }
     
     private Vector3 ToFlowVector(Vector2Int vec) => new Vector3(vec.x, 0, vec.y).normalized;
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.brown;
+        Gizmos.DrawWireSphere(transform.position, contactDistance);
+    }
 }
