@@ -23,6 +23,20 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         _bodyRadius = cc.radius;
     }
 
+    public override void OnPlayerContact(Vector3 pos, IDamageable target)
+    {
+        if (IsDead) return;
+
+        var distance = pos - Position;
+        distance.y = 0;
+        
+        if (distance.sqrMagnitude > contactDistance * contactDistance)
+            return;
+        
+        target.TakeDamage(damage);
+        OnDead();
+    }
+
     public override void Move(float dt)
     {
         var f = FlowField.Instance;
