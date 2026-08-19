@@ -21539,6 +21539,7 @@ GameObject:
   m_Component:
   - component: {fileID: 128184003}
   - component: {fileID: 128184008}
+  - component: {fileID: 128184009}
   - component: {fileID: 128184006}
   - component: {fileID: 128184005}
   - component: {fileID: 128184007}
@@ -21677,6 +21678,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerManager
   inputReader: {fileID: 11400000, guid: 2666b3e6a7396e948a0f1900bdb4cb2c, type: 2}
+--- !u!114 &128184009
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 128184002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acbe085c6f37bde408a8749736087244, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHull
+  hullCollider: {fileID: 1319512998}
+  hp: 1000
+  contactRadius: 6.3
 --- !u!1 &128398634
 GameObject:
   m_ObjectHideFlags: 0

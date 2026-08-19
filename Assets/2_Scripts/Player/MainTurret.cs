@@ -126,10 +126,10 @@ public class MainTurret : MonoBehaviour
     {
         _fire.performed -= FireMainTurret;
     }
-
+    
     private void OnDrawGizmosSelected()
     {
-        if (LoadedShell == null)
+        if (_slots == null || _slots[_curShellIndex] == null)
             return;
         
         Gizmos.color = Color.green;
