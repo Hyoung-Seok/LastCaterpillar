@@ -37,9 +37,8 @@ public class PlayerMoveController : MonoBehaviour
     private Vector2 _moveInput;
     private float _curSpeed = 0f;
     private float _curTurnSpeed = 0f;
-    private float _curSoundRadius;
     
-    private NoiseSystem _noise;
+    private float _curSoundRadius;
     private float _curNoiseCheckTime;
     
     private void Start()
@@ -47,7 +46,6 @@ public class PlayerMoveController : MonoBehaviour
         _move = GetComponent<PlayerManager>().InputReader.PlayerMove;
         
         _curSoundRadius = idlingSoundRadius;
-        _noise = NoiseSystem.Instance;
         _curNoiseCheckTime = 0f;
     }
 
@@ -63,7 +61,7 @@ public class PlayerMoveController : MonoBehaviour
         if (_curNoiseCheckTime >= noiseCheckInterval)
         {
             _curNoiseCheckTime -= noiseCheckInterval;
-            _noise.Emit(transform.position, _curSoundRadius);
+            NoiseSystem.Instance.Emit(transform.position, _curSoundRadius);
         }
     }
     
