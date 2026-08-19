@@ -40,10 +40,7 @@ public class NoiseSystem
 
     private void Dispatch((Vector3 pos, float radius) item)
     {
-        var reg = EnemyRegister.Instance;
-        if (reg == null) return;
-        
-        reg.QueryForRadius(item.pos, item.radius, _buffer);
+        EnemyRegister.Instance.QueryForRadius(item.pos, item.radius, _buffer);
         foreach (var e in _buffer)
         {
             e.OnHeardNoise(item.pos, Time.time);
