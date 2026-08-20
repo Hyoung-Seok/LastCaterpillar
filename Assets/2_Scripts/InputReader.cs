@@ -8,6 +8,7 @@ public class InputReader : ScriptableObject
     public InputAction PlayerMove => GameInput.Player.Move;
     public InputAction PlayerAim => GameInput.Player.Aim;
     public InputAction PlayerFire => GameInput.Player.Fire;
+    public InputAction PlayerMgFire => GameInput.Player.FireMG;
     
     // Global Value
     public Vector3 AimPoint;
