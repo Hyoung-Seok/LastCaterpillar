@@ -17,6 +17,21 @@ public class CoaxialMG : MonoBehaviour
     private List<Round> _firedRounds;
     private List<Enemy> _hitCandidates;
     private InputAction _fireAction;
+
+    private readonly struct HitPick
+    {
+        public readonly float Along;
+        public readonly Enemy Enemy;
+
+        public HitPick(float along, Enemy enemy)
+        {
+            Along = along;
+            Enemy = enemy;
+        }
+    }
+
+    private HitPick[] _picks;
+    private int _pickCount = 0;
     
     private float _nextFireTime;
     private EnemyRegister _enemyRegister;
@@ -28,6 +43,7 @@ public class CoaxialMG : MonoBehaviour
         _rounds = new Queue<Round>();
         _firedRounds = new List<Round>();
         _hitCandidates = new List<Enemy>();
+        _picks = new HitPick[config.PenetrationCount];
         
         _nextFireTime = Time.time + config.FireInterval;
         _fireAction = GetComponent<PlayerManager>().InputReader.PlayerMgFire;
@@ -73,6 +89,8 @@ public class CoaxialMG : MonoBehaviour
     private bool ProcessHits(Round r, Vector3 prev, float step)
     {
         prev.y = 0;
+        _pickCount = 0;
+        var budget = r.HitEnemies.Length - r.HitCount;
 
         var half = step * 0.5f;
         // N-1 과 N프레임의 총알 위치의 중앙 지점 계싼
@@ -100,28 +118,31 @@ public class CoaxialMG : MonoBehaviour
             //prev ●----------● cur              ● enemy
             //      0m       5m                 8m
             // 총알이 실제 이동하지 않는 위치에 있는 적을 검사하지 않도록 제한
-            along = Mathf.Clamp(along, 0f, step);
+            var clamped = Mathf.Clamp(along, 0f, step);
                 
             // along은 prev 위치에서 수평으로 n 미터 떨어져 있다는 것을 의미. 그래서 moveDir의 위치의 수평 성분에서 어디에 위치해있는지 구함.
             // prev ●────●──────────────→ moveDir
             //      ← 3m →
-            var closest = prev + r.Direction * along;
+            var closest = prev + r.Direction * clamped;
             var sqrDistance = (closest - enemyPos).sqrMagnitude;
                 
             if(sqrDistance > config.HitRadius * config.HitRadius) 
                 continue;
                 
-            // 이 적은 명중
-            e.TakeDamage(config.Damage);
-            r.CurPenetrationCount--;
+            // 이미 명중한 적이라면 스킵
+            if(AlreadyHit(r, e))
+                continue;
 
-            if (r.CurPenetrationCount <= 0)
-            {
-                return true;
-            }
+            TryPickNearest(along, e, budget);
         }
 
-        return false;
+        for (var i = 0; i < _pickCount; ++i)
+        {
+            _picks[i].Enemy.TakeDamage(config.Damage);
+            r.HitEnemies[r.HitCount++] = _picks[i].Enemy;
+        }
+
+        return r.HitCount >= r.HitEnemies.Length;
     }
 
     private void FireCoaxialMg()
@@ -141,13 +162,44 @@ public class CoaxialMG : MonoBehaviour
         
         r.CurPosition = firePos.position;
         r.CurLifeTime = 0;
-        r.CurPenetrationCount = config.PenetrationCount;
+
+        if (r.HitEnemies == null || r.HitEnemies.Length != config.PenetrationCount)
+        {
+            r.HitEnemies = new Enemy[config.PenetrationCount];
+        }
+
+        if (_picks == null || _picks.Length != config.PenetrationCount)
+        {
+            _picks = new HitPick[config.PenetrationCount];
+        }
+        r.HitCount = 0;
         
         r.Bullet.transform.SetPositionAndRotation(firePos.position, Quaternion.LookRotation(r.Direction));
         r.Bullet.SetActive(true);
         
         _firedRounds.Add(r);
         _nextFireTime = Time.time + config.FireInterval;
+    }
+
+    private void TryPickNearest(float along, Enemy enemy, int budget)
+    {
+        // 이미 가득 찼는데 가장 먼 적보다 더 멀리 있으면 버림
+        if (_pickCount == budget && along >= _picks[_pickCount - 1].Along)
+            return;
+        
+        // 자리 확보. 가득 찼으면 늘리지 않는다.
+        if(_pickCount < budget)
+            ++_pickCount;
+        
+        // 뒤에서부터 밀며 제자리 찾기
+        var i = _pickCount - 1;
+        while (i > 0 && _picks[i - 1].Along > along)
+        {
+            _picks[i] = _picks[i - 1];
+            --i;
+        }
+
+        _picks[i] = new HitPick(along, enemy);
     }
 
     private void CreateRound(int count)
@@ -158,17 +210,30 @@ public class CoaxialMG : MonoBehaviour
             _rounds.Enqueue(new Round(obj));
         }
     }
+
+    private bool AlreadyHit(Round r, Enemy e)
+    {
+        for(var i = 0; i < r.HitCount; ++i)
+        {
+            if (ReferenceEquals(r.HitEnemies[i], e))
+                return true;
+        }
+
+        return false;
+    }
     
     private bool IsCanFire() => Time.time >= _nextFireTime;
 }
 
 public class Round
 {
-    public GameObject Bullet;
+    public readonly GameObject Bullet;
     public Vector3 CurPosition;
     public Vector3 Direction;
     public float CurLifeTime;
-    public int CurPenetrationCount;
+    
+    public Enemy[] HitEnemies;
+    public int HitCount;
 
     public Round(GameObject bullet)
     {
