@@ -6,7 +6,7 @@ public class CoaxialMGData : ScriptableObject
     [Header("MG Bullet Config")]
     [SerializeField, Min(0.1f)] private float damage = 0.1f;
     [SerializeField, Min(0.1f)] private float velocity = 0.1f;
-    [SerializeField, Min(0)] private int penetrationCount;
+    [SerializeField, Min(1)] private int penetrationCount;
     [SerializeField, Min(0.1f)] private float hitRadius = 0.1f;
 
     [Header("MG Config")] 

@@ -3,10 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/GameInput.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/GameInput.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/InputReader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/InputReader.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/6_Data/GameInput.inputactions" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/6_Data/GameInput.inputactions" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Player/CoaxialMG.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Player/CoaxialMG.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Player/CoaxialMGData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Player/CoaxialMGData.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +160,8 @@
       <workItem from="1786956628202" duration="6259000" />
       <workItem from="1787041429378" duration="11484000" />
       <workItem from="1787127132449" duration="14797000" />
-      <workItem from="1787214813591" duration="10268000" />
+      <workItem from="1787214813591" duration="16826000" />
+      <workItem from="1787650398278" duration="5776000" />
     </task>
     <servers />
   </component>
