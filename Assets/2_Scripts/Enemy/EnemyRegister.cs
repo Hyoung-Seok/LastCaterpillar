@@ -100,29 +100,58 @@ public class EnemyRegister : MonoBehaviour
             _obstacleHash.Query(self.Position, _obstacleBuffer);
 
             var selfPos = self.Position;
-            var sep = Vector3.zero;
+            var correction = Vector3.zero;      // 이번 프레임에 내가 물러나야 할 변위
+            var overlapCount = 0;                      // 몇 바리와 겹쳤나(나중에 평균 낼 때 사용) 
             var obsForce = Vector3.zero;
             
             foreach (var other in _enemyBuffer)
             {
                 if(ReferenceEquals(other, self)) continue;
 
-                if (TryCalculateRepulsion(selfPos, other, out var f))
+                var away = selfPos - other.Position;
+                away.y = 0f;
+                var d = away.magnitude;
+                var rMin = self.BodyRadius + other.BodyRadius;
+
+                if (d < rMin && d > 0.0001f)
                 {
-                    var w = RepulsionWeight(self.Mass, other.Mass);
-                    sep += f * w;
+                    var penetration = rMin - d;
+                    var share = other.Mass / (self.Mass + other.Mass);
+                    correction += (away / d) * (penetration * share);
+                    overlapCount++;
                 }
             }
+            
+            if(overlapCount > 0)
+                correction /= overlapCount;
 
+            var obsCorrection = Vector3.zero;
+            var obsOverlapCount = 0;
+            
             foreach (var obs in _obstacleBuffer)
             {
+                var away = selfPos - obs.Position;
+                away.y = 0;
+                var d = away.magnitude;
+                var rMin = self.BodyRadius + obs.BodyRadius;
+
+                if (d < rMin && d > 0.0001f)
+                {
+                    obsCorrection += (away / d) * (rMin - d);
+                    obsOverlapCount++;
+                }
+                
                 if(TryCalculateRepulsion(selfPos, obs, out var f))
                 {
                     obsForce += f;
                 }
             }
-            
-            self.ApplyRepulsion(sep, obsForce);
+
+            if (obsOverlapCount > 0)
+                obsCorrection /= obsOverlapCount;
+
+            correction += obsCorrection;
+            self.ApplyRepulsion(correction, obsForce);
         }
 
         foreach (var e in _enemyList)
@@ -134,7 +163,7 @@ public class EnemyRegister : MonoBehaviour
         FlushPending();
     }
 
-    private bool TryCalculateRepulsion(Vector3 selfPos, IRepulsionSource item, out Vector3 force)
+    private bool TryCalculateRepulsion(Vector3 selfPos, ISteeringSource item, out Vector3 force)
     {
         var away = selfPos - item.Position;
         away.y = 0f;
@@ -149,8 +178,6 @@ public class EnemyRegister : MonoBehaviour
         force = away.normalized * (1 - dist / item.InfluenceRadius);
         return true;
     }
-
-    private float RepulsionWeight(float selfMass, float otherMass) => 2 * otherMass / (selfMass + otherMass);
 
     private void FlushPending()
     {
