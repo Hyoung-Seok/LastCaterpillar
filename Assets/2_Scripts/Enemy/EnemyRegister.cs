@@ -1,8 +1,14 @@
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
 
 public class EnemyRegister : MonoBehaviour
 {
+    [SerializeField, Min(1), 
+     Tooltip("모든 적의 BodyRadius보다 커야함")] private int enemyHashCellSize = 1;
+    [SerializeField, Min(1),
+    Tooltip("모든 장애물의 influenceRadius 보다 커야함")] private int obstacleHashCellSize = 2;
+    
     [SerializeField] private Transform smallObstacleParent;
     
     private List<Enemy> _enemyList;
@@ -19,6 +25,12 @@ public class EnemyRegister : MonoBehaviour
 
     private static EnemyRegister _instance;
     private static bool _isDestroy = false;
+    
+    private static readonly ProfilerMarker s_Prepare = new ("EnemyRegister.Prepare");
+    private static readonly ProfilerMarker s_GroupTick = new ("EnemyRegister.GroupTick");
+    private static readonly ProfilerMarker s_HashInsert = new("EnemyRegister.HashInsert");
+    private static readonly ProfilerMarker s_Repulsion = new ("EnemyRegister.Repulsion");
+    private static readonly ProfilerMarker s_MoveAll = new("EnemyRegister.MoveAll");
 
     public static EnemyRegister Instance
     {
@@ -81,85 +93,103 @@ public class EnemyRegister : MonoBehaviour
 
     private void Update()
     {
-        _enemyHash.Clear();
-        FlushPending();
-
-        foreach (var group in _fieldEnemyGroup)
+        using (s_Prepare.Auto())
         {
-            group.Tick(Time.time);
+            _enemyHash.Clear();
+            FlushPending();
         }
 
-        foreach (var e in _enemyList)
+        using (s_GroupTick.Auto())
         {
-            _enemyHash.Insert(e);
-        }
-
-        foreach (var self in _repulsionsReceivers)
-        {
-            _enemyHash.Query(self.Position, _enemyBuffer);
-            _obstacleHash.Query(self.Position, _obstacleBuffer);
-
-            var selfPos = self.Position;
-            var correction = Vector3.zero;      // 이번 프레임에 내가 물러나야 할 변위
-            var overlapCount = 0;                      // 몇 바리와 겹쳤나(나중에 평균 낼 때 사용) 
-            var obsForce = Vector3.zero;
-            
-            foreach (var other in _enemyBuffer)
+            foreach (var group in _fieldEnemyGroup)
             {
-                if(ReferenceEquals(other, self)) continue;
+                group.Tick(Time.time);
+            }
+        }
 
-                var away = selfPos - other.Position;
-                away.y = 0f;
-                var d = away.magnitude;
-                var rMin = self.BodyRadius + other.BodyRadius;
+        using (s_HashInsert.Auto())
+        {
+            foreach (var e in _enemyList)
+            {
+                _enemyHash.Insert(e);
+            }
+        }
 
-                if (d < rMin && d > 0.0001f)
+        using (s_Repulsion.Auto())
+        {
+            foreach (var self in _repulsionsReceivers)
+            {
+                var selfPos = self.Position;
+                
+                _enemyHash.Query(selfPos, _enemyBuffer);
+                _obstacleHash.Query(selfPos, _obstacleBuffer);
+                
+                var correction = Vector3.zero; // 이번 프레임에 내가 물러나야 할 변위
+                var overlapCount = 0; // 몇 바리와 겹쳤나(나중에 평균 낼 때 사용) 
+                var obsForce = Vector3.zero;
+
+                foreach (var other in _enemyBuffer)
                 {
+                    if (ReferenceEquals(other, self)) continue;
+
+                    var away = selfPos - other.Position;
+                    away.y = 0f;
+                    var sqrD = away.sqrMagnitude;
+                    var rMin = self.BodyRadius + other.BodyRadius;
+
+                    if(sqrD >= rMin * rMin) continue;
+                    if(sqrD < 1e-8f) continue;
+
+                    var d = Mathf.Sqrt(sqrD);
+             
                     var penetration = rMin - d;
                     var share = other.Mass / (self.Mass + other.Mass);
                     correction += (away / d) * (penetration * share);
                     overlapCount++;
                 }
-            }
-            
-            if(overlapCount > 0)
-                correction /= overlapCount;
 
-            var obsCorrection = Vector3.zero;
-            var obsOverlapCount = 0;
-            
-            foreach (var obs in _obstacleBuffer)
-            {
-                var away = selfPos - obs.Position;
-                away.y = 0;
-                var d = away.magnitude;
-                var rMin = self.BodyRadius + obs.BodyRadius;
+                if (overlapCount > 0)
+                    correction /= overlapCount;
 
-                if (d < rMin && d > 0.0001f)
+                var obsCorrection = Vector3.zero;
+                var obsOverlapCount = 0;
+
+                foreach (var obs in _obstacleBuffer)
                 {
-                    obsCorrection += (away / d) * (rMin - d);
-                    obsOverlapCount++;
+                    var away = selfPos - obs.Position;
+                    away.y = 0;
+                    var d = away.magnitude;
+                    var rMin = self.BodyRadius + obs.BodyRadius;
+
+                    if (d < rMin && d > 0.0001f)
+                    {
+                        obsCorrection += (away / d) * (rMin - d);
+                        obsOverlapCount++;
+                    }
+
+                    if (TryCalculateRepulsion(selfPos, obs, out var f))
+                    {
+                        obsForce += f;
+                    }
                 }
-                
-                if(TryCalculateRepulsion(selfPos, obs, out var f))
-                {
-                    obsForce += f;
-                }
+
+                if (obsOverlapCount > 0)
+                    obsCorrection /= obsOverlapCount;
+
+                correction += obsCorrection;
+                self.ApplyRepulsion(correction, obsForce);
             }
-
-            if (obsOverlapCount > 0)
-                obsCorrection /= obsOverlapCount;
-
-            correction += obsCorrection;
-            self.ApplyRepulsion(correction, obsForce);
         }
 
-        foreach (var e in _enemyList)
+        using (s_MoveAll.Auto())
         {
-            if(!e.IsDead)
-                e.Move(Time.deltaTime);
+            foreach (var e in _enemyList)
+            {
+                if (!e.IsDead)
+                    e.Move(Time.deltaTime);
+            }
         }
-        
+
         FlushPending();
     }
 
@@ -199,10 +229,9 @@ public class EnemyRegister : MonoBehaviour
         _fieldEnemyGroup = new List<EnemyGroup>();
         
         _pendingRemove = new List<Enemy>();
-
-        // CellSize를 매직넘버로 넘기는게 맞나?
-        _enemyHash = new SpatialHash<Enemy>(4);
-        _obstacleHash = new SpatialHash<Obstacle>(4);
+        
+        _enemyHash = new SpatialHash<Enemy>(enemyHashCellSize);
+        _obstacleHash = new SpatialHash<Obstacle>(obstacleHashCellSize);
 
         _enemyBuffer = new List<Enemy>();
         _obstacleBuffer = new List<Obstacle>();

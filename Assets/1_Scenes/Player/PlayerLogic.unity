@@ -37276,7 +37276,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.83
-  bodyRadius: 1.27
+  bodyRadius: 1.09
 --- !u!65 &209722186
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -39190,7 +39190,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.55
-  bodyRadius: 0.85
+  bodyRadius: 0.81
 --- !u!65 &221568547
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -131311,7 +131311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.55
-  bodyRadius: 0.85
+  bodyRadius: 0.81
 --- !u!65 &788716797
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -137200,7 +137200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.55
-  bodyRadius: 0.85
+  bodyRadius: 0.81
 --- !u!65 &816695776
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -137327,7 +137327,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.55
-  bodyRadius: 0.85
+  bodyRadius: 0.81
 --- !u!65 &817634198
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -157778,7 +157778,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.55
-  bodyRadius: 0.85
+  bodyRadius: 0.81
 --- !u!65 &947853976
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -211214,6 +211214,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c3cc29af5767848b06e88a5ee0fcaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRegister
+  enemyHashCellSize: 1
+  obstacleHashCellSize: 2
   smallObstacleParent: {fileID: 1546713544}
 --- !u!4 &1281527529
 Transform:
@@ -232775,7 +232777,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.55
-  bodyRadius: 0.85
+  bodyRadius: 0.81
 --- !u!65 &1415681862
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -233352,7 +233354,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.55
-  bodyRadius: 0.85
+  bodyRadius: 0.81
 --- !u!65 &1417893150
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -303893,7 +303895,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   enemy:
   - {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
-  spawnRepeatCount: 3
+  spawnRepeatCount: 4
   spawnCount: 100
   spawnInterval: 3
 --- !u!4 &1831126513
@@ -353231,7 +353233,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Obstacle
   influenceRadius: 1.55
-  bodyRadius: 0.85
+  bodyRadius: 0.81
 --- !u!65 &2099843820
 BoxCollider:
   m_ObjectHideFlags: 0

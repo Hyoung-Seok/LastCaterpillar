@@ -1,4 +1,5 @@
 using System;
+using Unity.Profiling;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -10,6 +11,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private float _moveSpeed;
     private Vector3 _correction;
     private Vector3 _obstacleForce;
+    
+    private static readonly ProfilerMarker s_TransformMove = new("SwarmEnemy.TransformMove");
 
     public void ApplyRepulsion(Vector3 correction, Vector3 obsForce)
     {
@@ -48,7 +51,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 
         if (f.IsBlocked(pos))
         {
-            transform.position += ToFlowVector(f.GetCurrentCellDirection(pos)) * step;
+            using (s_TransformMove.Auto())
+                transform.position += ToFlowVector(f.GetCurrentCellDirection(pos)) * step;
             return;
         }
         
@@ -57,11 +61,13 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         
         // 1단계 : 조향 - dt 있음
         var steerDir = (dir + clampedObsForce).normalized;
-        transform.position += SlideAlongWalls(pos, steerDir * (step * speedScale), f);
+        using (s_TransformMove.Auto())
+            transform.position += SlideAlongWalls(pos, steerDir * (step * speedScale), f);
         
         // 2단계 : 겹침 해소 - dt 없음
         var pos2 = transform.position;
-        transform.position += SlideAlongWalls(pos2, _correction * correctionStiffens, f);
+        using (s_TransformMove.Auto())
+            transform.position += SlideAlongWalls(pos2, _correction * correctionStiffens, f);
         
         if(dir.sqrMagnitude > 0.0001f)
             RotationMoveDir(dir, dt);
