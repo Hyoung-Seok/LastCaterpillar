@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Obstacle : MonoBehaviour, ISteeringSource
+public class Obstacle : MonoBehaviour, IRepulsionSource, ISteeringSource
 {
     public Vector3 Position => transform.position;
     public float InfluenceRadius => influenceRadius;

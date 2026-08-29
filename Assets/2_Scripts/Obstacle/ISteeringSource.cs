@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public interface ISteeringSource : IRepulsionSource
+public interface ISteeringSource : ISpatialItem
 {
     public float InfluenceRadius { get; }
 }
