@@ -125,7 +125,7 @@ public class EnemyRegister : MonoBehaviour
                 _obstacleHash.Query(selfPos, _obstacleBuffer);
                 
                 var correction = Vector3.zero; // 이번 프레임에 내가 물러나야 할 변위
-                var overlapCount = 0; // 몇 바리와 겹쳤나(나중에 평균 낼 때 사용) 
+                var overlapCount = 0; // 몇 마리와 겹쳤나(나중에 평균 낼 때 사용) 
                 var obsForce = Vector3.zero;
 
                 foreach (var other in _enemyBuffer)
@@ -167,7 +167,7 @@ public class EnemyRegister : MonoBehaviour
                         obsOverlapCount++;
                     }
 
-                    if (TryCalculateRepulsion(selfPos, obs, out var f))
+                    if (TryCalculateSteering(away, d, obs, out var f))
                     {
                         obsForce += f;
                     }
@@ -193,19 +193,16 @@ public class EnemyRegister : MonoBehaviour
         FlushPending();
     }
 
-    private bool TryCalculateRepulsion(Vector3 selfPos, ISteeringSource item, out Vector3 force)
+    private bool TryCalculateSteering(Vector3 away, float dist, ISteeringSource item,
+        out Vector3 force)
     {
-        var away = selfPos - item.Position;
-        away.y = 0f;
-        var dist = away.magnitude;
-
         if (dist < 0.0001f || dist >= item.InfluenceRadius)
         {
             force = Vector3.zero;
             return false;
         }
         
-        force = away.normalized * (1 - dist / item.InfluenceRadius);
+        force = (away / dist) * (1 - dist / item.InfluenceRadius);
         return true;
     }
 
