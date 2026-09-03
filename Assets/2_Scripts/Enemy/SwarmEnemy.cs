@@ -1,27 +1,29 @@
 using System;
+using Unity.Profiling;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class SwarmEnemy : Enemy, IRepulsionReceiver
 {
-    [SerializeField] private float maxSeparation = 0.4f;
-    [SerializeField] private float maxObstacleForce = 0.8f;
+    [SerializeField, Range(0.1f, 0.95f)] private float maxObsForce = 0.9f;
+    [SerializeField] private float correctionStiffens = 1f;
     
-    [Header("Components")]
-    [SerializeField] private CharacterController cc;
-    
-    private float _bodyRadius;
-    private Vector3 _separation;
+    private float _moveSpeed;
+    private Vector3 _correction;
     private Vector3 _obstacleForce;
+    
+    private static readonly ProfilerMarker s_TransformMove = new("SwarmEnemy.TransformMove");
 
-    public void ApplyRepulsion(Vector3 sep, Vector3 obsForce)
+    public void ApplyRepulsion(Vector3 correction, Vector3 obsForce)
     {
-        _separation = sep;
+        _correction = correction;
         _obstacleForce = obsForce;
     }
 
     private void Awake()
     {
-        _bodyRadius = cc.radius;
+        _moveSpeed = baseMoveSpeed * Random.Range(0.8f, 1.3f);
+        animator.SetBool("IsMove", true);
     }
 
     public override void OnPlayerContact(Vector3 pos, IDamageable target)
@@ -45,21 +47,27 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
             return;
         
         var pos = transform.position;
-        var step = speed * dt;
+        var step = _moveSpeed * dt;
 
         if (f.IsBlocked(pos))
         {
-            cc.Move(ToFlowVector(f.GetCurrentCellDirection(pos)) * step);
+            using (s_TransformMove.Auto())
+                transform.position += ToFlowVector(f.GetCurrentCellDirection(pos)) * step;
             return;
         }
         
         var (dir, speedScale) = GetDesiredMove(pos, f);
+        var clampedObsForce = Vector3.ClampMagnitude(_obstacleForce, maxObsForce);
         
-        var force = Vector3.ClampMagnitude(Vector3.ClampMagnitude(_separation, maxSeparation) +
-                    Vector3.ClampMagnitude(_obstacleForce, maxObstacleForce), 0.9f);
+        // 1단계 : 조향 - dt 있음
+        var steerDir = (dir + clampedObsForce).normalized;
+        using (s_TransformMove.Auto())
+            transform.position += SlideAlongWalls(pos, steerDir * (step * speedScale), f);
         
-        var desired = (dir + force).normalized * (step * speedScale);
-        cc.Move(SlideAlongWalls(pos, desired, f));
+        // 2단계 : 겹침 해소 - dt 없음
+        var pos2 = transform.position;
+        using (s_TransformMove.Auto())
+            transform.position += SlideAlongWalls(pos2, _correction * correctionStiffens, f);
         
         if(dir.sqrMagnitude > 0.0001f)
             RotationMoveDir(dir, dt);
@@ -95,14 +103,14 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private Vector3 ProbeOffset(float dx, float dz)
     {
         return new Vector3(
-            dx != 0 ? Mathf.Sign(dx) * (Mathf.Abs(dx) + _bodyRadius) : 0,
+            dx != 0 ? Mathf.Sign(dx) * (Mathf.Abs(dx) + bodyRadius) : 0,
             0,
-            dz != 0 ? Mathf.Sign(dz) * (Mathf.Abs(dz) + _bodyRadius) : 0);
+            dz != 0 ? Mathf.Sign(dz) * (Mathf.Abs(dz) + bodyRadius) : 0);
     }
     
     private Vector3 ToFlowVector(Vector2Int vec) => new Vector3(vec.x, 0, vec.y).normalized;
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.brown;
         Gizmos.DrawWireSphere(transform.position, contactDistance);

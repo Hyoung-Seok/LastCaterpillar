@@ -1,4 +1,4 @@
 public interface IRepulsionSource : ISpatialItem
 {
-    public float InfluenceRadius { get; }
+    public float BodyRadius { get; }
 }

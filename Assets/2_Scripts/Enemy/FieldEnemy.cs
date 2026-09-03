@@ -46,4 +46,10 @@ public class FieldEnemy : SwarmEnemy
         animator.SetBool(_isMoveAnim, isMove);
         return result;
     }
+
+    protected override void OnDead()
+    {
+        base.OnDead();
+        _enemyGroup.OnFieldEnemyDead();
+    }
 }
