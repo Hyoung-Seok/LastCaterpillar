@@ -3,9 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyGroup.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyGroup.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyRegister.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyRegister.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FieldEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FieldEnemy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FieldEnemySpawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/FieldEnemySpawner.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Obstacle/ISteeringSource.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Obstacle/ISteeringSource.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Obstacle/Obstacle.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Obstacle/Obstacle.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,6 +166,10 @@
       <workItem from="1787214813591" duration="16826000" />
       <workItem from="1787650398278" duration="10655000" />
       <workItem from="1787993867122" duration="14729000" />
+      <workItem from="1788094372720" duration="16064000" />
+      <workItem from="1788166410287" duration="17737000" />
+      <workItem from="1788251120817" duration="17051000" />
+      <workItem from="1788336586071" duration="16717000" />
     </task>
     <servers />
   </component>

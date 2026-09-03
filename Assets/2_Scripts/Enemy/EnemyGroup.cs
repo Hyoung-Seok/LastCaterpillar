@@ -10,7 +10,8 @@ public class EnemyGroup
     public float MoveSpeedScale => _groupConfig.MoveSpeedScale;
 
     private readonly GroupConfig _groupConfig;
-    
+
+    private int _aliveCount;
     private readonly Vector3 _homeCenter;
     private Vector3 _lastKnownPos;
     private Vector3 _checkPoint;
@@ -20,11 +21,12 @@ public class EnemyGroup
     private float _nextTransitionAt;
     private EGroupState _prevState;
 
-    public EnemyGroup(GroupConfig groupConfig, Vector3 center, float now)
+    public EnemyGroup(GroupConfig groupConfig, Vector3 center, int aliveCount, float now)
     {
         _groupConfig = groupConfig;
         _homeCenter = center; 
         _lastKnownPos = _homeCenter;
+        _aliveCount = aliveCount;
         
         State = Random.value < 0.5f ? EGroupState.Idle : EGroupState.Move;
         EnterState(now);
@@ -72,6 +74,14 @@ public class EnemyGroup
         State = EGroupState.Chase;
         
         _transitionTime = now;
+    }
+
+    public void OnFieldEnemyDead()
+    {
+        _aliveCount--;
+
+        if (_aliveCount <= 0)
+            EnemyRegister.Instance.UnRegisterFieldEnemyGroup(this);
     }
 
     private void PickMoveDir()

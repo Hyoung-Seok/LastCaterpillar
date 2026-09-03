@@ -5,7 +5,7 @@ using UnityEngine;
 public class EnemyRegister : MonoBehaviour
 {
     [SerializeField, Min(1), 
-     Tooltip("모든 적의 BodyRadius보다 커야함")] private int enemyHashCellSize = 1;
+     Tooltip("모든 적의 BodyRadius 합보다 커야 함")] private int enemyHashCellSize = 1;
     [SerializeField, Min(1),
     Tooltip("모든 장애물의 influenceRadius 보다 커야함")] private int obstacleHashCellSize = 2;
     
@@ -22,6 +22,7 @@ public class EnemyRegister : MonoBehaviour
     private List<Obstacle> _obstacleBuffer;
 
     private List<Enemy> _pendingRemove;
+    private List<EnemyGroup> _pendingGroup;
 
     private static EnemyRegister _instance;
     private static bool _isDestroy = false;
@@ -73,6 +74,11 @@ public class EnemyRegister : MonoBehaviour
         _fieldEnemyGroup.Add(group);
     }
 
+    public void UnRegisterFieldEnemyGroup(EnemyGroup group)
+    {
+        _pendingGroup.Add(group);
+    }
+
     public void QueryForRadius(Vector3 center, float radius, List<Enemy> buffer)
     {
         _enemyHash.QueryForRadius(center, radius, buffer);   
@@ -93,6 +99,7 @@ public class EnemyRegister : MonoBehaviour
 
     private void Update()
     {
+        var dt = Time.deltaTime;
         using (s_Prepare.Auto())
         {
             _enemyHash.Clear();
@@ -186,7 +193,7 @@ public class EnemyRegister : MonoBehaviour
             foreach (var e in _enemyList)
             {
                 if (!e.IsDead)
-                    e.Move(Time.deltaTime);
+                    e.Move(dt);
             }
         }
 
@@ -213,8 +220,14 @@ public class EnemyRegister : MonoBehaviour
             _enemyList.Remove(e);
             if(e is IRepulsionReceiver r) _repulsionsReceivers.Remove(r);
         }
+
+        foreach (var g in _pendingGroup)
+        {
+            _fieldEnemyGroup.Remove(g);
+        }
         
         _pendingRemove.Clear();
+        _pendingGroup.Clear();
     }
     
     private void EnsureInit()
@@ -226,6 +239,7 @@ public class EnemyRegister : MonoBehaviour
         _fieldEnemyGroup = new List<EnemyGroup>();
         
         _pendingRemove = new List<Enemy>();
+        _pendingGroup = new List<EnemyGroup>();
         
         _enemyHash = new SpatialHash<Enemy>(enemyHashCellSize);
         _obstacleHash = new SpatialHash<Obstacle>(obstacleHashCellSize);

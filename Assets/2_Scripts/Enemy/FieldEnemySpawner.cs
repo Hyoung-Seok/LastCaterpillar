@@ -87,14 +87,12 @@ public class FieldEnemySpawner : MonoBehaviour
         var pos = CityLayout.ConvertCellPosToWorld(spawnPoint.x, spawnPoint.y, _layout.CellSize);
         var spawnCount = Random.Range(minFieldSpawnCount, maxFieldSpawnCount + 1);
         
-        // 여기서 EnemyGroup 만들고 
-        var group = new EnemyGroup(groupConfig, pos, Time.time);
+        var group = new EnemyGroup(groupConfig, pos, spawnCount, Time.time);
         _enemyRegister.RegisterFieldEnemyGroup(group);
 
         for (var i = 0; i < spawnCount; i++)
         {
             var obj = Instantiate(fieldEnemies[Random.Range(0, fieldEnemies.Count)], parent.transform);
-            // 각 FieldEnemy에 EnemyGroup 참조 연결
             obj.Init(group, group.GetRelayDelay(i, spawnCount));
 
             var angle = i * GoldenAngleRad;
