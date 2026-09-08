@@ -76,7 +76,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     /// dir = 단위벡터 또는 영벡터(크기를 태우지 말 것), speedScale = 0~1
     protected virtual (Vector3 dir, float speedScale) GetDesiredMove(Vector3 pos, FlowField f)
     {
-        return (ToFlowVector(f.GetCurrentCellDirection(pos)), 1f);
+        return (f.GetSmoothedDirection(pos), 1f);
     }
 
     private Vector3 SlideAlongWalls(Vector3 pos, Vector3 desired, FlowField f)

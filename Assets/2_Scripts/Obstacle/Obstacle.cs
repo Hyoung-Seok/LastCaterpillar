@@ -7,7 +7,7 @@ public class Obstacle : MonoBehaviour, IRepulsionSource, ISteeringSource
     public float InfluenceRadius => influenceRadius;
     public float BodyRadius => bodyRadius;
 
-    [SerializeField] private float influenceRadius = 2.8f;
+    [SerializeField] private float influenceRadius = 1f;
     [SerializeField] private float bodyRadius = 0.3f;
 
     private void OnDrawGizmos()

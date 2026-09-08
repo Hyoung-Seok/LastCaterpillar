@@ -72,6 +72,59 @@ public class FlowField : MonoBehaviour
         SetupFlowField();
     }
 
+    public Vector3 GetSmoothedDirection(Vector3 pos)
+    {
+        if (_flowField == null) return Vector3.zero;
+        
+        var cx = (pos.x - _originCellPos.x) / _cellSize - 0.5f;
+        var cz = (pos.z - _originCellPos.z) / _cellSize - 0.5f;
+        
+        // 중심 격자 단위로 표현된 현재 위치
+        var gridPos = new Vector2(cx, cz);
+        
+        // 어느 두 표본인가?
+        var x0 = Mathf.FloorToInt(gridPos.x); 
+        var y0 = Mathf.FloorToInt(gridPos.y);
+        
+        // 그 표본 사이에 어디에 위치해있는가?
+        var tx = gridPos.x - x0;
+        var ty = gridPos.y - y0;
+
+        var sum = Vector3.zero;
+
+        for (var dx = 0; dx <= 1; ++dx)
+        {
+            for (var dy = 0; dy <= 1; ++dy)
+            {
+                var x = x0 + dx;
+                var y = y0 + dy;
+                
+                if(!InBounds(x, y)) continue;
+                if(!IsPassable(x, y)) continue;
+                if(_flowField[x,y].Direction == Vector2Int.zero) continue;
+                
+                // 가중치 구하기
+                // dx == 0이면 왼쪽 표본. 내가 오른쪽으로 tx 만큼 갔다면, 왼쪽에서 그만큼 멀어진거니 지분은 1-tx.
+                var wx = (dx == 0) ? 1f - tx : tx;
+                var wy = (dy == 0) ? 1f - ty : ty;
+                
+                // 최종 가중치
+                var w = wx * wy;
+
+                var d = _flowField[x, y].Direction;
+                sum += new Vector3(d.x, 0f, d.y).normalized * w;
+            }
+        }
+
+        if (sum.sqrMagnitude < 1e-6f)
+        {
+            var v2D = GetCurrentCellDirection(pos);
+            return new Vector3(v2D.x, 0f, v2D.y).normalized;
+        }
+
+        return sum.normalized;
+    }
+    
     public Vector2Int GetCurrentCellDirection(Vector3 pos)
     {
         if(_flowField == null)  return Vector2Int.zero;
@@ -90,6 +143,8 @@ public class FlowField : MonoBehaviour
         if (c.x < 0 || c.x >= _width || c.y < 0 || c.y >= _height) return true;
         return !IsPassable(c.x, c.y);
     }
+    
+    private bool InBounds(int x, int y) =>  x >= 0 && x < _width && y >= 0 && y < _height;
     
     private void Update()
     {
