@@ -5,9 +5,9 @@ using UnityEngine;
 public class EnemyRegister : MonoBehaviour
 {
     [SerializeField, Min(1), 
-     Tooltip("모든 적의 BodyRadius 합보다 커야 함")] private int enemyHashCellSize = 1;
+     Tooltip("가장 큰 적의 지름(BodyRadius × 2) 이상이어야 함")] private int enemyHashCellSize = 1;
     [SerializeField, Min(1),
-    Tooltip("모든 장애물의 influenceRadius 보다 커야함")] private int obstacleHashCellSize = 2;
+    Tooltip("이 해시의 최대 판정 거리(influenceRadius, 적+장애물 반지름 합) 이상이어야 함")] private int obstacleHashCellSize = 2;
     
     [SerializeField] private Transform smallObstacleParent;
     
