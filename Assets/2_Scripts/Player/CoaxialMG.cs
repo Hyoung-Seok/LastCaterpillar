@@ -93,7 +93,7 @@ public class CoaxialMG : MonoBehaviour
         var budget = r.HitEnemies.Length - r.HitCount;
 
         var half = step * 0.5f;
-        // N-1 과 N프레임의 총알 위치의 중앙 지점 계싼
+        // N-1 과 N프레임의 총알 위치의 중앙 지점 계산
         var mid = prev + r.Direction * half;
         // 총알이 이동한 거리를 감싸는 반지름 범위 계산
         var radius = half + config.HitRadius;
@@ -117,7 +117,7 @@ public class CoaxialMG : MonoBehaviour
             // 실제 선분 안에 있는지 확인
             //prev ●----------● cur              ● enemy
             //      0m       5m                 8m
-            // 총알이 실제 이동하지 않는 위치에 있는 적을 검사하지 않도록 제한
+            // 선분 밖에 있는 적의 along 값을 선분 위 가장 가까운 점으로 clamp
             var clamped = Mathf.Clamp(along, 0f, step);
                 
             // along은 prev 위치에서 수평으로 n 미터 떨어져 있다는 것을 의미. 그래서 moveDir의 위치의 수평 성분에서 어디에 위치해있는지 구함.
