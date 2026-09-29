@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class EnemyRegister : MonoBehaviour
 {
+    public float MaxObsBodyRadius {get; private set;}
+    
     [SerializeField, Min(1), 
      Tooltip("가장 큰 적의 지름(BodyRadius × 2) 이상이어야 함")] private int enemyHashCellSize = 1;
     [SerializeField, Min(1),
@@ -82,6 +84,11 @@ public class EnemyRegister : MonoBehaviour
     public void QueryForRadius(Vector3 center, float radius, List<Enemy> buffer)
     {
         _enemyHash.QueryForRadius(center, radius, buffer);   
+    }
+
+    public void QueryObstacleForRadius(Vector3 center, float radius, List<Obstacle> buffer)
+    {
+        _obstacleHash.QueryForRadius(center, radius, buffer);
     }
 
     private void Awake()
@@ -247,6 +254,8 @@ public class EnemyRegister : MonoBehaviour
         _enemyBuffer = new List<Enemy>();
         _obstacleBuffer = new List<Obstacle>();
 
+        MaxObsBodyRadius = 0f;
+        
         if (smallObstacleParent != null)
         {
             for (var i = 0; i < smallObstacleParent.childCount; ++i)
@@ -254,6 +263,7 @@ public class EnemyRegister : MonoBehaviour
                 if (smallObstacleParent.GetChild(i).TryGetComponent(out Obstacle obstacle))
                 {
                     _obstacleHash.Insert(obstacle);
+                    MaxObsBodyRadius = Mathf.Max(MaxObsBodyRadius, obstacle.BodyRadius);
                 }
             }
         }
