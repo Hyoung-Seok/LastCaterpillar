@@ -12,6 +12,7 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField, Min(1f)] private float forwardMaxSpeed = 10f;
     [SerializeField, Range(-100, -1)] private float reverseMaxSpeed;
     [SerializeField] private float acceleration;
+    [SerializeField, Min(0.1f)] private float maxDriveAccel = 10f;
     [SerializeField] private float breakDecel;
     [SerializeField] private float deceleration;
     
@@ -66,12 +67,23 @@ public class PlayerMoveController : MonoBehaviour
     }
     
     private void FixedUpdate()
-    {        
-        WheelRay();
+    {
+        var groundedWheels = WheelRay();
+        if (groundedWheels <= 0)
+            return;
+
+        var forward = transform.forward;
+        forward.y = 0;
+        forward.Normalize();
         
-        var v = transform.forward * _curSpeed;
-        v.y = rb.linearVelocity.y;
-        rb.linearVelocity = v;
+        var v = rb.linearVelocity;
+        v.y = 0;
+
+        var target = forward * _curSpeed;
+        var deltaV = target - v;
+        var correction = Vector3.ClampMagnitude(deltaV, maxDriveAccel * Time.fixedDeltaTime);
+        
+        rb.AddForce(correction, ForceMode.VelocityChange);
 
         var av = rb.angularVelocity;
         av.y = _curTurnSpeed * Mathf.Deg2Rad;
@@ -132,8 +144,10 @@ public class PlayerMoveController : MonoBehaviour
         _curTurnSpeed = Mathf.MoveTowards(_curTurnSpeed, targetSpeed, rate * Time.deltaTime);
     }
 
-    private void WheelRay()
+    private int WheelRay()
     {
+        var hitCount = 0;
+        
         foreach (var wheel in wheelPos)
         {
             var hit = Physics.Raycast(wheel.position, -transform.up, 
@@ -143,10 +157,14 @@ public class PlayerMoveController : MonoBehaviour
             {
                 var force = CalculateSpringDamper(info, wheel);
                 rb.AddForceAtPosition(force * transform.up, wheel.position);
+
+                hitCount++;
             }
             
             Debug.DrawRay(wheel.position, -transform.up * restLength, hit ? Color.green : Color.red);
         }
+
+        return hitCount;
     }
 
     private float CalculateSpringDamper(RaycastHit hit, Transform wheel)
