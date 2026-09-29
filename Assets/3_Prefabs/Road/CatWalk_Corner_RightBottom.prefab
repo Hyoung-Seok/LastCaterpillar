@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2409799509879259872}
   - component: {fileID: 7859122227881555641}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CatWalk_Corner_RightBottom
   m_TagString: Untagged
   m_Icon: {fileID: 0}

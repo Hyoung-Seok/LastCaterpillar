@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2458978162324156028}
   - component: {fileID: 3135468449056709361}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: CatWalk_Horizontal
   m_TagString: Untagged
   m_Icon: {fileID: 0}
