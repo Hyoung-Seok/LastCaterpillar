@@ -17,8 +17,9 @@ MonoBehaviour:
   penetrationCount: 3
   hitRadius: 1.5
   fireInterval: 0.2
-  heatingRate: 0
-  coolingRate: 0
+  heatPerShot: 0.08
+  coolingRate: 0.1
+  overHeatRelease: 0.3
   lifeTime: 4
   noiseRadius: 0
   noiseInterval: 0

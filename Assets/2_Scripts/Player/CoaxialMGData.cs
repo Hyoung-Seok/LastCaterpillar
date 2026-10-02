@@ -11,8 +11,9 @@ public class CoaxialMGData : ScriptableObject
 
     [Header("MG Config")] 
     [SerializeField, Min(0.01f)] private float fireInterval = 0.01f;
-    [SerializeField, Min(0.1f)] private float heatingRate = 0.1f;
-    [SerializeField, Min(0.1f)] private float coolingRate = 0.1f;
+    [SerializeField, Min(0.001f)] private float heatPerShot = 0.1f;
+    [SerializeField, Min(0.001f)] private float coolingRate = 0.1f;
+    [SerializeField, Range(0f, 0.99f)] private float overHeatRelease = 0.3f; 
 
     [Header("Life Config")] 
     [SerializeField, Min(0.1f)] private float lifeTime = 0.1f;
@@ -26,8 +27,9 @@ public class CoaxialMGData : ScriptableObject
     public int PenetrationCount => penetrationCount;
     public float HitRadius => hitRadius;
     public float FireInterval => fireInterval;
-    public float HeatingRate => heatingRate;
+    public float HeatPerShot => heatPerShot;
     public float CoolingRate => coolingRate;
+    public float OverHeatRelease => overHeatRelease;
     public float LifeTime => lifeTime;
     public float NoiseRadius => noiseRadius;
     public float NoiseInterval => noiseInterval;

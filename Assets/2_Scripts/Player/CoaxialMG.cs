@@ -35,9 +35,15 @@ public class CoaxialMG : MonoBehaviour
     private int _pickCount = 0;
     
     private float _nextFireTime;
+    private bool _isOverheated;
+    private float _heat = 0f;
     private EnemyRegister _enemyRegister;
     private FlowField _flowField;
-        
+
+    // UI 표시용 (0~1)
+    public float Heat => _heat;
+    public bool IsOverheated => _isOverheated;
+
     private void Start()
     {
         _enemyRegister = EnemyRegister.Instance;
@@ -50,6 +56,8 @@ public class CoaxialMG : MonoBehaviour
         _picks = new HitPick[config.PenetrationCount];
         
         _nextFireTime = Time.time + config.FireInterval;
+        _isOverheated = false;
+        _heat = 0f;
         _fireAction = GetComponent<PlayerManager>().InputReader.PlayerMgFire;
         
         CreateRound(initialPoolSize);
@@ -57,11 +65,13 @@ public class CoaxialMG : MonoBehaviour
 
     private void Update()
     {
+        CoolDown();
+        
         if (_fireAction.IsPressed())
         {
             FireCoaxialMg();
         }
-
+        
         var dt = Time.deltaTime;
         var step = config.Velocity * dt;
         
@@ -88,6 +98,25 @@ public class CoaxialMG : MonoBehaviour
             _firedRounds[i] = _firedRounds[^1];
             _firedRounds.RemoveAt(_firedRounds.Count - 1);
         }
+    }
+    
+    private void AddHeat()
+    {
+        _heat += config.HeatPerShot;
+
+        if (_heat < 1)
+            return;
+        
+        _heat = 1;
+        _isOverheated = true;
+    }
+
+    private void CoolDown()
+    {
+        _heat = Mathf.Max(0, _heat - config.CoolingRate * Time.deltaTime);
+
+        if (_isOverheated && _heat <= config.OverHeatRelease)
+            _isOverheated = false;
     }
 
     // 1. step : 총알의 이동 거리 (config.Velocity * Time.deltaTime)
@@ -180,6 +209,7 @@ public class CoaxialMG : MonoBehaviour
         
         _firedRounds.Add(r);
         _nextFireTime = Time.time + config.FireInterval;
+        AddHeat();
     }
 
     private static bool IsInCapsule(Vector3 prev, Vector3 targetPos, Vector3 roundDir, float step, float radius, out float along)
@@ -249,7 +279,7 @@ public class CoaxialMG : MonoBehaviour
         return false;
     }
     
-    private bool IsCanFire() => Time.time >= _nextFireTime;
+    private bool IsCanFire() => Time.time >= _nextFireTime && !_isOverheated;
 }
 
 public class Round
