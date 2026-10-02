@@ -17,6 +17,7 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField] private float deceleration;
     
     [Header("Turn Config")]
+    [SerializeField, Min(0.1f)] private float maxTurnAccel = 90f;
     [SerializeField] private float turnSpeed;
     [SerializeField] private float turnBreakDecel;
     [SerializeField] private float turnAcceleration;
@@ -72,6 +73,12 @@ public class PlayerMoveController : MonoBehaviour
         if (groundedWheels <= 0)
             return;
 
+        PlayerMove();
+        PlayerRotation();
+    }
+
+    private void PlayerMove()
+    {
         var forward = transform.forward;
         forward.y = 0;
         forward.Normalize();
@@ -81,13 +88,23 @@ public class PlayerMoveController : MonoBehaviour
 
         var target = forward * _curSpeed;
         var deltaV = target - v;
+        // maxDriveAccel = 한 스텝에 바뀔 수 있는 최대 상한
         var correction = Vector3.ClampMagnitude(deltaV, maxDriveAccel * Time.fixedDeltaTime);
         
         rb.AddForce(correction, ForceMode.VelocityChange);
+    }
 
-        var av = rb.angularVelocity;
-        av.y = _curTurnSpeed * Mathf.Deg2Rad;
-        rb.angularVelocity = av;
+    private void PlayerRotation()
+    {
+        var yaw = rb.angularVelocity.y;
+        var maxRot = maxTurnAccel * Mathf.Deg2Rad * Time.fixedDeltaTime;
+
+        var target = _curTurnSpeed * Mathf.Deg2Rad;
+        var deltaY = target - yaw;
+
+        var correction = Mathf.Clamp(deltaY, -maxRot, maxRot);
+
+        rb.AddTorque(Vector3.up * correction, ForceMode.VelocityChange);
     }
 
     private void UpdateSpeed()
