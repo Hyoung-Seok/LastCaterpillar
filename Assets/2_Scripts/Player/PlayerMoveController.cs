@@ -85,11 +85,15 @@ public class PlayerMoveController : MonoBehaviour
         
         var v = rb.linearVelocity;
         v.y = 0;
+        
+        // 장애물 등에 막혔을 때 명령이 현실과 분리되는 것을 방지
+        var actualForward = Vector3.Dot(v, forward);
+        var slack = maxDriveAccel * Time.fixedDeltaTime;
+        _curSpeed = Mathf.Clamp(_curSpeed, actualForward - slack, actualForward + slack);
 
         var target = forward * _curSpeed;
         var deltaV = target - v;
-        // maxDriveAccel = 한 스텝에 바뀔 수 있는 최대 상한
-        var correction = Vector3.ClampMagnitude(deltaV, maxDriveAccel * Time.fixedDeltaTime);
+        var correction = Vector3.ClampMagnitude(deltaV, slack);
         
         rb.AddForce(correction, ForceMode.VelocityChange);
     }
@@ -97,8 +101,12 @@ public class PlayerMoveController : MonoBehaviour
     private void PlayerRotation()
     {
         var yaw = rb.angularVelocity.y;
+        
+        var actualYawDeg = yaw * Mathf.Rad2Deg;
+        var turnSlack = maxTurnAccel * Time.fixedDeltaTime;
+        _curTurnSpeed = Mathf.Clamp(_curTurnSpeed, actualYawDeg - turnSlack, actualYawDeg + turnSlack);
+        
         var maxRot = maxTurnAccel * Mathf.Deg2Rad * Time.fixedDeltaTime;
-
         var target = _curTurnSpeed * Mathf.Deg2Rad;
         var deltaY = target - yaw;
 
@@ -106,7 +114,7 @@ public class PlayerMoveController : MonoBehaviour
 
         rb.AddTorque(Vector3.up * correction, ForceMode.VelocityChange);
     }
-
+    
     private void UpdateSpeed()
     {
         var inputDir = Math.Sign(_moveInput.y);
