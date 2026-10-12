@@ -211862,7 +211862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81c3cc29af5767848b06e88a5ee0fcaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyRegister
-  enemyHashCellSize: 1
+  enemyHashCellSize: 2
   obstacleHashCellSize: 2
   smallObstacleParent: {fileID: 1546713544}
 --- !u!4 &1281527529
@@ -304698,7 +304698,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1831126512
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304711,10 +304711,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 564f328ab09b2a446b94878ae33f0e12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
-  enemy:
-  - {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
-  spawnRepeatCount: 4
-  spawnCount: 100
+  spawnWave:
+  - Wave:
+    - enemy: {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
+      count: 200
+    - enemy: {fileID: 7259546905375039682, guid: 4d888f856d6e6ba41bb37fa9f1188d07, type: 3}
+      count: 5
+  - Wave:
+    - enemy: {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
+      count: 150
+    - enemy: {fileID: 7259546905375039682, guid: 4d888f856d6e6ba41bb37fa9f1188d07, type: 3}
+      count: 8
+  - Wave:
+    - enemy: {fileID: 5795572266117386044, guid: 5e04ea76a2cce264993f5efccf94a848, type: 3}
+      count: 300
+    - enemy: {fileID: 7259546905375039682, guid: 4d888f856d6e6ba41bb37fa9f1188d07, type: 3}
+      count: 10
   spawnInterval: 3
 --- !u!4 &1831126513
 Transform:

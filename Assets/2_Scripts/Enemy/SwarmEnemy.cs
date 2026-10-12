@@ -7,6 +7,9 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 {
     [SerializeField, Range(0.1f, 0.95f)] private float maxObsForce = 0.9f;
     [SerializeField] private float correctionStiffens = 1f;
+
+    [Header("Debug")] 
+    [SerializeField] private float spearYPos = 0f;
     
     private float _moveSpeed;
     private Vector3 _correction;
@@ -112,7 +115,11 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 
     private void OnDrawGizmosSelected()
     {
+        var pos = transform.position + (Vector3.up * spearYPos);
         Gizmos.color = Color.brown;
-        Gizmos.DrawWireSphere(transform.position, contactDistance);
+        Gizmos.DrawWireSphere(pos, contactDistance);
+
+        Gizmos.color = Color.blue;
+        Gizmos.DrawWireSphere(pos, bodyRadius);
     }
 }

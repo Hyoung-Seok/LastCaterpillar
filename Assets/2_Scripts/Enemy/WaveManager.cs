@@ -1,15 +1,13 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class WaveManager : MonoBehaviour
 {
-    [Header("Components")]
-    [SerializeField] private List<Enemy> enemy;
-
     [Header("Config")] 
-    [SerializeField] private int spawnRepeatCount;
-    [SerializeField] private int spawnCount;
+    [SerializeField] private SpawnWave[] spawnWave;
     [SerializeField] private float spawnInterval;
     
     private IEnumerator _spawnRoutine;
@@ -27,18 +25,36 @@ public class WaveManager : MonoBehaviour
 
     private IEnumerator StartSpawnCoroutine()
     {
-        for(var a = 0; a < spawnRepeatCount; ++a)
+        for (var i = 0; i < spawnWave.Length; ++i)
         {
-            for (var i = 0; i < spawnCount; i++)
+            foreach (var spawnData in spawnWave[i].Wave)
             {
-                var index = Random.Range(0, enemy.Count);
-                var e = Instantiate(enemy[index], transform);
-            
-                e.transform.position = transform.position + new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
-                e.gameObject.SetActive(true);
+                for (var j = 0; j < spawnData.Count; ++j)
+                {
+                    var e = Instantiate(spawnData.Enemy, transform);
+                    
+                    e.transform.position = transform.position + new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
+                    e.gameObject.SetActive(true);
+                }
             }
             
             yield return new WaitForSeconds(spawnInterval);
         }
     }
+}
+
+[Serializable]
+public class SpawnWave
+{
+    public List<EnemySpawnData> Wave;
+}
+
+[Serializable]
+public struct EnemySpawnData
+{
+    [SerializeField] private Enemy enemy;
+    [SerializeField] private int count;
+
+    public Enemy Enemy => enemy;
+    public int Count => count;
 }
