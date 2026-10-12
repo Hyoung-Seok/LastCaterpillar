@@ -5,8 +5,8 @@ using Random = UnityEngine.Random;
 
 public class SwarmEnemy : Enemy, IRepulsionReceiver
 {
-    [SerializeField, Range(0.1f, 0.499f)] private float maxSepForce = 0.1f;
-    [SerializeField, Range(0.1f, 0.499f)] private float maxObsForce = 0.1f;
+    [SerializeField, Range(0f, 0.999f)] private float maxSepForce = 0.1f;
+    [SerializeField, Range(0f, 0.999f)] private float maxObsForce = 0.1f;
     [SerializeField] private float correctionStiffens = 1f;
 
     [Header("Debug")] 
@@ -16,6 +16,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private Vector3 _sepForce;
     private Vector3 _correction;
     private Vector3 _obstacleForce;
+
+    [NonSerialized] private float _prevSep, _prevObs;
     
     private static readonly ProfilerMarker s_TransformMove = new("SwarmEnemy.TransformMove");
 
@@ -128,5 +130,19 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(pos, influenceRadius);
+    }
+
+    private void OnValidate()
+    {
+        if (maxObsForce + maxSepForce >= 0.999f)
+        {
+            if (maxSepForce != _prevSep)
+                maxSepForce = 0.999f - maxObsForce;
+            else
+                maxObsForce = 0.999f - maxSepForce;
+        }
+
+        _prevSep = maxSepForce;
+        _prevObs = maxObsForce;
     }
 }
