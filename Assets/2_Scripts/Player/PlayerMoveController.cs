@@ -12,10 +12,12 @@ public class PlayerMoveController : MonoBehaviour
     [SerializeField, Min(1f)] private float forwardMaxSpeed = 10f;
     [SerializeField, Range(-100, -1)] private float reverseMaxSpeed;
     [SerializeField] private float acceleration;
+    [SerializeField, Min(0.1f)] private float maxDriveAccel = 10f;
     [SerializeField] private float breakDecel;
     [SerializeField] private float deceleration;
     
     [Header("Turn Config")]
+    [SerializeField, Min(0.1f)] private float maxTurnAccel = 90f;
     [SerializeField] private float turnSpeed;
     [SerializeField] private float turnBreakDecel;
     [SerializeField] private float turnAcceleration;
@@ -66,18 +68,53 @@ public class PlayerMoveController : MonoBehaviour
     }
     
     private void FixedUpdate()
-    {        
-        WheelRay();
-        
-        var v = transform.forward * _curSpeed;
-        v.y = rb.linearVelocity.y;
-        rb.linearVelocity = v;
+    {
+        var groundedWheels = WheelRay();
+        if (groundedWheels <= 0)
+            return;
 
-        var av = rb.angularVelocity;
-        av.y = _curTurnSpeed * Mathf.Deg2Rad;
-        rb.angularVelocity = av;
+        PlayerMove();
+        PlayerRotation();
     }
 
+    private void PlayerMove()
+    {
+        var forward = transform.forward;
+        forward.y = 0;
+        forward.Normalize();
+        
+        var v = rb.linearVelocity;
+        v.y = 0;
+        
+        // 장애물 등에 막혔을 때 명령이 현실과 분리되는 것을 방지
+        var actualForward = Vector3.Dot(v, forward);
+        var slack = maxDriveAccel * Time.fixedDeltaTime;
+        _curSpeed = Mathf.Clamp(_curSpeed, actualForward - slack, actualForward + slack);
+
+        var target = forward * _curSpeed;
+        var deltaV = target - v;
+        var correction = Vector3.ClampMagnitude(deltaV, slack);
+        
+        rb.AddForce(correction, ForceMode.VelocityChange);
+    }
+
+    private void PlayerRotation()
+    {
+        var yaw = rb.angularVelocity.y;
+        
+        var actualYawDeg = yaw * Mathf.Rad2Deg;
+        var turnSlack = maxTurnAccel * Time.fixedDeltaTime;
+        _curTurnSpeed = Mathf.Clamp(_curTurnSpeed, actualYawDeg - turnSlack, actualYawDeg + turnSlack);
+        
+        var maxRot = maxTurnAccel * Mathf.Deg2Rad * Time.fixedDeltaTime;
+        var target = _curTurnSpeed * Mathf.Deg2Rad;
+        var deltaY = target - yaw;
+
+        var correction = Mathf.Clamp(deltaY, -maxRot, maxRot);
+
+        rb.AddTorque(Vector3.up * correction, ForceMode.VelocityChange);
+    }
+    
     private void UpdateSpeed()
     {
         var inputDir = Math.Sign(_moveInput.y);
@@ -132,8 +169,10 @@ public class PlayerMoveController : MonoBehaviour
         _curTurnSpeed = Mathf.MoveTowards(_curTurnSpeed, targetSpeed, rate * Time.deltaTime);
     }
 
-    private void WheelRay()
+    private int WheelRay()
     {
+        var hitCount = 0;
+        
         foreach (var wheel in wheelPos)
         {
             var hit = Physics.Raycast(wheel.position, -transform.up, 
@@ -143,10 +182,14 @@ public class PlayerMoveController : MonoBehaviour
             {
                 var force = CalculateSpringDamper(info, wheel);
                 rb.AddForceAtPosition(force * transform.up, wheel.position);
+
+                hitCount++;
             }
             
             Debug.DrawRay(wheel.position, -transform.up * restLength, hit ? Color.green : Color.red);
         }
+
+        return hitCount;
     }
 
     private float CalculateSpringDamper(RaycastHit hit, Transform wheel)
