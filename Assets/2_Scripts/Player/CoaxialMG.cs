@@ -296,7 +296,7 @@ public class CoaxialMG : MonoBehaviour
     
     private bool IsCanFire() => Time.time >= _nextFireTime && !_isOverheated;
 
-    private void OnDrawGizmos()
+    private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.darkOrange;
         Gizmos.DrawWireSphere(transform.position, config.NoiseRadius);
