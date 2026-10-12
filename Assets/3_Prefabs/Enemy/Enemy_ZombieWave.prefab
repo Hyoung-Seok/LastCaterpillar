@@ -787,9 +787,11 @@ MonoBehaviour:
   rotationSpeed: 200
   bodyRadius: 0.3
   mass: 1
-  influenceRadius: 1.2
-  maxObsForce: 0.9
+  influenceRadius: 1.1
+  maxSepForce: 0.499
+  maxObsForce: 0.499
   correctionStiffens: 1
+  sphereYPos: 1
 --- !u!95 &783345900526783121
 Animator:
   serializedVersion: 7

@@ -272,9 +272,11 @@ MonoBehaviour:
   rotationSpeed: 200
   bodyRadius: 0.65
   mass: 3
-  maxObsForce: 0.9
+  influenceRadius: 1.8
+  maxSepForce: 0.499
+  maxObsForce: 0.499
   correctionStiffens: 1
-  spearYPos: 1
+  sphereYPos: 2
 --- !u!1 &676190804458931814
 GameObject:
   m_ObjectHideFlags: 0

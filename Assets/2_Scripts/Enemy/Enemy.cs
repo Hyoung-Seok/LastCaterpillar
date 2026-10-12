@@ -1,10 +1,11 @@
 using UnityEngine;
 
-public abstract class Enemy : MonoBehaviour, IRepulsionSource, IDamageable
+public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, IDamageable
 {
     public Vector3 Position => transform.position;
     public float BodyRadius => bodyRadius;
     public float Mass => mass;
+    public float InfluenceRadius => influenceRadius;
     public bool IsDead => _isDead;
     
     [Header("Components")]
@@ -18,6 +19,7 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, IDamageable
     [SerializeField] protected float rotationSpeed;
     [SerializeField] protected float bodyRadius = 0.3f;
     [SerializeField, Tooltip("반발 저항 가중치"), Min(0.1f)] private float mass;
+    [SerializeField, Min(0.1f)] protected float influenceRadius;
     
     private bool _isDead = false;
     private float _curHp;

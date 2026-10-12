@@ -138,8 +138,14 @@ public class EnemyRegister : MonoBehaviour
                 _enemyHash.Query(selfPos, _enemyBuffer);
                 _obstacleHash.Query(selfPos, _obstacleBuffer);
                 
-                var correction = Vector3.zero; // 이번 프레임에 내가 물러나야 할 변위
-                var overlapCount = 0; // 몇 마리와 겹쳤나(나중에 평균 낼 때 사용) 
+                // 분리
+                var correction = Vector3.zero;   // 이번 프레임에 내가 물러나야 할 변위
+                var overlapCount = 0;                   // 몇 마리와 겹쳤나(나중에 평균 낼 때 사용) 
+                
+                // 조향
+                var sepForce = Vector3.zero;     // 조향력
+                var steerCount = 0;
+                
                 var obsForce = Vector3.zero;
 
                 foreach (var other in _enemyBuffer)
@@ -149,13 +155,26 @@ public class EnemyRegister : MonoBehaviour
                     var away = selfPos - other.Position;
                     away.y = 0f;
                     var sqrD = away.sqrMagnitude;
+
+                    var otherInfluence = other.InfluenceRadius;
                     var rMin = self.BodyRadius + other.BodyRadius;
 
-                    if(sqrD >= rMin * rMin) continue;
+                    // 영향 범위 안에 없으면 생략
+                    if(sqrD >= otherInfluence * otherInfluence) continue;
                     if(sqrD < 1e-8f) continue;
 
                     var d = Mathf.Sqrt(sqrD);
              
+                    // 조향 (닿기 전부터)
+                    if (TryCalculateSteering(away, d, other, out var f))
+                    {
+                        sepForce += f;
+                        steerCount++;
+                    }
+                    
+                    if(sqrD >= rMin * rMin) continue;   // 겹치지 않았으면 생략
+                    
+                    // 보정(닿았을 때만)
                     var penetration = rMin - d;
                     var share = other.Mass / (self.Mass + other.Mass);
                     correction += (away / d) * (penetration * share);
@@ -164,6 +183,9 @@ public class EnemyRegister : MonoBehaviour
 
                 if (overlapCount > 0)
                     correction /= overlapCount;
+
+                if (steerCount > 0)
+                    sepForce /= steerCount;
 
                 var obsCorrection = Vector3.zero;
                 var obsOverlapCount = 0;
@@ -191,7 +213,7 @@ public class EnemyRegister : MonoBehaviour
                     obsCorrection /= obsOverlapCount;
 
                 correction += obsCorrection;
-                self.ApplyRepulsion(correction, obsForce);
+                self.ApplyRepulsion(sepForce, correction, obsForce);
             }
         }
 
@@ -207,6 +229,8 @@ public class EnemyRegister : MonoBehaviour
         FlushPending();
     }
 
+    
+    // 장애물 조향 계산
     private bool TryCalculateSteering(Vector3 away, float dist, ISteeringSource item,
         out Vector3 force)
     {

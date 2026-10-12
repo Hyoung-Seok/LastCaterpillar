@@ -3,15 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="7b4a08f3-519e-4ec5-8b63-8001b524cc55" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.LastCaterpillar/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/1_Scenes/Player/PlayerLogic.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/Enemy.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyRegister.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/EnemyRegister.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/IRepulsionReceiver.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/IRepulsionReceiver.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/SwarmEnemy.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/SwarmEnemy.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/WaveManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/2_Scripts/Enemy/WaveManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/4_Model/Enemy/Ch10_body.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/4_Model/Enemy/Ch10_body.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/4_Model/Enemy/Ch10_body1.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/4_Model/Enemy/Ch10_body1.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/4_Model/Enemy/Enemy_ZombieWave.fbx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/4_Model/Enemy/Enemy_ZombieWave.fbx.meta" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

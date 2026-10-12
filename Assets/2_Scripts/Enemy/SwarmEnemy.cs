@@ -5,20 +5,23 @@ using Random = UnityEngine.Random;
 
 public class SwarmEnemy : Enemy, IRepulsionReceiver
 {
-    [SerializeField, Range(0.1f, 0.95f)] private float maxObsForce = 0.9f;
+    [SerializeField, Range(0.1f, 0.499f)] private float maxSepForce = 0.1f;
+    [SerializeField, Range(0.1f, 0.499f)] private float maxObsForce = 0.1f;
     [SerializeField] private float correctionStiffens = 1f;
 
     [Header("Debug")] 
-    [SerializeField] private float spearYPos = 0f;
+    [SerializeField] private float sphereYPos = 0f;
     
     private float _moveSpeed;
+    private Vector3 _sepForce;
     private Vector3 _correction;
     private Vector3 _obstacleForce;
     
     private static readonly ProfilerMarker s_TransformMove = new("SwarmEnemy.TransformMove");
 
-    public void ApplyRepulsion(Vector3 correction, Vector3 obsForce)
+    public void ApplyRepulsion(Vector3 sep, Vector3 correction, Vector3 obsForce)
     {
+        _sepForce = sep;
         _correction = correction;
         _obstacleForce = obsForce;
     }
@@ -60,10 +63,11 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         }
         
         var (dir, speedScale) = GetDesiredMove(pos, f);
-        var clampedObsForce = Vector3.ClampMagnitude(_obstacleForce, maxObsForce);
+        //var clampedObsForce = Vector3.ClampMagnitude(_obstacleForce, maxObsForce);
         
         // 1단계 : 조향 - dt 있음
-        var steerDir = (dir + clampedObsForce).normalized;
+        var steerDir = (Vector3.ClampMagnitude(_obstacleForce, maxObsForce) + 
+                       Vector3.ClampMagnitude(_sepForce, maxSepForce) + dir).normalized;
         using (s_TransformMove.Auto())
             transform.position += SlideAlongWalls(pos, steerDir * (step * speedScale), f);
         
@@ -115,11 +119,14 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 
     private void OnDrawGizmosSelected()
     {
-        var pos = transform.position + (Vector3.up * spearYPos);
+        var pos = transform.position + (Vector3.up * sphereYPos);
         Gizmos.color = Color.brown;
         Gizmos.DrawWireSphere(pos, contactDistance);
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(pos, bodyRadius);
+
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(pos, influenceRadius);
     }
 }
