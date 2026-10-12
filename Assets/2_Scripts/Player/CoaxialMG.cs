@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.InputSystem;
@@ -40,6 +41,8 @@ public class CoaxialMG : MonoBehaviour
     private EnemyRegister _enemyRegister;
     private FlowField _flowField;
 
+    private float _nextNoiseTime;
+
     // UI 표시용 (0~1)
     public float Heat => _heat;
     public bool IsOverheated => _isOverheated;
@@ -56,6 +59,7 @@ public class CoaxialMG : MonoBehaviour
         _picks = new HitPick[config.PenetrationCount];
         
         _nextFireTime = Time.time + config.FireInterval;
+        _nextNoiseTime = 0;
         _isOverheated = false;
         _heat = 0f;
         _fireAction = GetComponent<PlayerManager>().InputReader.PlayerMgFire;
@@ -209,7 +213,9 @@ public class CoaxialMG : MonoBehaviour
         
         _firedRounds.Add(r);
         _nextFireTime = Time.time + config.FireInterval;
+        
         AddHeat();
+        NoiseIntervalCheck();
     }
 
     private static bool IsInCapsule(Vector3 prev, Vector3 targetPos, Vector3 roundDir, float step, float radius, out float along)
@@ -278,8 +284,23 @@ public class CoaxialMG : MonoBehaviour
 
         return false;
     }
+
+    private void NoiseIntervalCheck()
+    {
+        if (Time.time < _nextNoiseTime)
+            return;
+        
+        NoiseSystem.Instance.Emit(transform.position, config.NoiseRadius);
+        _nextNoiseTime = Time.time + config.NoiseInterval;
+    }
     
     private bool IsCanFire() => Time.time >= _nextFireTime && !_isOverheated;
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.darkOrange;
+        Gizmos.DrawWireSphere(transform.position, config.NoiseRadius);
+    }
 }
 
 public class Round
