@@ -63,11 +63,11 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         }
         
         var (dir, speedScale) = GetDesiredMove(pos, f);
-        //var clampedObsForce = Vector3.ClampMagnitude(_obstacleForce, maxObsForce);
-        
+
         // 1단계 : 조향 - dt 있음
         var steerDir = (Vector3.ClampMagnitude(_obstacleForce, maxObsForce) + 
                        Vector3.ClampMagnitude(_sepForce, maxSepForce) + dir).normalized;
+        
         using (s_TransformMove.Auto())
             transform.position += SlideAlongWalls(pos, steerDir * (step * speedScale), f);
         

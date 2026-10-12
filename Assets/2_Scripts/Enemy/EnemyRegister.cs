@@ -155,12 +155,12 @@ public class EnemyRegister : MonoBehaviour
                     var away = selfPos - other.Position;
                     away.y = 0f;
                     var sqrD = away.sqrMagnitude;
-
-                    var otherInfluence = other.InfluenceRadius;
+                    
                     var rMin = self.BodyRadius + other.BodyRadius;
+                    var reach = Mathf.Max(other.InfluenceRadius, rMin);
 
-                    // 영향 범위 안에 없으면 생략
-                    if(sqrD >= otherInfluence * otherInfluence) continue;
+                    // 조향·보정 어느 쪽 범위에도 없으면 생략
+                    if(sqrD >= reach * reach) continue;
                     if(sqrD < 1e-8f) continue;
 
                     var d = Mathf.Sqrt(sqrD);
