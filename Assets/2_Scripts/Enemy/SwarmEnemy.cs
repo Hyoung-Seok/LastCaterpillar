@@ -17,7 +17,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private Vector3 _correction;
     private Vector3 _obstacleForce;
 
-    [NonSerialized] private float _prevSep, _prevObs;
+    [NonSerialized] private float _prevSep;
     
     private static readonly ProfilerMarker s_TransformMove = new("SwarmEnemy.TransformMove");
 
@@ -143,6 +143,5 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         }
 
         _prevSep = maxSepForce;
-        _prevObs = maxObsForce;
     }
 }
