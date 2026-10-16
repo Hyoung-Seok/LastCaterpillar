@@ -9,8 +9,11 @@ public class WaveManager : MonoBehaviour
     [Header("Config")] 
     [SerializeField] private SpawnWave[] spawnWave;
     [SerializeField] private float spawnInterval;
+    [SerializeField] private float radiusScale = 0.5f;
+    [SerializeField, Min(1)] private float limitRatio = 1.5f;
     
     private IEnumerator _spawnRoutine;
+    private const float GoldenAngleRad = 2.39996f; 
     
     public void Start()
     {
@@ -25,16 +28,46 @@ public class WaveManager : MonoBehaviour
 
     private IEnumerator StartSpawnCoroutine()
     {
-        for (var i = 0; i < spawnWave.Length; ++i)
+        var spawnerPos = transform.position;
+        
+        foreach (var waveData in spawnWave)
         {
-            foreach (var spawnData in spawnWave[i].Wave)
+            var n = 0;
+            var totalSpawnCount = waveData.GetAllSpawnCount();
+            
+            foreach (var data in waveData.Wave)
             {
-                for (var j = 0; j < spawnData.Count; ++j)
+                var c = 0;
+                var spawnCount = data.Count;
+
+                while (c < spawnCount && n < totalSpawnCount * limitRatio)
                 {
-                    var e = Instantiate(spawnData.Enemy, transform);
+                    var angle = n * GoldenAngleRad;
+                    var radius = Mathf.Sqrt(n) * radiusScale;
                     
-                    e.transform.position = transform.position + new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
+                    var x = Mathf.Cos(angle) * radius;
+                    var z = Mathf.Sin(angle) * radius;
+                    
+                    var spawnPos = new Vector3(x + spawnerPos.x, 0, z + spawnerPos.z);
+
+                    if (FlowField.Instance.IsBlocked(spawnPos))
+                    {
+                        n++;
+                        continue;
+                    }
+                    
+                    var e = Instantiate(data.Enemy, transform);
+                    
+                    e.transform.position = spawnPos;
                     e.gameObject.SetActive(true);
+
+                    n++;
+                    c++;
+                }
+
+                if (c < spawnCount)
+                {
+                    Debug.LogWarning("정상적인 스폰 수보다 적게 스폰되었습니다.");
                 }
             }
             
@@ -47,6 +80,18 @@ public class WaveManager : MonoBehaviour
 public class SpawnWave
 {
     public List<EnemySpawnData> Wave;
+
+    public int GetAllSpawnCount()
+    {
+        var result = 0;
+
+        foreach (var data in Wave)
+        {
+            result += data.Count;
+        }
+
+        return result;
+    }
 }
 
 [Serializable]

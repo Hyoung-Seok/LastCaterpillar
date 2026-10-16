@@ -54,8 +54,8 @@ MonoBehaviour:
   bodyRadius: 0.3
   mass: 1
   influenceRadius: 1.1
-  maxSepForce: 0.499
-  maxObsForce: 0.499
+  maxSepForce: 0.65
+  maxObsForce: 0.34
   correctionStiffens: 1
   sphereYPos: 1
 --- !u!1001 &8085572075750030779
