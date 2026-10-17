@@ -117,7 +117,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
             dz != 0 ? Mathf.Sign(dz) * (Mathf.Abs(dz) + bodyRadius) : 0);
     }
     
-    private Vector3 ToFlowVector(Vector2Int vec) => new Vector3(vec.x, 0, vec.y).normalized;
+    private Vector3 ToFlowVector(Vector2 vec) => new Vector3(vec.x, 0, vec.y).normalized;
 
     private void OnDrawGizmosSelected()
     {

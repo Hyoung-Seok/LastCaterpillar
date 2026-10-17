@@ -60,7 +60,7 @@ public class FlowField : MonoBehaviour
         {
             for (var y = 0; y < _height; ++y)
             {
-                _flowField[x, y] = new Node(int.MaxValue, Vector2Int.zero);
+                _flowField[x, y] = new Node(int.MaxValue, Vector2.zero);
             }
         }
 
@@ -101,7 +101,7 @@ public class FlowField : MonoBehaviour
                 
                 if(!InBounds(x, y)) continue;
                 if(!IsPassable(x, y)) continue;
-                if(_flowField[x,y].Direction == Vector2Int.zero) continue;
+                if(_flowField[x,y].Direction == Vector2.zero) continue;
                 
                 // 가중치 구하기
                 // dx == 0이면 왼쪽 표본. 내가 오른쪽으로 tx 만큼 갔다면, 왼쪽에서 그만큼 멀어진거니 지분은 1-tx.
@@ -125,14 +125,14 @@ public class FlowField : MonoBehaviour
         return sum.normalized;
     }
     
-    public Vector2Int GetCurrentCellDirection(Vector3 pos)
+    public Vector2 GetCurrentCellDirection(Vector3 pos)
     {
-        if(_flowField == null)  return Vector2Int.zero;
+        if(_flowField == null)  return Vector2.zero;
 
         var index = WorldToCell(pos);
         
         return (index.x < 0 || index.x >= _width || index.y < 0 || index.y >= _height)
-            ? Vector2Int.zero
+            ? Vector2.zero
             : _flowField[index.x, index.y].Direction;
     }
 
@@ -194,8 +194,8 @@ public class FlowField : MonoBehaviour
         
         queue.Enqueue(_curPlayerCell);
         visited[_curPlayerCell.x * _height + _curPlayerCell.y] = true;
-        _flowField[_curPlayerCell.x, _curPlayerCell.y] = new Node(0, Vector2Int.zero);
-
+        _flowField[_curPlayerCell.x, _curPlayerCell.y] = new Node(0, Vector2.zero);
+        
         while (queue.Count > 0)
         {
             var node = queue.Dequeue();
@@ -206,10 +206,10 @@ public class FlowField : MonoBehaviour
             {
                 var sx = node.x + _searchDir[i].x;
                 var sy = node.y + _searchDir[i].y;
-
+        
                 if (sx < 0 || sx >= _width || sy < 0 || sy >= _height) continue;
                 if (visited[sx * _height + sy] || IsPassable(sx, sy) == false) continue;
-
+        
                 _flowField[sx, sy].Cost = curCost + 1;
                 
                 queue.Enqueue(new Vector2Int(sx, sy));
@@ -221,7 +221,7 @@ public class FlowField : MonoBehaviour
         foreach (var pNode in passable)
         {
             var min = _flowField[pNode.x, pNode.y].Cost;
-
+        
             foreach (var s in _searchDir)
             {
                 var dx = pNode.x + s.x;
@@ -229,13 +229,13 @@ public class FlowField : MonoBehaviour
                 
                 if(dx < 0 || dx >= _width || dy < 0 || dy >= _height)
                     continue;
-
+        
                 if (s.x != 0 && s.y != 0)
                 {
                     if(!IsPassable(dx, pNode.y) || !IsPassable(pNode.x, dy))
                         continue;
                 }
-
+        
                 if (min > _flowField[dx, dy].Cost)
                 {
                     min = _flowField[dx, dy].Cost;
@@ -253,7 +253,7 @@ public class FlowField : MonoBehaviour
         {
             for (var y = 0; y < _height; ++y)
             {
-                if (_flowField[x, y].Direction == Vector2Int.zero) continue;
+                if (_flowField[x, y].Direction == Vector2.zero) continue;
 
                 // 중앙을 좌하단으로 맞췄으니까, 다시 중앙으로 맞춤.
                 var center = _originCellPos + new Vector3((x + 0.5f) * _cellSize, 0f, (y + 0.5f) * _cellSize);
@@ -296,7 +296,7 @@ public class FlowField : MonoBehaviour
                 if (!IsPassable(x,y)) continue;
                 
                 _flowField[x, y].Cost = int.MaxValue;
-                _flowField[x, y].Direction = Vector2Int.zero;
+                _flowField[x, y].Direction = Vector2.zero;
             }
         }
     }
@@ -339,12 +339,20 @@ public class FlowField : MonoBehaviour
 public struct Node
 {
     public int Cost;
-    public Vector2Int Direction;
+    public Vector2 Direction
+    {
+        get { return _direction;}
+        set
+        {
+            _direction = value.normalized;
+        }
+    }
+    private Vector2 _direction;
     
-    public Node(int cost, Vector2Int direction)
+    public Node(int cost, Vector2 direction)
     {
         Cost = cost;
-        Direction = direction;
+        _direction = direction.normalized;
     }
 }
 
