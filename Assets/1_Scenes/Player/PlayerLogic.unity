@@ -301340,6 +301340,8 @@ MonoBehaviour:
   playerTf: {fileID: 128184003}
   blockingObstacleParent: {fileID: 269040874}
   sub: 2
+  losEnable: 1
+  losRadius: 40
 --- !u!4 &1804001334
 Transform:
   m_ObjectHideFlags: 0

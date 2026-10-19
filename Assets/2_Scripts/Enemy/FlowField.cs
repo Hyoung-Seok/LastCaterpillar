@@ -13,6 +13,10 @@ public class FlowField : MonoBehaviour
     [Header("Setting")] 
     [SerializeField, Min(1)] private int sub = 1;
 
+    [Header("LOS")] 
+    [SerializeField] private bool losEnable = true;
+    [SerializeField, Min(0)] private float losRadius = 15f;
+
     public static FlowField Instance => _instance;
     private static FlowField _instance;
     
@@ -20,6 +24,7 @@ public class FlowField : MonoBehaviour
     private int _width = 0;
     private int _height = 0;
     private float _cellSize = 0f;
+    private int _losRadiusCell = 1;
     private Node[,] _flowField;
 
     private Vector2Int _curPlayerCell;
@@ -53,6 +58,7 @@ public class FlowField : MonoBehaviour
         _width = _layout.Width * sub;
         _height = _layout.Height * sub;
         _cellSize = _layout.CellSize / (float)sub;
+        _losRadiusCell = Mathf.CeilToInt(losRadius / _cellSize);
 
         _flowField = new Node[_width, _height];
 
@@ -221,6 +227,7 @@ public class FlowField : MonoBehaviour
         foreach (var pNode in passable)
         {
             var min = _flowField[pNode.x, pNode.y].Cost;
+            _flowField[pNode.x, pNode.y].IsInBoundLos = false;
         
             foreach (var s in _searchDir)
             {
@@ -243,6 +250,92 @@ public class FlowField : MonoBehaviour
                 }
             }
         }
+        
+        if(losEnable)
+            OverwriteLosDirection(_curPlayerCell);
+    }
+
+    private void OverwriteLosDirection(Vector2Int p)
+    {
+        if (!IsPassable(p.x, p.y)) return;
+
+        var r = _losRadiusCell;
+        var powR = r * r;
+        var check = Vector2Int.zero;
+
+        for (var dx = -r; dx <= r; dx++)
+        {
+            for (var dy = -r; dy <= r; dy++)
+            {
+                if(dx * dx + dy * dy > powR) continue;
+
+                check.x = p.x + dx;
+                check.y = p.y + dy;
+
+                if (!InBounds(check.x, check.y)) continue;
+                if (!IsPassable(check.x, check.y)) continue;
+                if (!HasLineOfSight(p, check)) continue;
+                
+                _flowField[check.x, check.y].Direction = p - check;
+                _flowField[check.x, check.y].IsInBoundLos = true;
+            }
+        }
+    }
+
+    private bool HasLineOfSight(Vector2Int start, Vector2Int end)
+    {
+        var dx = end.x - start.x;
+        var dy = end.y - start.y;
+        
+        // 전체 이동 칸 수
+        var nx = Mathf.Abs(dx);
+        var ny =  Mathf.Abs(dy);
+        
+        // 방향
+        var sx = System.Math.Sign(dx);
+        var sy = System.Math.Sign(dy);
+        
+        // 이동한 칸 수
+        var ix = 0;
+        var iy = 0;
+
+        var cur = start;
+
+        while (ix < nx || iy < ny)
+        {
+            var tx = (1 + 2 * ix) * ny;
+            var ty = (1 + 2 * iy) * nx;
+
+            if (tx < ty)    // 세로벽(우측or좌측)에 도달
+            {
+                cur.x += sx;
+                ix++;
+            }
+            else if (tx == ty)  // 꼭짓점 이동
+            {
+                // 꼭짓점 통과: 양 옆 칸 검사 (방향장 대각 규칙과 동일)
+                if (!IsPassable(cur.x + sx, cur.y) || !IsPassable(cur.x, cur.y + sy))
+                {
+                    return false;
+                }
+                
+                cur.x += sx;
+                cur.y += sy;
+
+                ix++;
+                iy++;
+            }
+            else                // 가로벽(위or아래)에 도달
+            {
+                cur.y += sy;
+                iy++;
+            }
+
+            if (!IsPassable(cur.x, cur.y))
+                return false;
+        }
+
+        return true;
     }
 
     private void OnDrawGizmos()
@@ -261,8 +354,8 @@ public class FlowField : MonoBehaviour
                 var dir = _flowField[x, y].Direction;
                 var worldDir = new Vector3(dir.x, 0f, dir.y).normalized;
                 var tip = center + worldDir * (_cellSize * 0.4f);
-
-                Gizmos.color = Color.cyan;
+                
+                Gizmos.color = (_flowField[x,y].IsInBoundLos) ? Color.red : Color.cyan;
                 Gizmos.DrawLine(center, tip);
                 
                 var back1 = Quaternion.Euler(0,  150f, 0) * worldDir;
@@ -349,10 +442,14 @@ public struct Node
     }
     private Vector2 _direction;
     
+    // 테스트 코드 끝나면 삭제
+    public bool IsInBoundLos;
+    
     public Node(int cost, Vector2 direction)
     {
         Cost = cost;
         _direction = direction.normalized;
+        IsInBoundLos = false;
     }
 }
 
