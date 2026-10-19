@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
 
 public class FlowField : MonoBehaviour
@@ -45,7 +46,9 @@ public class FlowField : MonoBehaviour
         new Vector2Int(-1, 1), new Vector2Int(1, 1), // 좌상, 우상
         new Vector2Int(-1, -1), new Vector2Int(1, -1)  // 좌하, 우하
     };
-    
+
+    private static readonly ProfilerMarker s_UpdateFlowField = new("FlowField.UpdateFlowField");
+
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -79,7 +82,9 @@ public class FlowField : MonoBehaviour
         if (playerIndex != _curPlayerCell)
         {
             _curPlayerCell = playerIndex;
-            UpdateFlowField();
+
+            using (s_UpdateFlowField.Auto())
+                UpdateFlowField();
         }
     }
     
