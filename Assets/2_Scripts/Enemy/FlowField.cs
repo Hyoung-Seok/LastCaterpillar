@@ -308,18 +308,19 @@ public class FlowField : MonoBehaviour
         
         foreach (var pNode in _passableCells)
         {
+            var bestIdx = -1;
             var min = _flowField[pNode.x, pNode.y].Cost;
             _flowField[pNode.x, pNode.y].IsInBoundLos = false;
-        
-            foreach (var s in _searchDir)
+
+            for (var i = 0; i < _searchDir.Length; ++i)
             {
-                var dx = pNode.x + s.x;
-                var dy = pNode.y + s.y;
+                var dx = pNode.x + _searchDir[i].x;
+                var dy = pNode.y + _searchDir[i].y;
                 
                 if(dx < 0 || dx >= _width || dy < 0 || dy >= _height)
                     continue;
         
-                if (s.x != 0 && s.y != 0)
+                if (_searchDir[i].x != 0 && _searchDir[i].y != 0)
                 {
                     if(!IsPassable(dx, pNode.y) || !IsPassable(pNode.x, dy))
                         continue;
@@ -328,9 +329,12 @@ public class FlowField : MonoBehaviour
                 if (min > _flowField[dx, dy].Cost)
                 {
                     min = _flowField[dx, dy].Cost;
-                    _flowField[pNode.x, pNode.y].Direction = s;
+                    bestIdx = i;
                 }
             }
+        
+            if(bestIdx != -1)
+                _flowField[pNode.x, pNode.y].Direction = _searchDir[bestIdx];
         }
         
         if(losEnable)

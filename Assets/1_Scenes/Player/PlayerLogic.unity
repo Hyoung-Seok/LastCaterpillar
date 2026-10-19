@@ -301335,7 +301335,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 95d7d830f807c1d42904742ae2af4275, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlowField
-  drawGizmos: 1
+  drawGizmos: 0
   cityGenerator: {fileID: 2088994207}
   playerTf: {fileID: 128184003}
   blockingObstacleParent: {fileID: 269040874}
