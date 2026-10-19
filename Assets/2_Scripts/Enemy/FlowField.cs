@@ -26,12 +26,20 @@ public class FlowField : MonoBehaviour
     private float _cellSize = 0f;
     private int _losRadiusCell = 1;
     private Node[,] _flowField;
+    private bool[] _passableMap;
 
     private Vector2Int _curPlayerCell;
     private Vector3 _originCellPos;
     
     private HashSet<Vector2Int> _obstacleIndex;
+    
+    // using FlowField Update
+    private Queue<Vector2Int> _cellIndexQueue;
+    private List<Vector2Int> _passableCells;
+    private bool[] _visitedCells;
 
+    private bool IsPassable(int x, int y) => _passableMap[x * _height + y];
+    
     private void Awake()
     {
         if (_instance != null && _instance != this)
@@ -61,6 +69,9 @@ public class FlowField : MonoBehaviour
         _losRadiusCell = Mathf.CeilToInt(losRadius / _cellSize);
 
         _flowField = new Node[_width, _height];
+        _cellIndexQueue = new Queue<Vector2Int>();
+        _passableCells = new List<Vector2Int>(_width * _height);
+        _visitedCells = new bool[_width * _height];
 
         for (var x = 0; x < _width; ++x)
         {
@@ -75,7 +86,9 @@ public class FlowField : MonoBehaviour
         _originCellPos = _layout.ConvertCellPosToWorld(0,0) - new Vector3(half, 0, half);
         
         GetObstaclePositions();
+        UpdatePassableMap();
         SetupFlowField();
+        UpdatePassableCells();
     }
 
     public Vector3 GetSmoothedDirection(Vector3 pos)
@@ -192,19 +205,20 @@ public class FlowField : MonoBehaviour
 
     private void UpdateFlowField()
     {
+        if(!IsPassable(_curPlayerCell.x, _curPlayerCell.y)) 
+            return;
+        
         ResetNode();
         
-        var queue = new Queue<Vector2Int>();
-        var passable = new List<Vector2Int>();
-        var visited = new bool[_width * _height];
+        _cellIndexQueue.Enqueue(_curPlayerCell);
+        System.Array.Clear(_visitedCells, 0, _visitedCells.Length);
         
-        queue.Enqueue(_curPlayerCell);
-        visited[_curPlayerCell.x * _height + _curPlayerCell.y] = true;
+        _visitedCells[_curPlayerCell.x * _height + _curPlayerCell.y] = true;
         _flowField[_curPlayerCell.x, _curPlayerCell.y] = new Node(0, Vector2.zero);
         
-        while (queue.Count > 0)
+        while (_cellIndexQueue.Count > 0)
         {
-            var node = queue.Dequeue();
+            var node = _cellIndexQueue.Dequeue();
             var curCost = _flowField[node.x, node.y].Cost;
             
             // 4방향 탐색 먼저
@@ -214,17 +228,16 @@ public class FlowField : MonoBehaviour
                 var sy = node.y + _searchDir[i].y;
         
                 if (sx < 0 || sx >= _width || sy < 0 || sy >= _height) continue;
-                if (visited[sx * _height + sy] || IsPassable(sx, sy) == false) continue;
+                if (_visitedCells[sx * _height + sy] || IsPassable(sx, sy) == false) continue;
         
                 _flowField[sx, sy].Cost = curCost + 1;
                 
-                queue.Enqueue(new Vector2Int(sx, sy));
-                passable.Add(new Vector2Int(sx, sy));
-                visited[sx * _height + sy] = true;
+                _cellIndexQueue.Enqueue(new Vector2Int(sx, sy));
+                _visitedCells[sx * _height + sy] = true;
             }
         }
         
-        foreach (var pNode in passable)
+        foreach (var pNode in _passableCells)
         {
             var min = _flowField[pNode.x, pNode.y].Cost;
             _flowField[pNode.x, pNode.y].IsInBoundLos = false;
@@ -374,12 +387,6 @@ public class FlowField : MonoBehaviour
         return new Vector2Int(col, row);
     }
 
-    private bool IsPassable(int x, int y)
-    {
-        return _layout.Cells[x / sub, y / sub] is ECellType.CatWalk or ECellType.Road
-               && !_obstacleIndex.Contains(new Vector2Int(x, y));
-    }
-
     private void ResetNode()
     {
         for (var x = 0; x < _width; ++x)
@@ -410,6 +417,35 @@ public class FlowField : MonoBehaviour
                 {
                     _obstacleIndex.Add(new Vector2Int(x, y));
                 }
+            }
+        }
+    }
+
+    private void UpdatePassableCells()
+    {
+        _passableCells.Clear();
+
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                if(IsPassable(x,y))
+                    _passableCells.Add(new Vector2Int(x, y));
+            }
+        }
+    }
+
+    private void UpdatePassableMap()
+    {
+        _passableMap = new bool[_width *  _height];
+
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                _passableMap[x * _height + y] =
+                    _layout.Cells[x / sub, y / sub] is ECellType.CatWalk or ECellType.Road
+                    && !_obstacleIndex.Contains(new Vector2Int(x, y));
             }
         }
     }
