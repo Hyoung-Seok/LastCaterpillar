@@ -26,19 +26,25 @@ public class FlowField : MonoBehaviour
     private float _cellSize = 0f;
     private int _losRadiusCell = 1;
     private Node[,] _flowField;
-    private bool[] _passableMap;
 
     private Vector2Int _curPlayerCell;
     private Vector3 _originCellPos;
     
-    private HashSet<Vector2Int> _obstacleIndex;
-    
-    // using FlowField Update
+    // BFS 버퍼
     private Queue<Vector2Int> _cellIndexQueue;
-    private List<Vector2Int> _passableCells;
     private bool[] _visitedCells;
+    //통행 가능성
+    private List<Vector2Int> _passableCells;
+    private bool[] _passableMap;
 
-    private bool IsPassable(int x, int y) => _passableMap[x * _height + y];
+    
+    private readonly Vector2Int[] _searchDir = new[]
+    {
+        new Vector2Int(0, 1), new Vector2Int(0, -1), // 상, 하
+        new Vector2Int(-1, 0), new Vector2Int(1, 0), // 좌, 우
+        new Vector2Int(-1, 1), new Vector2Int(1, 1), // 좌상, 우상
+        new Vector2Int(-1, -1), new Vector2Int(1, -1)  // 좌하, 우하
+    };
     
     private void Awake()
     {
@@ -62,35 +68,27 @@ public class FlowField : MonoBehaviour
             return;
         }
         
-        _layout = cityGenerator.CityLayout;
-        _width = _layout.Width * sub;
-        _height = _layout.Height * sub;
-        _cellSize = _layout.CellSize / (float)sub;
-        _losRadiusCell = Mathf.CeilToInt(losRadius / _cellSize);
-
-        _flowField = new Node[_width, _height];
-        _cellIndexQueue = new Queue<Vector2Int>();
-        _passableCells = new List<Vector2Int>(_width * _height);
-        _visitedCells = new bool[_width * _height];
-
-        for (var x = 0; x < _width; ++x)
-        {
-            for (var y = 0; y < _height; ++y)
-            {
-                _flowField[x, y] = new Node(int.MaxValue, Vector2.zero);
-            }
-        }
-
-        var half = _layout.CellSize * 0.5f;
-        // 셀의 피봇을 중심이 아닌 좌하단으로 잡음.
-        _originCellPos = _layout.ConvertCellPosToWorld(0,0) - new Vector3(half, 0, half);
-        
-        GetObstaclePositions();
-        UpdatePassableMap();
-        SetupFlowField();
-        UpdatePassableCells();
+        InitGrid();
+        BuildPassability();
     }
+    
+    private void Update()
+    {
+        var playerIndex = WorldToCell(playerTf.position);
 
+        if (playerIndex != _curPlayerCell)
+        {
+            _curPlayerCell = playerIndex;
+            UpdateFlowField();
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
+    }
+    
     public Vector3 GetSmoothedDirection(Vector3 pos)
     {
         if (_flowField == null) return Vector3.zero;
@@ -163,20 +161,40 @@ public class FlowField : MonoBehaviour
         return !IsPassable(c.x, c.y);
     }
     
-    private bool InBounds(int x, int y) =>  x >= 0 && x < _width && y >= 0 && y < _height;
-    
-    private void Update()
+    private void InitGrid()
     {
-        var playerIndex = WorldToCell(playerTf.position);
+        _layout = cityGenerator.CityLayout;
+        _width = _layout.Width * sub;
+        _height = _layout.Height * sub;
+        _cellSize = _layout.CellSize / (float)sub;
+        _losRadiusCell = Mathf.CeilToInt(losRadius / _cellSize);
 
-        if (playerIndex != _curPlayerCell)
+        _flowField = new Node[_width, _height];
+        _cellIndexQueue = new Queue<Vector2Int>();
+        _passableCells = new List<Vector2Int>(_width * _height);
+        _visitedCells = new bool[_width * _height];
+
+        for (var x = 0; x < _width; ++x)
         {
-            _curPlayerCell = playerIndex;
-            UpdateFlowField();
+            for (var y = 0; y < _height; ++y)
+            {
+                _flowField[x, y] = new Node(int.MaxValue, Vector2.zero);
+            }
         }
-    }
 
-    private void SetupFlowField()
+        var half = _layout.CellSize * 0.5f;
+        // 셀의 피봇을 중심이 아닌 좌하단으로 잡음.
+        _originCellPos = _layout.ConvertCellPosToWorld(0,0) - new Vector3(half, 0, half);
+    }
+    
+    private void BuildPassability()
+    {
+        _passableMap = BuildPassableMap();
+        SetUpReturnDirection();
+        CollectPassableCells();
+    }
+    
+    private void SetUpReturnDirection()
     {
         for (var x = 0; x < _width; ++x)
         {
@@ -193,6 +211,7 @@ public class FlowField : MonoBehaviour
                     var ny = dy + y;
 
                     if (nx < 0 || nx >= _width || ny < 0 || ny >= _height) continue;
+                    
                     if (IsPassable(nx, ny))
                     {
                         _flowField[x, y].Direction = _searchDir[i];
@@ -202,10 +221,60 @@ public class FlowField : MonoBehaviour
             }
         }
     }
+    
+    private void CollectPassableCells()
+    {
+        _passableCells.Clear();
+
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                if(IsPassable(x,y))
+                    _passableCells.Add(new Vector2Int(x, y));
+            }
+        }
+    }
+    
+    private bool[] BuildPassableMap()
+    {
+        var passableMap = new bool[_width *  _height];
+        var obstacleIndex = new HashSet<Vector2Int>();
+
+        // 장애물에 의해 막힌 셀 검사
+        foreach (Transform child in blockingObstacleParent)
+        {
+            var b = child.GetComponent<BoxCollider>().bounds;
+            var minCell = WorldToCell(b.min);
+            var maxCell = WorldToCell(b.max);
+
+            for (var x = minCell.x; x <= maxCell.x; x++)
+            {
+                for (var y = minCell.y; y <= maxCell.y; y++)
+                {
+                    obstacleIndex.Add(new Vector2Int(x, y));
+                }
+            }
+        }
+        
+        // 통행할 수 없는 셀 캐싱
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                passableMap[x * _height + y] =
+                    _layout.Cells[x / sub, y / sub] is ECellType.CatWalk or ECellType.Road
+                    && !obstacleIndex.Contains(new Vector2Int(x, y));
+            }
+        }
+
+        return passableMap;
+    }
 
     private void UpdateFlowField()
     {
-        if(!IsPassable(_curPlayerCell.x, _curPlayerCell.y)) 
+        if (!InBounds(_curPlayerCell.x, _curPlayerCell.y) ||
+            !IsPassable(_curPlayerCell.x, _curPlayerCell.y))
             return;
         
         ResetNode();
@@ -266,6 +335,20 @@ public class FlowField : MonoBehaviour
         
         if(losEnable)
             OverwriteLosDirection(_curPlayerCell);
+    }
+    
+    private void ResetNode()
+    {
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                if (!IsPassable(x,y)) continue;
+                
+                _flowField[x, y].Cost = int.MaxValue;
+                _flowField[x, y].Direction = Vector2.zero;
+            }
+        }
     }
 
     private void OverwriteLosDirection(Vector2Int p)
@@ -350,7 +433,21 @@ public class FlowField : MonoBehaviour
 
         return true;
     }
-
+    
+    /// <summary>
+    /// 범위 검사는 호출자 책임
+    /// </summary>
+    private bool IsPassable(int x, int y) => _passableMap[x * _height + y];
+    private bool InBounds(int x, int y) =>  x >= 0 && x < _width && y >= 0 && y < _height;
+    
+    private Vector2Int WorldToCell(Vector3 worldPos)
+    {
+        var col = Mathf.FloorToInt((worldPos.x - _originCellPos.x) / _cellSize);
+        var row = Mathf.FloorToInt((worldPos.z - _originCellPos.z) / _cellSize);
+        
+        return new Vector2Int(col, row);
+    }
+    
     private void OnDrawGizmos()
     {
         if (drawGizmos == false || _flowField == null) return;
@@ -377,91 +474,6 @@ public class FlowField : MonoBehaviour
                 Gizmos.DrawLine(tip, tip + back2 * (_cellSize * 0.15f));
             }
         }
-    }
-    
-    private Vector2Int WorldToCell(Vector3 worldPos)
-    {
-        var col = Mathf.FloorToInt((worldPos.x - _originCellPos.x) / _cellSize);
-        var row = Mathf.FloorToInt((worldPos.z - _originCellPos.z) / _cellSize);
-        
-        return new Vector2Int(col, row);
-    }
-
-    private void ResetNode()
-    {
-        for (var x = 0; x < _width; ++x)
-        {
-            for (var y = 0; y < _height; ++y)
-            {
-                if (!IsPassable(x,y)) continue;
-                
-                _flowField[x, y].Cost = int.MaxValue;
-                _flowField[x, y].Direction = Vector2.zero;
-            }
-        }
-    }
-
-    private void GetObstaclePositions()
-    {
-        _obstacleIndex = new HashSet<Vector2Int>();
-
-        foreach (Transform child in blockingObstacleParent)
-        {
-            var b = child.GetComponent<BoxCollider>().bounds;
-            var minCell = WorldToCell(b.min);
-            var maxCell = WorldToCell(b.max);
-
-            for (var x = minCell.x; x <= maxCell.x; x++)
-            {
-                for (var y = minCell.y; y <= maxCell.y; y++)
-                {
-                    _obstacleIndex.Add(new Vector2Int(x, y));
-                }
-            }
-        }
-    }
-
-    private void UpdatePassableCells()
-    {
-        _passableCells.Clear();
-
-        for (var x = 0; x < _width; ++x)
-        {
-            for (var y = 0; y < _height; ++y)
-            {
-                if(IsPassable(x,y))
-                    _passableCells.Add(new Vector2Int(x, y));
-            }
-        }
-    }
-
-    private void UpdatePassableMap()
-    {
-        _passableMap = new bool[_width *  _height];
-
-        for (var x = 0; x < _width; ++x)
-        {
-            for (var y = 0; y < _height; ++y)
-            {
-                _passableMap[x * _height + y] =
-                    _layout.Cells[x / sub, y / sub] is ECellType.CatWalk or ECellType.Road
-                    && !_obstacleIndex.Contains(new Vector2Int(x, y));
-            }
-        }
-    }
-
-    private readonly Vector2Int[] _searchDir = new[]
-    {
-        new Vector2Int(0, 1), new Vector2Int(0, -1), // 상, 하
-        new Vector2Int(-1, 0), new Vector2Int(1, 0), // 좌, 우
-        new Vector2Int(-1, 1), new Vector2Int(1, 1), // 좌상, 우상
-        new Vector2Int(-1, -1), new Vector2Int(1, -1)  // 좌하, 우하
-    };
-
-    private void OnDestroy()
-    {
-        if (_instance == this)
-            _instance = null;
     }
 }
 
