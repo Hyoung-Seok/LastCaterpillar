@@ -3,7 +3,6 @@
     "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main",
     "com.unity.addressables.android": "1.0.10",
     "com.unity.ai.navigation": "2.0.10",
-    "com.unity.charactercontroller": "1.4.2",
     "com.unity.cinemachine": "3.1.6",
     "com.unity.cloud.gltfast": "6.19.0",
     "com.unity.collab-proxy": "2.11.3",

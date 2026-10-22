@@ -4,7 +4,7 @@ using UnityEngine;
 public class SpatialHash<T> where T : ISpatialItem
 {
     private readonly int _cellSize;
-    private readonly Dictionary<long, List<T>> _buckets = new();
+    private readonly Dictionary<long, List<SpatialEntry<T>>> _buckets = new();
     
     public SpatialHash(int size)
     {
@@ -27,16 +27,16 @@ public class SpatialHash<T> where T : ISpatialItem
         var cy = Mathf.FloorToInt(pos.z / _cellSize);
         var key = Key(cx, cy);
 
-        if (!_buckets.TryGetValue(key, out var list))
+        if (!_buckets.TryGetValue(key, out var bucket))
         {
-            list = new List<T>();
-            _buckets.Add(key, list);
+            bucket = new List<SpatialEntry<T>>();
+            _buckets.Add(key, bucket);
         }
         
-        list.Add(agent);
+        bucket.Add(new SpatialEntry<T>(agent, pos));
     }
 
-    public void Query(Vector3 pos, List<T> result)
+    public void Query(Vector3 pos, List<SpatialEntry<T>> result)
     {
         result.Clear();
         
@@ -47,8 +47,8 @@ public class SpatialHash<T> where T : ISpatialItem
         {
             for (var dy = -1; dy <= 1; ++dy)
             {
-                if(_buckets.TryGetValue(Key(cx + dx, cy + dy), out var list))
-                    result.AddRange(list);
+                if(_buckets.TryGetValue(Key(cx + dx, cy + dy), out var bucket))
+                    result.AddRange(bucket);
             }
         }
     }
@@ -69,14 +69,14 @@ public class SpatialHash<T> where T : ISpatialItem
             {
                 if(!_buckets.TryGetValue(Key(cx, cy), out var list)) continue;
 
-                foreach (var item in list)
+                foreach (var bucket in list)
                 {
-                    var d = item.Position - center;
+                    var d = bucket.Item.Position - center;
                     d.y = 0;
 
                     if (d.sqrMagnitude <= sqrRadius)
                     {
-                        result.Add(item);
+                        result.Add(bucket.Item);
                     }
                 }
             }
@@ -84,4 +84,16 @@ public class SpatialHash<T> where T : ISpatialItem
     }
 
     private long Key(int cx, int cy) => ((long)cx << 32) | (uint)cy;
+}
+
+public readonly struct SpatialEntry<T> where T : ISpatialItem
+{
+    public readonly T Item;
+    public readonly Vector3 Pos;
+    
+    public SpatialEntry (T item, Vector3 pos)
+    {
+        Item = item;
+        Pos = pos;
+    }
 }

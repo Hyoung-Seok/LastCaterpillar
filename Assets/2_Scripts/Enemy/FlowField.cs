@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
 
 public class FlowField : MonoBehaviour
@@ -13,6 +14,10 @@ public class FlowField : MonoBehaviour
     [Header("Setting")] 
     [SerializeField, Min(1)] private int sub = 1;
 
+    [Header("LOS")] 
+    [SerializeField] private bool losEnable = true;
+    [SerializeField, Min(0)] private float losRadius = 15f;
+
     public static FlowField Instance => _instance;
     private static FlowField _instance;
     
@@ -20,12 +25,29 @@ public class FlowField : MonoBehaviour
     private int _width = 0;
     private int _height = 0;
     private float _cellSize = 0f;
+    private int _losRadiusCell = 1;
     private Node[,] _flowField;
 
     private Vector2Int _curPlayerCell;
     private Vector3 _originCellPos;
     
-    private HashSet<Vector2Int> _obstacleIndex;
+    // BFS 버퍼
+    private Queue<Vector2Int> _cellIndexQueue;
+    private bool[] _visitedCells;
+    //통행 가능성
+    private List<Vector2Int> _passableCells;
+    private bool[] _passableMap;
+
+    
+    private readonly Vector2Int[] _searchDir = new[]
+    {
+        new Vector2Int(0, 1), new Vector2Int(0, -1), // 상, 하
+        new Vector2Int(-1, 0), new Vector2Int(1, 0), // 좌, 우
+        new Vector2Int(-1, 1), new Vector2Int(1, 1), // 좌상, 우상
+        new Vector2Int(-1, -1), new Vector2Int(1, -1)  // 좌하, 우하
+    };
+
+    private static readonly ProfilerMarker s_UpdateFlowField = new("FlowField.UpdateFlowField");
 
     private void Awake()
     {
@@ -49,29 +71,29 @@ public class FlowField : MonoBehaviour
             return;
         }
         
-        _layout = cityGenerator.CityLayout;
-        _width = _layout.Width * sub;
-        _height = _layout.Height * sub;
-        _cellSize = _layout.CellSize / (float)sub;
-
-        _flowField = new Node[_width, _height];
-
-        for (var x = 0; x < _width; ++x)
-        {
-            for (var y = 0; y < _height; ++y)
-            {
-                _flowField[x, y] = new Node(int.MaxValue, Vector2Int.zero);
-            }
-        }
-
-        var half = _layout.CellSize * 0.5f;
-        // 셀의 피봇을 중심이 아닌 좌하단으로 잡음.
-        _originCellPos = _layout.ConvertCellPosToWorld(0,0) - new Vector3(half, 0, half);
-        
-        GetObstaclePositions();
-        SetupFlowField();
+        InitGrid();
+        BuildPassability();
     }
+    
+    private void Update()
+    {
+        var playerIndex = WorldToCell(playerTf.position);
 
+        if (playerIndex != _curPlayerCell)
+        {
+            _curPlayerCell = playerIndex;
+
+            using (s_UpdateFlowField.Auto())
+                UpdateFlowField();
+        }
+    }
+    
+    private void OnDestroy()
+    {
+        if (_instance == this)
+            _instance = null;
+    }
+    
     public Vector3 GetSmoothedDirection(Vector3 pos)
     {
         if (_flowField == null) return Vector3.zero;
@@ -101,7 +123,7 @@ public class FlowField : MonoBehaviour
                 
                 if(!InBounds(x, y)) continue;
                 if(!IsPassable(x, y)) continue;
-                if(_flowField[x,y].Direction == Vector2Int.zero) continue;
+                if(_flowField[x,y].Direction == Vector2.zero) continue;
                 
                 // 가중치 구하기
                 // dx == 0이면 왼쪽 표본. 내가 오른쪽으로 tx 만큼 갔다면, 왼쪽에서 그만큼 멀어진거니 지분은 1-tx.
@@ -125,14 +147,14 @@ public class FlowField : MonoBehaviour
         return sum.normalized;
     }
     
-    public Vector2Int GetCurrentCellDirection(Vector3 pos)
+    public Vector2 GetCurrentCellDirection(Vector3 pos)
     {
-        if(_flowField == null)  return Vector2Int.zero;
+        if(_flowField == null)  return Vector2.zero;
 
         var index = WorldToCell(pos);
         
         return (index.x < 0 || index.x >= _width || index.y < 0 || index.y >= _height)
-            ? Vector2Int.zero
+            ? Vector2.zero
             : _flowField[index.x, index.y].Direction;
     }
 
@@ -144,20 +166,40 @@ public class FlowField : MonoBehaviour
         return !IsPassable(c.x, c.y);
     }
     
-    private bool InBounds(int x, int y) =>  x >= 0 && x < _width && y >= 0 && y < _height;
-    
-    private void Update()
+    private void InitGrid()
     {
-        var playerIndex = WorldToCell(playerTf.position);
+        _layout = cityGenerator.CityLayout;
+        _width = _layout.Width * sub;
+        _height = _layout.Height * sub;
+        _cellSize = _layout.CellSize / (float)sub;
+        _losRadiusCell = Mathf.CeilToInt(losRadius / _cellSize);
 
-        if (playerIndex != _curPlayerCell)
+        _flowField = new Node[_width, _height];
+        _cellIndexQueue = new Queue<Vector2Int>();
+        _passableCells = new List<Vector2Int>(_width * _height);
+        _visitedCells = new bool[_width * _height];
+
+        for (var x = 0; x < _width; ++x)
         {
-            _curPlayerCell = playerIndex;
-            UpdateFlowField();
+            for (var y = 0; y < _height; ++y)
+            {
+                _flowField[x, y] = new Node(int.MaxValue, Vector2.zero);
+            }
         }
-    }
 
-    private void SetupFlowField()
+        var half = _layout.CellSize * 0.5f;
+        // 셀의 피봇을 중심이 아닌 좌하단으로 잡음.
+        _originCellPos = _layout.ConvertCellPosToWorld(0,0) - new Vector3(half, 0, half);
+    }
+    
+    private void BuildPassability()
+    {
+        _passableMap = BuildPassableMap();
+        SetUpReturnDirection();
+        CollectPassableCells();
+    }
+    
+    private void SetUpReturnDirection()
     {
         for (var x = 0; x < _width; ++x)
         {
@@ -174,6 +216,7 @@ public class FlowField : MonoBehaviour
                     var ny = dy + y;
 
                     if (nx < 0 || nx >= _width || ny < 0 || ny >= _height) continue;
+                    
                     if (IsPassable(nx, ny))
                     {
                         _flowField[x, y].Direction = _searchDir[i];
@@ -183,128 +226,27 @@ public class FlowField : MonoBehaviour
             }
         }
     }
-
-    private void UpdateFlowField()
+    
+    private void CollectPassableCells()
     {
-        ResetNode();
-        
-        var queue = new Queue<Vector2Int>();
-        var passable = new List<Vector2Int>();
-        var visited = new bool[_width * _height];
-        
-        queue.Enqueue(_curPlayerCell);
-        visited[_curPlayerCell.x * _height + _curPlayerCell.y] = true;
-        _flowField[_curPlayerCell.x, _curPlayerCell.y] = new Node(0, Vector2Int.zero);
-
-        while (queue.Count > 0)
-        {
-            var node = queue.Dequeue();
-            var curCost = _flowField[node.x, node.y].Cost;
-            
-            // 4방향 탐색 먼저
-            for (var i = 0; i < 4; ++i)
-            {
-                var sx = node.x + _searchDir[i].x;
-                var sy = node.y + _searchDir[i].y;
-
-                if (sx < 0 || sx >= _width || sy < 0 || sy >= _height) continue;
-                if (visited[sx * _height + sy] || IsPassable(sx, sy) == false) continue;
-
-                _flowField[sx, sy].Cost = curCost + 1;
-                
-                queue.Enqueue(new Vector2Int(sx, sy));
-                passable.Add(new Vector2Int(sx, sy));
-                visited[sx * _height + sy] = true;
-            }
-        }
-        
-        foreach (var pNode in passable)
-        {
-            var min = _flowField[pNode.x, pNode.y].Cost;
-
-            foreach (var s in _searchDir)
-            {
-                var dx = pNode.x + s.x;
-                var dy = pNode.y + s.y;
-                
-                if(dx < 0 || dx >= _width || dy < 0 || dy >= _height)
-                    continue;
-
-                if (s.x != 0 && s.y != 0)
-                {
-                    if(!IsPassable(dx, pNode.y) || !IsPassable(pNode.x, dy))
-                        continue;
-                }
-
-                if (min > _flowField[dx, dy].Cost)
-                {
-                    min = _flowField[dx, dy].Cost;
-                    _flowField[pNode.x, pNode.y].Direction = s;
-                }
-            }
-        }
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (drawGizmos == false || _flowField == null) return;
+        _passableCells.Clear();
 
         for (var x = 0; x < _width; ++x)
         {
             for (var y = 0; y < _height; ++y)
             {
-                if (_flowField[x, y].Direction == Vector2Int.zero) continue;
-
-                // 중앙을 좌하단으로 맞췄으니까, 다시 중앙으로 맞춤.
-                var center = _originCellPos + new Vector3((x + 0.5f) * _cellSize, 0f, (y + 0.5f) * _cellSize);
-                
-                var dir = _flowField[x, y].Direction;
-                var worldDir = new Vector3(dir.x, 0f, dir.y).normalized;
-                var tip = center + worldDir * (_cellSize * 0.4f);
-
-                Gizmos.color = Color.cyan;
-                Gizmos.DrawLine(center, tip);
-                
-                var back1 = Quaternion.Euler(0,  150f, 0) * worldDir;
-                var back2 = Quaternion.Euler(0, -150f, 0) * worldDir;
-                Gizmos.DrawLine(tip, tip + back1 * (_cellSize * 0.15f));
-                Gizmos.DrawLine(tip, tip + back2 * (_cellSize * 0.15f));
+                if(IsPassable(x,y))
+                    _passableCells.Add(new Vector2Int(x, y));
             }
         }
     }
     
-    private Vector2Int WorldToCell(Vector3 worldPos)
+    private bool[] BuildPassableMap()
     {
-        var col = Mathf.FloorToInt((worldPos.x - _originCellPos.x) / _cellSize);
-        var row = Mathf.FloorToInt((worldPos.z - _originCellPos.z) / _cellSize);
-        
-        return new Vector2Int(col, row);
-    }
+        var passableMap = new bool[_width *  _height];
+        var obstacleIndex = new HashSet<Vector2Int>();
 
-    private bool IsPassable(int x, int y)
-    {
-        return _layout.Cells[x / sub, y / sub] is ECellType.CatWalk or ECellType.Road
-               && !_obstacleIndex.Contains(new Vector2Int(x, y));
-    }
-
-    private void ResetNode()
-    {
-        for (var x = 0; x < _width; ++x)
-        {
-            for (var y = 0; y < _height; ++y)
-            {
-                if (!IsPassable(x,y)) continue;
-                
-                _flowField[x, y].Cost = int.MaxValue;
-                _flowField[x, y].Direction = Vector2Int.zero;
-            }
-        }
-    }
-
-    private void GetObstaclePositions()
-    {
-        _obstacleIndex = new HashSet<Vector2Int>();
-
+        // 장애물에 의해 막힌 셀 검사
         foreach (Transform child in blockingObstacleParent)
         {
             var b = child.GetComponent<BoxCollider>().bounds;
@@ -315,36 +257,256 @@ public class FlowField : MonoBehaviour
             {
                 for (var y = minCell.y; y <= maxCell.y; y++)
                 {
-                    _obstacleIndex.Add(new Vector2Int(x, y));
+                    obstacleIndex.Add(new Vector2Int(x, y));
                 }
+            }
+        }
+        
+        // 통행할 수 없는 셀 캐싱
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                passableMap[x * _height + y] =
+                    _layout.Cells[x / sub, y / sub] is ECellType.CatWalk or ECellType.Road
+                    && !obstacleIndex.Contains(new Vector2Int(x, y));
+            }
+        }
+
+        return passableMap;
+    }
+
+    private void UpdateFlowField()
+    {
+        if (!InBounds(_curPlayerCell.x, _curPlayerCell.y) ||
+            !IsPassable(_curPlayerCell.x, _curPlayerCell.y))
+            return;
+        
+        ResetNode();
+        
+        _cellIndexQueue.Enqueue(_curPlayerCell);
+        System.Array.Clear(_visitedCells, 0, _visitedCells.Length);
+        
+        _visitedCells[_curPlayerCell.x * _height + _curPlayerCell.y] = true;
+        _flowField[_curPlayerCell.x, _curPlayerCell.y] = new Node(0, Vector2.zero);
+        
+        while (_cellIndexQueue.Count > 0)
+        {
+            var node = _cellIndexQueue.Dequeue();
+            var curCost = _flowField[node.x, node.y].Cost;
+            
+            // 4방향 탐색 먼저
+            for (var i = 0; i < 4; ++i)
+            {
+                var sx = node.x + _searchDir[i].x;
+                var sy = node.y + _searchDir[i].y;
+        
+                if (sx < 0 || sx >= _width || sy < 0 || sy >= _height) continue;
+                if (_visitedCells[sx * _height + sy] || IsPassable(sx, sy) == false) continue;
+        
+                _flowField[sx, sy].Cost = curCost + 1;
+                
+                _cellIndexQueue.Enqueue(new Vector2Int(sx, sy));
+                _visitedCells[sx * _height + sy] = true;
+            }
+        }
+        
+        foreach (var pNode in _passableCells)
+        {
+            var bestIdx = -1;
+            var min = _flowField[pNode.x, pNode.y].Cost;
+            _flowField[pNode.x, pNode.y].IsInBoundLos = false;
+
+            for (var i = 0; i < _searchDir.Length; ++i)
+            {
+                var dx = pNode.x + _searchDir[i].x;
+                var dy = pNode.y + _searchDir[i].y;
+                
+                if(dx < 0 || dx >= _width || dy < 0 || dy >= _height)
+                    continue;
+        
+                if (_searchDir[i].x != 0 && _searchDir[i].y != 0)
+                {
+                    if(!IsPassable(dx, pNode.y) || !IsPassable(pNode.x, dy))
+                        continue;
+                }
+        
+                if (min > _flowField[dx, dy].Cost)
+                {
+                    min = _flowField[dx, dy].Cost;
+                    bestIdx = i;
+                }
+            }
+        
+            if(bestIdx != -1)
+                _flowField[pNode.x, pNode.y].Direction = _searchDir[bestIdx];
+        }
+        
+        if(losEnable)
+            OverwriteLosDirection(_curPlayerCell);
+    }
+    
+    private void ResetNode()
+    {
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                if (!IsPassable(x,y)) continue;
+                
+                _flowField[x, y].Cost = int.MaxValue;
+                _flowField[x, y].Direction = Vector2.zero;
             }
         }
     }
 
-    private readonly Vector2Int[] _searchDir = new[]
+    private void OverwriteLosDirection(Vector2Int p)
     {
-        new Vector2Int(0, 1), new Vector2Int(0, -1), // 상, 하
-        new Vector2Int(-1, 0), new Vector2Int(1, 0), // 좌, 우
-        new Vector2Int(-1, 1), new Vector2Int(1, 1), // 좌상, 우상
-        new Vector2Int(-1, -1), new Vector2Int(1, -1)  // 좌하, 우하
-    };
+        if (!IsPassable(p.x, p.y)) return;
 
-    private void OnDestroy()
+        var r = _losRadiusCell;
+        var powR = r * r;
+        var check = Vector2Int.zero;
+
+        for (var dx = -r; dx <= r; dx++)
+        {
+            for (var dy = -r; dy <= r; dy++)
+            {
+                if(dx * dx + dy * dy > powR) continue;
+
+                check.x = p.x + dx;
+                check.y = p.y + dy;
+
+                if (!InBounds(check.x, check.y)) continue;
+                if (!IsPassable(check.x, check.y)) continue;
+                if (!HasLineOfSight(p, check)) continue;
+                
+                _flowField[check.x, check.y].Direction = p - check;
+                _flowField[check.x, check.y].IsInBoundLos = true;
+            }
+        }
+    }
+
+    private bool HasLineOfSight(Vector2Int start, Vector2Int end)
     {
-        if (_instance == this)
-            _instance = null;
+        var dx = end.x - start.x;
+        var dy = end.y - start.y;
+        
+        // 전체 이동 칸 수
+        var nx = Mathf.Abs(dx);
+        var ny =  Mathf.Abs(dy);
+        
+        // 방향
+        var sx = System.Math.Sign(dx);
+        var sy = System.Math.Sign(dy);
+        
+        // 이동한 칸 수
+        var ix = 0;
+        var iy = 0;
+
+        var cur = start;
+
+        while (ix < nx || iy < ny)
+        {
+            var tx = (1 + 2 * ix) * ny;
+            var ty = (1 + 2 * iy) * nx;
+
+            if (tx < ty)    // 세로벽(우측or좌측)에 도달
+            {
+                cur.x += sx;
+                ix++;
+            }
+            else if (tx == ty)  // 꼭짓점 이동
+            {
+                // 꼭짓점 통과: 양 옆 칸 검사 (방향장 대각 규칙과 동일)
+                if (!IsPassable(cur.x + sx, cur.y) || !IsPassable(cur.x, cur.y + sy))
+                {
+                    return false;
+                }
+                
+                cur.x += sx;
+                cur.y += sy;
+
+                ix++;
+                iy++;
+            }
+            else                // 가로벽(위or아래)에 도달
+            {
+                cur.y += sy;
+                iy++;
+            }
+
+            if (!IsPassable(cur.x, cur.y))
+                return false;
+        }
+
+        return true;
+    }
+    
+    /// <summary>
+    /// 범위 검사는 호출자 책임
+    /// </summary>
+    private bool IsPassable(int x, int y) => _passableMap[x * _height + y];
+    private bool InBounds(int x, int y) =>  x >= 0 && x < _width && y >= 0 && y < _height;
+    
+    private Vector2Int WorldToCell(Vector3 worldPos)
+    {
+        var col = Mathf.FloorToInt((worldPos.x - _originCellPos.x) / _cellSize);
+        var row = Mathf.FloorToInt((worldPos.z - _originCellPos.z) / _cellSize);
+        
+        return new Vector2Int(col, row);
+    }
+    
+    private void OnDrawGizmos()
+    {
+        if (drawGizmos == false || _flowField == null) return;
+
+        for (var x = 0; x < _width; ++x)
+        {
+            for (var y = 0; y < _height; ++y)
+            {
+                if (_flowField[x, y].Direction == Vector2.zero) continue;
+
+                // 중앙을 좌하단으로 맞췄으니까, 다시 중앙으로 맞춤.
+                var center = _originCellPos + new Vector3((x + 0.5f) * _cellSize, 0f, (y + 0.5f) * _cellSize);
+                
+                var dir = _flowField[x, y].Direction;
+                var worldDir = new Vector3(dir.x, 0f, dir.y).normalized;
+                var tip = center + worldDir * (_cellSize * 0.4f);
+                
+                Gizmos.color = (_flowField[x,y].IsInBoundLos) ? Color.red : Color.cyan;
+                Gizmos.DrawLine(center, tip);
+                
+                var back1 = Quaternion.Euler(0,  150f, 0) * worldDir;
+                var back2 = Quaternion.Euler(0, -150f, 0) * worldDir;
+                Gizmos.DrawLine(tip, tip + back1 * (_cellSize * 0.15f));
+                Gizmos.DrawLine(tip, tip + back2 * (_cellSize * 0.15f));
+            }
+        }
     }
 }
 
 public struct Node
 {
     public int Cost;
-    public Vector2Int Direction;
+    public Vector2 Direction
+    {
+        get { return _direction;}
+        set
+        {
+            _direction = value.normalized;
+        }
+    }
+    private Vector2 _direction;
     
-    public Node(int cost, Vector2Int direction)
+    // 테스트 코드 끝나면 삭제
+    public bool IsInBoundLos;
+    
+    public Node(int cost, Vector2 direction)
     {
         Cost = cost;
-        Direction = direction;
+        _direction = direction.normalized;
+        IsInBoundLos = false;
     }
 }
 

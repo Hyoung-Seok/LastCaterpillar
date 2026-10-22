@@ -20,8 +20,8 @@ public class EnemyRegister : MonoBehaviour
     private SpatialHash<Enemy> _enemyHash;
     private SpatialHash<Obstacle> _obstacleHash;
 
-    private List<Enemy> _enemyBuffer;
-    private List<Obstacle> _obstacleBuffer;
+    private List<SpatialEntry<Enemy>> _enemyBuffer;
+    private List<SpatialEntry<Obstacle>> _obstacleBuffer;
 
     private List<Enemy> _pendingRemove;
     private List<EnemyGroup> _pendingGroup;
@@ -134,30 +134,51 @@ public class EnemyRegister : MonoBehaviour
             foreach (var self in _repulsionsReceivers)
             {
                 var selfPos = self.Position;
+                var selfBodyRadius = self.BodyRadius;
+                var selfMass = self.Mass;
                 
                 _enemyHash.Query(selfPos, _enemyBuffer);
                 _obstacleHash.Query(selfPos, _obstacleBuffer);
                 
-                var correction = Vector3.zero; // 이번 프레임에 내가 물러나야 할 변위
-                var overlapCount = 0; // 몇 마리와 겹쳤나(나중에 평균 낼 때 사용) 
+                // 분리
+                var correction = Vector3.zero;   // 이번 프레임에 내가 물러나야 할 변위
+                var overlapCount = 0;                   // 몇 마리와 겹쳤나(나중에 평균 낼 때 사용) 
+                
+                // 조향
+                var sepForce = Vector3.zero;     // 조향력
+                var steerCount = 0;
+                
                 var obsForce = Vector3.zero;
 
                 foreach (var other in _enemyBuffer)
                 {
-                    if (ReferenceEquals(other, self)) continue;
+                    if (ReferenceEquals(other.Item, self)) continue;
 
-                    var away = selfPos - other.Position;
+                    var away = selfPos - other.Pos;
                     away.y = 0f;
                     var sqrD = away.sqrMagnitude;
-                    var rMin = self.BodyRadius + other.BodyRadius;
+                    
+                    var rMin = selfBodyRadius + other.Item.BodyRadius;
+                    var reach = Mathf.Max(other.Item.InfluenceRadius, rMin);
 
-                    if(sqrD >= rMin * rMin) continue;
+                    // 조향·보정 어느 쪽 범위에도 없으면 생략
+                    if(sqrD >= reach * reach) continue;
                     if(sqrD < 1e-8f) continue;
 
                     var d = Mathf.Sqrt(sqrD);
              
+                    // 조향 (닿기 전부터)
+                    if (TryCalculateSteering(away, d, other.Item, out var f))
+                    {
+                        sepForce += f;
+                        steerCount++;
+                    }
+                    
+                    if(sqrD >= rMin * rMin) continue;   // 겹치지 않았으면 생략
+                    
+                    // 보정(닿았을 때만)
                     var penetration = rMin - d;
-                    var share = other.Mass / (self.Mass + other.Mass);
+                    var share = other.Item.Mass / (selfMass + other.Item.Mass);
                     correction += (away / d) * (penetration * share);
                     overlapCount++;
                 }
@@ -165,15 +186,18 @@ public class EnemyRegister : MonoBehaviour
                 if (overlapCount > 0)
                     correction /= overlapCount;
 
+                if (steerCount > 0)
+                    sepForce /= steerCount;
+
                 var obsCorrection = Vector3.zero;
                 var obsOverlapCount = 0;
 
                 foreach (var obs in _obstacleBuffer)
                 {
-                    var away = selfPos - obs.Position;
+                    var away = selfPos - obs.Pos;
                     away.y = 0;
                     var d = away.magnitude;
-                    var rMin = self.BodyRadius + obs.BodyRadius;
+                    var rMin = selfBodyRadius + obs.Item.BodyRadius;
 
                     if (d < rMin && d > 0.0001f)
                     {
@@ -181,7 +205,7 @@ public class EnemyRegister : MonoBehaviour
                         obsOverlapCount++;
                     }
 
-                    if (TryCalculateSteering(away, d, obs, out var f))
+                    if (TryCalculateSteering(away, d, obs.Item, out var f))
                     {
                         obsForce += f;
                     }
@@ -191,7 +215,7 @@ public class EnemyRegister : MonoBehaviour
                     obsCorrection /= obsOverlapCount;
 
                 correction += obsCorrection;
-                self.ApplyRepulsion(correction, obsForce);
+                self.ApplyRepulsion(sepForce, correction, obsForce);
             }
         }
 
@@ -207,6 +231,8 @@ public class EnemyRegister : MonoBehaviour
         FlushPending();
     }
 
+    
+    // 장애물 조향 계산
     private bool TryCalculateSteering(Vector3 away, float dist, ISteeringSource item,
         out Vector3 force)
     {
@@ -251,8 +277,8 @@ public class EnemyRegister : MonoBehaviour
         _enemyHash = new SpatialHash<Enemy>(enemyHashCellSize);
         _obstacleHash = new SpatialHash<Obstacle>(obstacleHashCellSize);
 
-        _enemyBuffer = new List<Enemy>();
-        _obstacleBuffer = new List<Obstacle>();
+        _enemyBuffer = new List<SpatialEntry<Enemy>>();
+        _obstacleBuffer = new List<SpatialEntry<Obstacle>>();
 
         MaxObsBodyRadius = 0f;
         
