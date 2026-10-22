@@ -4,13 +4,10 @@ public class SelfDestructAttack : EnemyAttack
 {
     public override bool CanAttack(Vector3 targetPos, IDamageable target)
     {
-        var distance = targetPos - Self.Position;
-        distance.y = 0;
-
-        return distance.sqrMagnitude <= contactDistance * contactDistance;
+        return IsInContactDistance(targetPos);
     }
 
-    public override void Attack(IDamageable target)
+    public override void Attack(Vector3 targetPos, IDamageable target)
     {
         target.TakeDamage(damage);
         Self.TakeDamage(float.MaxValue);

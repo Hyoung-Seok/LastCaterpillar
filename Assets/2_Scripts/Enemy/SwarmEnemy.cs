@@ -37,7 +37,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     public override void OnPlayerContact(Vector3 pos, IDamageable target)
     {
         if (!IsDead && attacks[0].CanAttack(pos, target))
-            attacks[0].Attack(target);
+            attacks[0].Attack(pos, target);
     }
 
     public override void Move(float dt)
