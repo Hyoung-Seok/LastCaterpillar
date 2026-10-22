@@ -11,6 +11,9 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
     [Header("Components")]
     [SerializeField] protected Animator animator;
 
+    [Header("Attack Source")] 
+    [SerializeField] protected EnemyAttack[] attacks;
+
     [Header("Config")] 
     [SerializeField] protected float maxHp = 100;
     [SerializeField, Min(0.1f)] protected float damage = 50f;

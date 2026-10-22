@@ -304717,18 +304717,12 @@ MonoBehaviour:
   - Wave:
     - enemy: {fileID: 8300611349215601613, guid: a951403f35e90bd43bca8c0658425dcb, type: 3}
       count: 200
-    - enemy: {fileID: 7259546905375039682, guid: 4d888f856d6e6ba41bb37fa9f1188d07, type: 3}
-      count: 5
   - Wave:
     - enemy: {fileID: 8300611349215601613, guid: a951403f35e90bd43bca8c0658425dcb, type: 3}
       count: 150
-    - enemy: {fileID: 7259546905375039682, guid: 4d888f856d6e6ba41bb37fa9f1188d07, type: 3}
-      count: 8
   - Wave:
     - enemy: {fileID: 8300611349215601613, guid: a951403f35e90bd43bca8c0658425dcb, type: 3}
       count: 300
-    - enemy: {fileID: 7259546905375039682, guid: 4d888f856d6e6ba41bb37fa9f1188d07, type: 3}
-      count: 10
   spawnInterval: 3
   radiusScale: 0.5
   limitRatio: 1.5

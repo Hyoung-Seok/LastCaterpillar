@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7519674184160765004}
   - component: {fileID: 8300611349215601613}
+  - component: {fileID: -2761753971536918457}
   m_Layer: 0
   m_Name: E_NormalZombie_Wave
   m_TagString: Untagged
@@ -46,6 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwarmEnemy
   animator: {fileID: 6612709192592063451}
+  attacks:
+  - {fileID: -2761753971536918457}
   maxHp: 100
   damage: 50
   contactDistance: 1
@@ -58,6 +61,21 @@ MonoBehaviour:
   maxObsForce: 0.34
   correctionStiffens: 1
   sphereYPos: 1
+--- !u!114 &-2761753971536918457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 73730107906465671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b05298c06fab4ff4fb3e060f9e6aa4b1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SelfDestructAttack
+  damage: 50
+  contactDistance: 1
+  cooldown: 0
 --- !u!1001 &8085572075750030779
 PrefabInstance:
   m_ObjectHideFlags: 0

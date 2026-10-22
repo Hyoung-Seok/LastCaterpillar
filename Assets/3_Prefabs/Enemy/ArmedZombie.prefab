@@ -69,6 +69,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwarmEnemy
   animator: {fileID: 7522618103418403348}
+  attacks: []
   maxHp: 500
   damage: 30
   contactDistance: 3.5
