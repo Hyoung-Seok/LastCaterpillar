@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 [RequireComponent(typeof(Enemy))]
@@ -17,7 +16,7 @@ public class EnemyAttackController : MonoBehaviour
         {
             case AttackPhase.Approach:
                 // 순회해서 쓸 수 있는 공격이 없을 때
-                if(!CheckCanEntryPreHeat(targetPos, target))
+                if(!TryEnterPreheat(targetPos, target))
                 {
                     // 첫 공격의 사거리 안이지만, 지금 쓸 수 있는 공격이 하나도 없다
                     if (attacks[0].IsInContactDistance(targetPos))
@@ -27,7 +26,7 @@ public class EnemyAttackController : MonoBehaviour
             
             case AttackPhase.StandBy:
                 // 순회해서 쓸 수 있는 공격이 없을 때
-                if(!CheckCanEntryPreHeat(targetPos, target))
+                if(!TryEnterPreheat(targetPos, target))
                 {
                     // 첫 공격이 사거리 밖을 벗어났다면 접근
                     if (!attacks[0].IsInContactDistance(targetPos))
@@ -54,7 +53,7 @@ public class EnemyAttackController : MonoBehaviour
         }
     }
 
-    private bool CheckCanEntryPreHeat(Vector3 targetPos, IDamageable target)
+    private bool TryEnterPreheat(Vector3 targetPos, IDamageable target)
     {
         // 순회해서 쓸 수 있는 공격이 있는지 확인
         if (!TryFindCanAttackComponent(targetPos, target, out _curSelectedAttack))
