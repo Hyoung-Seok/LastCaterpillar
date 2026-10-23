@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, IDamageable
@@ -7,12 +8,14 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
     public float Mass => mass;
     public float InfluenceRadius => influenceRadius;
     public bool IsDead => _isDead;
+    public EnemyAttackController AtkController => atkController;
     
     [Header("Components")]
     [SerializeField] protected Animator animator;
 
     [Header("Attack Source")] 
-    [SerializeField] protected EnemyAttack[] attacks;
+    [SerializeField] protected EnemyAttackController atkController;
+    [SerializeField] protected EnemyAttack nonPhaseAttack;
 
     [Header("Config")] 
     [SerializeField] protected float maxHp = 100;
@@ -71,5 +74,14 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
             register.UnRegisterEnemy(this);
         
         OnDespawned();
+    }
+
+    protected virtual void OnValidate()
+    {
+        if(atkController == null && nonPhaseAttack == null)
+            Debug.LogWarning("적에게 할당된 공격이 없습니다.");
+        
+        if(atkController != null && nonPhaseAttack != null)
+            Debug.LogError($"{atkController}와 {nonPhaseAttack}에 공격이 모두 할당되었습니다.");
     }
 }

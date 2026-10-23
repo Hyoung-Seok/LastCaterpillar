@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
@@ -12,7 +13,8 @@ public class EnemyRegister : MonoBehaviour
     Tooltip("이 해시의 최대 판정 거리(influenceRadius, 적+장애물 반지름 합) 이상이어야 함")] private int obstacleHashCellSize = 2;
     
     [SerializeField] private Transform smallObstacleParent;
-    
+    [SerializeField] private PlayerHull atkTarget;
+     
     private List<Enemy> _enemyList;
     private List<IRepulsionReceiver> _repulsionsReceivers;
     private List<EnemyGroup> _fieldEnemyGroup;
@@ -64,6 +66,9 @@ public class EnemyRegister : MonoBehaviour
         
         if(enemy is IRepulsionReceiver r)
             _repulsionsReceivers.Add(r);
+        
+        if(enemy.AtkController != null)
+            enemy.AtkController.SetEnemyAtkTarget(atkTarget);
     }
 
     public void UnRegisterEnemy(Enemy enemy)
@@ -302,5 +307,11 @@ public class EnemyRegister : MonoBehaviour
             _instance = null;
             _isDestroy = true;
         }
+    }
+
+    private void OnValidate()
+    {
+        if(atkTarget == null)
+            Debug.LogWarning("atkTarget이 null 입니다.");
     }
 }

@@ -36,14 +36,27 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 
     public override void OnPlayerContact(Vector3 pos, IDamageable target)
     {
-        if (!IsDead && attacks[0].CanAttack(pos, target))
-            attacks[0].Attack(pos, target);
+        if (nonPhaseAttack == null)
+            return;
+        
+        if (!IsDead && nonPhaseAttack.CanAttack(pos, target))
+            nonPhaseAttack.Attack(pos, target);
     }
 
     public override void Move(float dt)
     {
         var f = FlowField.Instance;
         if (f == null)
+            return;
+
+        var canWalk = true;
+        if (atkController != null)
+        {
+            canWalk = atkController.Tick();
+        }
+
+
+        if (IsDead)
             return;
         
         var pos = transform.position;
@@ -57,6 +70,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         }
         
         var (dir, speedScale) = GetDesiredMove(pos, f);
+        if (!canWalk)
+            speedScale = 0f;
 
         // 1단계 : 조향 - dt 있음
         var steerDir = (Vector3.ClampMagnitude(_obstacleForce, maxObsForce) + 
@@ -126,6 +141,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
 
     private void OnValidate()
     {
+        base.OnValidate();
+        
         if (maxObsForce + maxSepForce >= 0.999f)
         {
             if (maxSepForce != _prevSep)
