@@ -11,8 +11,10 @@ GameObject:
   - component: {fileID: 4176208204710385456}
   - component: {fileID: 7522618103418403348}
   - component: {fileID: 7259546905375039682}
+  - component: {fileID: 2205622775212228412}
+  - component: {fileID: 8235467712764877268}
   m_Layer: 0
-  m_Name: ArmedZombie
+  m_Name: E_ArmedZombie
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69,7 +71,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwarmEnemy
   animator: {fileID: 7522618103418403348}
-  attacks: []
+  atkController: {fileID: 2205622775212228412}
+  nonPhaseAttack: {fileID: 0}
   maxHp: 500
   damage: 30
   contactDistance: 3.5
@@ -82,6 +85,37 @@ MonoBehaviour:
   maxObsForce: 0.3
   correctionStiffens: 1
   sphereYPos: 2
+--- !u!114 &2205622775212228412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 641390629251916047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff2a254182930b41acff0e2bce4d8f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackController
+  attacks:
+  - {fileID: 8235467712764877268}
+--- !u!114 &8235467712764877268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 641390629251916047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca837c88a6eac5e46876894a494c106c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeAttack
+  damage: 50
+  contactDistance: 3
+  preheatTime: 0.3
+  recoveryTime: 1.7
+  coolDown: 3
 --- !u!1 &3689644319741104966
 GameObject:
   m_ObjectHideFlags: 0

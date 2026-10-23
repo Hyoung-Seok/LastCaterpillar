@@ -47,8 +47,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SwarmEnemy
   animator: {fileID: 6612709192592063451}
-  attacks:
-  - {fileID: -2761753971536918457}
+  atkController: {fileID: 0}
+  nonPhaseAttack: {fileID: -2761753971536918457}
   maxHp: 100
   damage: 50
   contactDistance: 1
@@ -75,7 +75,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SelfDestructAttack
   damage: 50
   contactDistance: 1
-  cooldown: 0
+  preheatTime: 0.1
+  recoveryTime: 0.1
 --- !u!1001 &8085572075750030779
 PrefabInstance:
   m_ObjectHideFlags: 0
