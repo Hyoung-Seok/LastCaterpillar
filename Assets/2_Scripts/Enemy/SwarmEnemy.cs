@@ -31,7 +31,6 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private void Awake()
     {
         _moveSpeed = baseMoveSpeed * Random.Range(0.8f, 1.3f);
-        animator.SetBool("IsMove", true);
     }
 
     public override void OnPlayerContact(Vector3 pos, IDamageable target)
@@ -54,8 +53,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         {
             canWalk = atkController.Tick();
         }
-
-
+        
         if (IsDead)
             return;
         
@@ -72,6 +70,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         var (dir, speedScale) = GetDesiredMove(pos, f);
         if (!canWalk)
             speedScale = 0f;
+
+        animator.SetFloat(SpeedHash, speedScale, speedDampTime, dt);
 
         // 1단계 : 조향 - dt 있음
         var steerDir = (Vector3.ClampMagnitude(_obstacleForce, maxObsForce) + 

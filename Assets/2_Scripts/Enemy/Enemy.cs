@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, IDamageable
 {
@@ -26,6 +27,12 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
     [SerializeField] protected float bodyRadius = 0.3f;
     [SerializeField, Tooltip("반발 저항 가중치"), Min(0.1f)] private float mass;
     [SerializeField, Min(0.1f)] protected float influenceRadius;
+    
+    [Header("Animation Config")]
+    [SerializeField] protected float speedDampTime = 0.1f;
+    
+    protected static readonly int SpeedHash = Animator.StringToHash("Speed");
+    protected static readonly int CycleHash = Animator.StringToHash("CycleOffset");
     
     private bool _isDead = false;
     private float _curHp;
@@ -65,6 +72,11 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
     
     protected virtual void OnDespawned() { _isDead = true; }
 
+    protected virtual void Start()
+    {
+        animator.SetFloat(CycleHash, Random.value);    
+    }
+    
     private void OnEnable()
     {
         EnemyRegister.Instance.RegisterEnemy(this);

@@ -4,8 +4,6 @@ public class FieldEnemy : SwarmEnemy
 {
     private EnemyGroup _enemyGroup;
     private float _delayTime;
-    
-    private readonly int _isMoveAnim = Animator.StringToHash("IsMove");
 
     public void Init(EnemyGroup enemyGroup, float delayTime)
     {
@@ -25,7 +23,6 @@ public class FieldEnemy : SwarmEnemy
         _enemyGroup.ReportPosition(pos);
         
         var result = (Vector3.zero, 0f);
-        var isMove = false;
 
         switch (_enemyGroup.EffectiveStateFor(_delayTime, Time.time))
         {
@@ -33,17 +30,14 @@ public class FieldEnemy : SwarmEnemy
                 break;
             
             case  EGroupState.Move:
-                isMove = true;
                 result = (_enemyGroup.MoveDir, _enemyGroup.MoveSpeedScale);
                 break;
             
             case EGroupState.Chase:
-                isMove = true;
                 result = base.GetDesiredMove(pos, f);
                 break;
         }
         
-        animator.SetBool(_isMoveAnim, isMove);
         return result;
     }
 
