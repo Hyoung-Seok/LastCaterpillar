@@ -115,6 +115,7 @@ MonoBehaviour:
   contactDistance: 3
   preheatTime: 0.3
   recoveryTime: 1.7
+  atkStateName: Melee_Atk
   coolDown: 3
 --- !u!1 &3689644319741104966
 GameObject:
