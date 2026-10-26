@@ -40,6 +40,11 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
         OnDead();
     }
 
+    public void PlayAnimationClipByHashCode(int hash, float transitionTime)
+    {
+        animator.CrossFadeInFixedTime(hash, transitionTime);
+    }
+
     public abstract void Move(float dt);
 
     public virtual void OnHeardNoise(Vector3 pos, float now) { }

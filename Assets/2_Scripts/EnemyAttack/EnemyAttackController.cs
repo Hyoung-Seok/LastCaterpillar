@@ -69,6 +69,7 @@ public class EnemyAttackController : MonoBehaviour
         // 있다면 예열 상태로
         _nextTransitionTime = Time.time + _curSelectedAttack.PreheatTime;
         _curPhase = AttackPhase.Preheat;
+        _curSelectedAttack.OnPreheatEnter();
 
         return true;
     }

@@ -16,6 +16,7 @@ public abstract class EnemyAttack : MonoBehaviour
     protected Enemy Self;
     public abstract bool CanAttack(Vector3 targetPos, IDamageable target);
     public abstract void Attack(Vector3 targetPos, IDamageable target);
+    public virtual void OnPreheatEnter() { }
 
     public bool IsInContactDistance(Vector3 targetPos)
     {

@@ -139,7 +139,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         Gizmos.DrawWireSphere(pos, influenceRadius);
     }
 
-    private void OnValidate()
+    protected override void OnValidate()
     {
         base.OnValidate();
         
