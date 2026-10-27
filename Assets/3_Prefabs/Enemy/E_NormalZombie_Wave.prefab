@@ -57,6 +57,7 @@ MonoBehaviour:
   bodyRadius: 0.3
   mass: 1
   influenceRadius: 1.5
+  speedDampTime: 0.1
   maxSepForce: 0.65
   maxObsForce: 0.34
   correctionStiffens: 1
@@ -75,6 +76,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SelfDestructAttack
   damage: 50
   contactDistance: 1
+  hasAttackAnimation: 0
+  atkStateName: 
+  transitionTime: 0
   preheatTime: 0.1
   recoveryTime: 0.1
 --- !u!1 &221896705881842866

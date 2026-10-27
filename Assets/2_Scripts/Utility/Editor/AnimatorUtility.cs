@@ -10,7 +10,7 @@ public static class AnimatorUtility
         var states = new List<AnimatorState>();
 
         if (controller == null)
-            return null;
+            return states;
         
         foreach (var layer in controller.layers)
         {

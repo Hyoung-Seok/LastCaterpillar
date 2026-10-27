@@ -76,6 +76,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SelfDestructAttack
   damage: 50
   contactDistance: 1
+  hasAttackAnimation: 0
+  atkStateName: Melee_Atk
+  transitionTime: 0
   preheatTime: 0.1
   recoveryTime: 0.1
 --- !u!1 &8698776158653194214
