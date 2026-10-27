@@ -91,10 +91,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MeleeAttack
   damage: 50
   contactDistance: 3
-  preheatTime: 0.3
-  recoveryTime: 1.7
+  preheatTime: 0.668
+  recoveryTime: 0.9453335
   atkStateName: Melee_Atk
-  transitionTime: 0
+  transitionTime: 0.2
   coolDown: 3
 --- !u!1001 &8847023163759837240
 PrefabInstance:
