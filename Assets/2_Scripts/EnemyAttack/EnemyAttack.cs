@@ -19,13 +19,14 @@ public abstract class EnemyAttack : MonoBehaviour
 
     protected Enemy Self;
     private int _atkStateHash;
+    private bool _canPlayAtkAnim;
         
     public abstract bool CanAttack(Vector3 targetPos, IDamageable target);
     public abstract void Attack(Vector3 targetPos, IDamageable target);
 
     public virtual void OnPreheatEnter()
     {
-        if (!hasAttackAnimation) return;
+        if (!_canPlayAtkAnim) return;
         
         Self.PlayAnimationClipByHashCode(_atkStateHash, transitionTime);
     }
@@ -44,5 +45,18 @@ public abstract class EnemyAttack : MonoBehaviour
         
         if(hasAttackAnimation)
             _atkStateHash = Animator.StringToHash(atkStateName);
+    }
+
+    protected virtual void Start()
+    {
+        if (hasAttackAnimation && !Self.HasAnimState(_atkStateHash))
+        {
+            Debug.LogWarning($"{gameObject.GetType().Name} : {atkStateName} 상태가 Animator에 없음!", this);
+            _canPlayAtkAnim = false;
+        }
+        else
+        {
+            _canPlayAtkAnim = hasAttackAnimation;
+        }
     }
 }

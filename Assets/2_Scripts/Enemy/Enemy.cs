@@ -52,6 +52,19 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
         animator.CrossFadeInFixedTime(hash, transitionTime);
     }
 
+    public bool HasAnimState(int hash)
+    {
+        var layerCount = animator.layerCount;
+
+        for (var i = 0; i < layerCount; i++)
+        {
+            if (animator.HasState(i, hash))
+                return true;
+        }
+        
+        return false;
+    }
+
     public abstract void Move(float dt);
 
     public virtual void OnHeardNoise(Vector3 pos, float now) { }
