@@ -37,7 +37,6 @@ public class FlowField : MonoBehaviour
     //통행 가능성
     private List<Vector2Int> _passableCells;
     private bool[] _passableMap;
-
     
     private readonly Vector2Int[] _searchDir = new[]
     {

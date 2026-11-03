@@ -13,7 +13,7 @@ public class WaveManager : MonoBehaviour
     [SerializeField, Min(1)] private float limitRatio = 1.5f;
     
     private IEnumerator _spawnRoutine;
-    private const float GoldenAngleRad = 2.39996f; 
+    private const float GoldenAngleRad = 2.39996f;
     
     public void Start()
     {
@@ -28,6 +28,10 @@ public class WaveManager : MonoBehaviour
 
     private IEnumerator StartSpawnCoroutine()
     {
+        // 지금은 Wave를 Start()에서 호출. 후에는 특정 조건을 만족해야 스폰시키므로(더 이상 Start에서 호출하지 않으므로)
+        // FlowField()의 start가 호출된 뒤에 호출할 수 있도록 임시 조치.
+        yield return null;
+        
         var spawnerPos = transform.position;
         
         foreach (var waveData in spawnWave)
