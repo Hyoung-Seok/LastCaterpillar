@@ -92,6 +92,17 @@ public class FlowField : MonoBehaviour
         if (_instance == this)
             _instance = null;
     }
+
+    public bool HasLineOfSight(Vector3 from, Vector3 to)
+    {
+        var start = WorldToCell(from);
+        var end = WorldToCell(to);
+
+        if (!InBounds(start.x, start.y) || !InBounds(end.x, end.y))
+            return false;
+        
+        return HasLineOfSight(start, end);
+    }
     
     public Vector3 GetSmoothedDirection(Vector3 pos)
     {
