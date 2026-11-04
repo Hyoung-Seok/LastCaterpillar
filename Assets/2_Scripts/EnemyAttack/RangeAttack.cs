@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 public class RangeAttack : EnemyAttack
@@ -16,7 +15,7 @@ public class RangeAttack : EnemyAttack
     public override void Attack(Vector3 targetPos, IAttackTarget target)
     {
         var obj = Instantiate(projectile, handTf.position, Quaternion.identity);
-        obj.Throw(handTf.position, targetPos, minAttackDistance, contactDistance);
+        obj.Throw(target, Self, handTf.position, targetPos, minAttackDistance, contactDistance, damage);
         
         StartCoolDown();
     }

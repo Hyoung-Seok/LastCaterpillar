@@ -127388,10 +127388,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WaveManager
   spawnWave:
   - Wave:
-    - enemy: {fileID: 7259546905375039682, guid: 4d888f856d6e6ba41bb37fa9f1188d07, type: 3}
-      count: 1
-  - Wave:
-    - enemy: {fileID: 7259546905375039682, guid: 4d888f856d6e6ba41bb37fa9f1188d07, type: 3}
+    - enemy: {fileID: 7259546905375039682, guid: 3b05a584dcfe61647b032626114d4d74, type: 3}
       count: 1
   spawnInterval: 1
   radiusScale: 0.5
