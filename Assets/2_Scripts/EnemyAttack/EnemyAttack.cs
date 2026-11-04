@@ -3,8 +3,10 @@ using UnityEngine;
 [RequireComponent(typeof(Enemy))]
 public abstract class EnemyAttack : MonoBehaviour
 {
+    [Header("Attack Config")]
     [SerializeField] protected float damage;
     [SerializeField] protected float contactDistance;
+    [SerializeField, Min(0)] protected float coolDown;
 
     [Header("Animation Config")] 
     [SerializeField] private bool hasAttackAnimation;
@@ -18,6 +20,8 @@ public abstract class EnemyAttack : MonoBehaviour
     public float RecoveryTime => recoveryTime;
 
     protected Enemy Self;
+
+    private float _nextAttackTime;
     private int _atkStateHash;
     private bool _canPlayAtkAnim;
         
@@ -31,17 +35,21 @@ public abstract class EnemyAttack : MonoBehaviour
         Self.PlayAnimationClipByHashCode(_atkStateHash, transitionTime);
     }
 
-    public bool IsInContactDistance(Vector3 targetPos)
+    public virtual bool IsInAttackPosition(Vector3 targetPos)
     {
         var distance = targetPos - Self.Position;
         distance.y = 0;
 
         return distance.sqrMagnitude <= contactDistance * contactDistance;
     }
+
+    protected bool IsCoolDownReady() => Time.time >= _nextAttackTime;
+    protected void StartCoolDown() => _nextAttackTime = Time.time + coolDown;
     
     protected virtual void Awake()
     {
         Self = GetComponent<Enemy>();
+        _nextAttackTime = 0f;
         
         if(hasAttackAnimation)
             _atkStateHash = Animator.StringToHash(atkStateName);

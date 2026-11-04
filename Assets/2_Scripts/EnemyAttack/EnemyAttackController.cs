@@ -24,7 +24,7 @@ public class EnemyAttackController : MonoBehaviour
                 if(!TryEnterPreheat(targetPos, _atkTarget))
                 {
                     // 첫 공격의 사거리 안이지만, 지금 쓸 수 있는 공격이 하나도 없다
-                    if (attacks[0].IsInContactDistance(targetPos))
+                    if (attacks[0].IsInAttackPosition(targetPos))
                         _curPhase = AttackPhase.StandBy;
                 }
                 break;
@@ -34,7 +34,7 @@ public class EnemyAttackController : MonoBehaviour
                 if(!TryEnterPreheat(targetPos, _atkTarget))
                 {
                     // 첫 공격이 사거리 밖을 벗어났다면 접근
-                    if (!attacks[0].IsInContactDistance(targetPos))
+                    if (!attacks[0].IsInAttackPosition(targetPos))
                         _curPhase = AttackPhase.Approach;
                 }
                 break;
