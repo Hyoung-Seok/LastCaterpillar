@@ -33,7 +33,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         _moveSpeed = baseMoveSpeed * Random.Range(0.8f, 1.3f);
     }
 
-    public override void OnPlayerContact(Vector3 pos, IDamageable target)
+    public override void OnPlayerContact(Vector3 pos, IAttackTarget target)
     {
         if (nonPhaseAttack == null)
             return;

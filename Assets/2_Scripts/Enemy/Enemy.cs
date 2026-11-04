@@ -69,7 +69,7 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
 
     public virtual void OnHeardNoise(Vector3 pos, float now) { }
 
-    public virtual void OnPlayerContact(Vector3 pos, IDamageable target) { }
+    public virtual void OnPlayerContact(Vector3 pos, IAttackTarget target) { }
 
     protected virtual void OnDead()
     {

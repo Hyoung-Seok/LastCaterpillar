@@ -25,8 +25,8 @@ public abstract class EnemyAttack : MonoBehaviour
     private int _atkStateHash;
     private bool _canPlayAtkAnim;
         
-    public abstract bool CanAttack(Vector3 targetPos, IDamageable target);
-    public abstract void Attack(Vector3 targetPos, IDamageable target);
+    public abstract bool CanAttack(Vector3 targetPos, IAttackTarget target);
+    public abstract void Attack(Vector3 targetPos, IAttackTarget target);
 
     public virtual void OnPreheatEnter()
     {

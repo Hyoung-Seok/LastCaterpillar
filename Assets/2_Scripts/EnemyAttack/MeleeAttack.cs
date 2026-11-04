@@ -2,12 +2,12 @@ using UnityEngine;
 
 public class MeleeAttack : EnemyAttack
 {
-    public override bool CanAttack(Vector3 targetPos, IDamageable target)
+    public override bool CanAttack(Vector3 targetPos, IAttackTarget target)
     {
         return IsCoolDownReady() && IsInAttackPosition(targetPos);
     }
 
-    public override void Attack(Vector3 targetPos, IDamageable target)
+    public override void Attack(Vector3 targetPos, IAttackTarget target)
     {
         if(IsInAttackPosition(targetPos))
             target.TakeDamage(damage);

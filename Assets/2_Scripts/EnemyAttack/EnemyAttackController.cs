@@ -5,12 +5,12 @@ public class EnemyAttackController : MonoBehaviour
 {
     [SerializeField] private EnemyAttack[] attacks;
 
-    private PlayerHull _atkTarget;
+    private IAttackTarget _atkTarget;
     private AttackPhase _curPhase = AttackPhase.Approach;
     private EnemyAttack _curSelectedAttack;
     private float _nextTransitionTime;
 
-    public void SetEnemyAtkTarget(PlayerHull target)
+    public void SetEnemyAtkTarget(IAttackTarget target)
         => _atkTarget = target;
 
     public bool Tick()
@@ -60,7 +60,7 @@ public class EnemyAttackController : MonoBehaviour
         return _curPhase == AttackPhase.Approach;
     }
 
-    private bool TryEnterPreheat(Vector3 targetPos, IDamageable target)
+    private bool TryEnterPreheat(Vector3 targetPos, IAttackTarget target)
     {
         // 순회해서 쓸 수 있는 공격이 있는지 확인
         if (!TryFindCanAttackComponent(targetPos, target, out _curSelectedAttack))
@@ -74,7 +74,7 @@ public class EnemyAttackController : MonoBehaviour
         return true;
     }
     
-    private bool TryFindCanAttackComponent(Vector3 targetPos, IDamageable target, out EnemyAttack attack)
+    private bool TryFindCanAttackComponent(Vector3 targetPos, IAttackTarget target, out EnemyAttack attack)
     {
         foreach (var atk in attacks)
         {

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHull : MonoBehaviour, IDamageable
+public class PlayerHull : MonoBehaviour, IAttackTarget
 {
     [SerializeField] private Collider hullCollider;
     [SerializeField] private float maxHp = 1000f;

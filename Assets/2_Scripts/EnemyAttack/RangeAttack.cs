@@ -8,12 +8,12 @@ public class RangeAttack : EnemyAttack
     [SerializeField] private Transform handTf;
     [SerializeField, Min(0)] private float minAttackDistance;
     
-    public override bool CanAttack(Vector3 targetPos, IDamageable target)
+    public override bool CanAttack(Vector3 targetPos, IAttackTarget target)
     {
         return IsCoolDownReady() && IsInAttackPosition(targetPos);
     }
 
-    public override void Attack(Vector3 targetPos, IDamageable target)
+    public override void Attack(Vector3 targetPos, IAttackTarget target)
     {
         var obj = Instantiate(projectile, handTf.position, Quaternion.identity);
         obj.Throw(handTf.position, targetPos, minAttackDistance, contactDistance);
