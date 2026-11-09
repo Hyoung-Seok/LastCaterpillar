@@ -58,7 +58,7 @@ MonoBehaviour:
   baseMoveSpeed: 5
   rotationSpeed: 200
   bodyRadius: 0.65
-  mass: 3
+  mass: 30
   influenceRadius: 1.8
   speedDampTime: 0.1
   maxSepForce: 0.65
