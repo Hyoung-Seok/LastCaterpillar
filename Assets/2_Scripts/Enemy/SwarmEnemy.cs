@@ -84,9 +84,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         var pos2 = transform.position;
         using (s_TransformMove.Auto())
             transform.position += SlideAlongWalls(pos2, _correction * correctionStiffens, f);
-        
-        if(dir.sqrMagnitude > 0.0001f)
-            RotationMoveDir(dir, dt);
+
+        Rotate(dir, dt, canWalk);
     }
 
     /// dir = 단위벡터 또는 영벡터(크기를 태우지 말 것), speedScale = 0~1
@@ -109,9 +108,23 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         return desired;
     }
 
-    private void RotationMoveDir(Vector3 dir, float dt)
+    private void Rotate(Vector3 dir, float dt, bool canWalk)
     {
-        var target = Quaternion.LookRotation(dir);
+        var lookDir = Vector3.zero;
+
+        if (canWalk)
+        {
+            lookDir = dir;
+        }
+        else
+        {
+            atkController.TryGetLookDirection(out lookDir);
+        }
+        
+        if (lookDir.sqrMagnitude <= 0.001f)
+            return;
+        
+        var target = Quaternion.LookRotation(lookDir);
         transform.rotation = Quaternion.RotateTowards
             (transform.rotation, target, dt * rotationSpeed);
     }

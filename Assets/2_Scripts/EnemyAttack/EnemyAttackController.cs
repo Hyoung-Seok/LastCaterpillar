@@ -8,6 +8,7 @@ public class EnemyAttackController : MonoBehaviour
     private IAttackTarget _atkTarget;
     private AttackPhase _curPhase = AttackPhase.Approach;
     private EnemyAttack _curSelectedAttack;
+    private Vector3 _targetPos;
     private float _nextTransitionTime;
 
     public void SetEnemyAtkTarget(IAttackTarget target)
@@ -15,26 +16,26 @@ public class EnemyAttackController : MonoBehaviour
 
     public bool Tick()
     {
-        var targetPos = _atkTarget.GetSurfacePoint(transform.position);
+        _targetPos = _atkTarget.GetSurfacePoint(transform.position);
         
         switch (_curPhase)
         {
             case AttackPhase.Approach:
                 // 순회해서 쓸 수 있는 공격이 없을 때
-                if(!TryEnterPreheat(targetPos, _atkTarget))
+                if(!TryEnterPreheat(_targetPos, _atkTarget))
                 {
                     // 첫 공격의 사거리 안이지만, 지금 쓸 수 있는 공격이 하나도 없다
-                    if (attacks[0].IsInAttackPosition(targetPos))
+                    if (attacks[0].IsInAttackPosition(_targetPos))
                         _curPhase = AttackPhase.StandBy;
                 }
                 break;
             
             case AttackPhase.StandBy:
                 // 순회해서 쓸 수 있는 공격이 없을 때
-                if(!TryEnterPreheat(targetPos, _atkTarget))
+                if(!TryEnterPreheat(_targetPos, _atkTarget))
                 {
                     // 첫 공격이 사거리 밖을 벗어났다면 접근
-                    if (!attacks[0].IsInAttackPosition(targetPos))
+                    if (!attacks[0].IsInAttackPosition(_targetPos))
                         _curPhase = AttackPhase.Approach;
                 }
                 break;
@@ -43,7 +44,7 @@ public class EnemyAttackController : MonoBehaviour
                 if (_nextTransitionTime <= Time.time)
                 {
                     _nextTransitionTime = Time.time + _curSelectedAttack.RecoveryTime;
-                    _curSelectedAttack.Attack(targetPos, _atkTarget);
+                    _curSelectedAttack.Attack(_targetPos, _atkTarget);
                     
                     _curPhase = AttackPhase.Recovery;
                 }
@@ -58,6 +59,21 @@ public class EnemyAttackController : MonoBehaviour
         }
 
         return _curPhase == AttackPhase.Approach;
+    }
+
+    public bool TryGetLookDirection(out Vector3 lookDirection)
+    {
+        if (_curPhase is AttackPhase.Approach or AttackPhase.Recovery)
+        {
+            lookDirection = Vector3.zero;
+            return false;
+        }
+
+        lookDirection = _targetPos - transform.position;
+        lookDirection.y = 0;
+        lookDirection.Normalize();
+
+        return true;
     }
 
     private bool TryEnterPreheat(Vector3 targetPos, IAttackTarget target)
