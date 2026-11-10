@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerHull : MonoBehaviour, IDamageable
+public class PlayerHull : MonoBehaviour, IAttackTarget
 {
     [SerializeField] private Collider hullCollider;
     [SerializeField] private float maxHp = 1000f;
@@ -23,8 +23,7 @@ public class PlayerHull : MonoBehaviour, IDamageable
         
         foreach (var e in _buffer)
         {
-            var surfacePoint = hullCollider.ClosestPoint(e.Position);
-            e.OnPlayerContact(surfacePoint, this);
+            e.OnPlayerContact(GetSurfacePoint(e.Position), this);
         }
     }
     
@@ -34,6 +33,11 @@ public class PlayerHull : MonoBehaviour, IDamageable
         
         // TODO : 사망 처리는 나중에. 지금은 로그만
         Debug.Log(_curHp);
+    }
+
+    public Vector3 GetSurfacePoint(Vector3 from)
+    {
+        return hullCollider.ClosestPoint(from);
     }
 
     private void OnDrawGizmos()

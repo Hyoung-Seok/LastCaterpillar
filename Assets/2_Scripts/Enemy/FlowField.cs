@@ -37,7 +37,6 @@ public class FlowField : MonoBehaviour
     //통행 가능성
     private List<Vector2Int> _passableCells;
     private bool[] _passableMap;
-
     
     private readonly Vector2Int[] _searchDir = new[]
     {
@@ -92,6 +91,17 @@ public class FlowField : MonoBehaviour
     {
         if (_instance == this)
             _instance = null;
+    }
+
+    public bool HasLineOfSight(Vector3 from, Vector3 to)
+    {
+        var start = WorldToCell(from);
+        var end = WorldToCell(to);
+
+        if (!InBounds(start.x, start.y) || !InBounds(end.x, end.y))
+            return false;
+        
+        return HasLineOfSight(start, end);
     }
     
     public Vector3 GetSmoothedDirection(Vector3 pos)

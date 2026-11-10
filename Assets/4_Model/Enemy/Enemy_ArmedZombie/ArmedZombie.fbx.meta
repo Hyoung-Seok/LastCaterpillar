@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: PumpkinHulk_Material
-    second: {fileID: 2100000, guid: eb5feb3bd3ee23b42932c257adb47e85, type: 2}
+    second: {fileID: 2100000, guid: 05349cbf71281e0409354c0f1d5ac458, type: 2}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule

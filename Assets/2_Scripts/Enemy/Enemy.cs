@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, IDamageable
 {
@@ -7,19 +9,28 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
     public float Mass => mass;
     public float InfluenceRadius => influenceRadius;
     public bool IsDead => _isDead;
+    public EnemyAttackController AtkController => atkController;
     
     [Header("Components")]
     [SerializeField] protected Animator animator;
 
+    [Header("Attack Source")] 
+    [SerializeField] protected EnemyAttackController atkController;
+    [SerializeField] protected EnemyAttack nonPhaseAttack;
+
     [Header("Config")] 
     [SerializeField] protected float maxHp = 100;
-    [SerializeField, Min(0.1f)] protected float damage = 50f;
-    [SerializeField, Min(0.1f)] protected float contactDistance = 3f;
     [SerializeField] protected float baseMoveSpeed = 5f;
     [SerializeField] protected float rotationSpeed;
     [SerializeField] protected float bodyRadius = 0.3f;
     [SerializeField, Tooltip("반발 저항 가중치"), Min(0.1f)] private float mass;
     [SerializeField, Min(0.1f)] protected float influenceRadius;
+    
+    [Header("Animation Config")]
+    [SerializeField] protected float speedDampTime = 0.1f;
+    
+    protected static readonly int SpeedHash = Animator.StringToHash("Speed");
+    protected static readonly int CycleHash = Animator.StringToHash("CycleOffset");
     
     private bool _isDead = false;
     private float _curHp;
@@ -34,11 +45,29 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
         OnDead();
     }
 
+    public void PlayAnimationClipByHashCode(int hash, float transitionTime)
+    {
+        animator.CrossFadeInFixedTime(hash, transitionTime);
+    }
+
+    public bool HasAnimState(int hash)
+    {
+        var layerCount = animator.layerCount;
+
+        for (var i = 0; i < layerCount; i++)
+        {
+            if (animator.HasState(i, hash))
+                return true;
+        }
+        
+        return false;
+    }
+
     public abstract void Move(float dt);
 
     public virtual void OnHeardNoise(Vector3 pos, float now) { }
 
-    public virtual void OnPlayerContact(Vector3 pos, IDamageable target) { }
+    public virtual void OnPlayerContact(Vector3 pos, IAttackTarget target) { }
 
     protected virtual void OnDead()
     {
@@ -54,6 +83,11 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
     
     protected virtual void OnDespawned() { _isDead = true; }
 
+    protected virtual void Start()
+    {
+        animator.SetFloat(CycleHash, Random.value);    
+    }
+    
     private void OnEnable()
     {
         EnemyRegister.Instance.RegisterEnemy(this);
@@ -68,5 +102,14 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
             register.UnRegisterEnemy(this);
         
         OnDespawned();
+    }
+
+    protected virtual void OnValidate()
+    {
+        if(atkController == null && nonPhaseAttack == null)
+            Debug.LogWarning("적에게 할당된 공격이 없습니다.");
+        
+        if(atkController != null && nonPhaseAttack != null)
+            Debug.LogError($"{atkController}와 {nonPhaseAttack}에 공격이 모두 할당되었습니다.");
     }
 }

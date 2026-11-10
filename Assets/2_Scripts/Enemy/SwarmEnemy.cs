@@ -31,27 +31,30 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private void Awake()
     {
         _moveSpeed = baseMoveSpeed * Random.Range(0.8f, 1.3f);
-        animator.SetBool("IsMove", true);
     }
 
-    public override void OnPlayerContact(Vector3 pos, IDamageable target)
+    public override void OnPlayerContact(Vector3 pos, IAttackTarget target)
     {
-        if (IsDead) return;
-
-        var distance = pos - Position;
-        distance.y = 0;
-        
-        if (distance.sqrMagnitude > contactDistance * contactDistance)
+        if (nonPhaseAttack == null)
             return;
         
-        target.TakeDamage(damage);
-        OnDead();
+        if (!IsDead && nonPhaseAttack.CanAttack(pos, target))
+            nonPhaseAttack.Attack(pos, target);
     }
 
     public override void Move(float dt)
     {
         var f = FlowField.Instance;
         if (f == null)
+            return;
+
+        var canWalk = true;
+        if (atkController != null)
+        {
+            canWalk = atkController.Tick();
+        }
+        
+        if (IsDead)
             return;
         
         var pos = transform.position;
@@ -65,6 +68,10 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         }
         
         var (dir, speedScale) = GetDesiredMove(pos, f);
+        if (!canWalk)
+            speedScale = 0f;
+
+        animator.SetFloat(SpeedHash, speedScale, speedDampTime, dt);
 
         // 1단계 : 조향 - dt 있음
         var steerDir = (Vector3.ClampMagnitude(_obstacleForce, maxObsForce) + 
@@ -77,9 +84,8 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         var pos2 = transform.position;
         using (s_TransformMove.Auto())
             transform.position += SlideAlongWalls(pos2, _correction * correctionStiffens, f);
-        
-        if(dir.sqrMagnitude > 0.0001f)
-            RotationMoveDir(dir, dt);
+
+        Rotate(dir, dt, canWalk);
     }
 
     /// dir = 단위벡터 또는 영벡터(크기를 태우지 말 것), speedScale = 0~1
@@ -102,9 +108,23 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         return desired;
     }
 
-    private void RotationMoveDir(Vector3 dir, float dt)
+    private void Rotate(Vector3 dir, float dt, bool canWalk)
     {
-        var target = Quaternion.LookRotation(dir);
+        var lookDir = Vector3.zero;
+
+        if (canWalk)
+        {
+            lookDir = dir;
+        }
+        else
+        {
+            atkController.TryGetLookDirection(out lookDir);
+        }
+        
+        if (lookDir.sqrMagnitude <= 0.001f)
+            return;
+        
+        var target = Quaternion.LookRotation(lookDir);
         transform.rotation = Quaternion.RotateTowards
             (transform.rotation, target, dt * rotationSpeed);
     }
@@ -122,7 +142,14 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private void OnDrawGizmosSelected()
     {
         var pos = transform.position + (Vector3.up * sphereYPos);
-        Gizmos.color = Color.brown;
+        var contactDistance = 0f;
+
+        if (nonPhaseAttack != null)
+            contactDistance = nonPhaseAttack.ContactDistance;
+        else if (atkController != null && atkController.PrimaryAttack != null)
+            contactDistance = atkController.PrimaryAttack.ContactDistance;
+        
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(pos, contactDistance);
 
         Gizmos.color = Color.blue;
@@ -132,8 +159,10 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
         Gizmos.DrawWireSphere(pos, influenceRadius);
     }
 
-    private void OnValidate()
+    protected override void OnValidate()
     {
+        base.OnValidate();
+        
         if (maxObsForce + maxSepForce >= 0.999f)
         {
             if (maxSepForce != _prevSep)
