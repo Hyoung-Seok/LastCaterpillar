@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7259546905375039682}
   - component: {fileID: 2205622775212228412}
   - component: {fileID: 7793086235999532570}
+  - component: {fileID: -2770872129585528498}
   - component: {fileID: 6743025194608777410}
   - component: {fileID: 5235092679465631623}
   m_Layer: 8
@@ -77,6 +78,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackController
   attacks:
   - {fileID: 7793086235999532570}
+  - {fileID: -2770872129585528498}
 --- !u!114 &7793086235999532570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,6 +103,27 @@ MonoBehaviour:
   projectile: {fileID: 3114262854914308054, guid: 493b3ad57ba272e438838ec31b91aebe, type: 3}
   handTf: {fileID: 7166173119368216560}
   minAttackDistance: 5
+--- !u!114 &-2770872129585528498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 641390629251916047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca837c88a6eac5e46876894a494c106c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MeleeAttack
+  damage: 50
+  contactDistance: 5
+  coolDown: 2
+  hasAttackAnimation: 1
+  atkStateName: Melee_Atk
+  transitionTime: 0.2
+  preheatTime: 0.668
+  aimLockdownTime: 0
+  recoveryTime: 0.9453335
 --- !u!54 &6743025194608777410
 Rigidbody:
   m_ObjectHideFlags: 0
