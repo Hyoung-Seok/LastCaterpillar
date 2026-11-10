@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -15,6 +16,7 @@ public class EnemyAtkCustomInspector : Editor
     private SerializedProperty _atkStateName;
     private SerializedProperty _transitionTime;
     private SerializedProperty _preHeatProperty;
+    private SerializedProperty _aimLockdownTime;
     private SerializedProperty _recoveryProperty;
     
     private bool _hasController;
@@ -31,6 +33,7 @@ public class EnemyAtkCustomInspector : Editor
             if (_hasController)
             {
                 EditorGUILayout.PropertyField(_preHeatProperty);
+                EditorGUILayout.PropertyField(_aimLockdownTime);
                 EditorGUILayout.PropertyField(_recoveryProperty);
                 
                 serializedObject.ApplyModifiedProperties();
@@ -85,13 +88,18 @@ public class EnemyAtkCustomInspector : Editor
             serializedObject.ApplyModifiedProperties();
             return;
         }
-
-
+        
         var exitDuration = exitTime * clip.length;
         if (selectedState.speed != 0)
             exitDuration /= selectedState.speed;
-        
-        CreatePreheatSlider(exitDuration);
+
+        CreateTimeSlider(_preHeatProperty, 0, exitDuration, "Preheat Time",
+            v =>
+            {
+                _recoveryProperty.floatValue = exitDuration - v;
+                _aimLockdownTime.floatValue = Mathf.Min(_aimLockdownTime.floatValue, v);
+            });
+        CreateTimeSlider(_aimLockdownTime, 0f, _preHeatProperty.floatValue, "Aim Lock Time");
         
         var rect = EditorGUILayout.GetControlRect();
 
@@ -119,25 +127,26 @@ public class EnemyAtkCustomInspector : Editor
         return false;
     }
 
-    private void CreatePreheatSlider(float maxValue)
+    private void CreateTimeSlider(SerializedProperty property, float minValue, float maxValue, string sliderName, 
+        Action<float> endChangeCheck = null)
     {
         EditorGUI.BeginChangeCheck();
         EditorGUILayout.BeginHorizontal();
         
-        var v = _preHeatProperty.floatValue;
+        var v = property.floatValue;
         
-        EditorGUILayout.PrefixLabel("Preheat Time");
+        EditorGUILayout.PrefixLabel(sliderName);
         // 슬라이더바 - 즉시반영
-        v = GUILayout.HorizontalSlider(v, 0f, maxValue, GUILayout.ExpandWidth(true));
+        v = GUILayout.HorizontalSlider(v, minValue, maxValue, GUILayout.ExpandWidth(true));
         // 필드 - 지연반영
         v = EditorGUILayout.DelayedFloatField(v, GUILayout.Width(50));
 
         if (EditorGUI.EndChangeCheck())
         {
-            v = Mathf.Clamp(v, 0f, maxValue);
-            
-            _preHeatProperty.floatValue = v;
-            _recoveryProperty.floatValue = maxValue - v;
+            v = Mathf.Clamp(v, minValue, maxValue);
+
+            property.floatValue = v;
+            endChangeCheck?.Invoke(v);
         }
         
         EditorGUILayout.EndHorizontal();
@@ -200,6 +209,7 @@ public class EnemyAtkCustomInspector : Editor
         _atkStateName = serializedObject.FindProperty("atkStateName");
         _transitionTime = serializedObject.FindProperty("transitionTime");
         _preHeatProperty = serializedObject.FindProperty("preheatTime");
+        _aimLockdownTime = serializedObject.FindProperty("aimLockdownTime");
         _recoveryProperty = serializedObject.FindProperty("recoveryTime");
     }
     
