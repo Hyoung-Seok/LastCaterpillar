@@ -32,6 +32,15 @@ public class RangeAttack : EnemyAttack
         return isInRange && FlowField.Instance.HasLineOfSight(Self.Position, targetPos);
     }
 
+    public override void DrawRangeGizmo(Vector3 center)
+    {
+        base.DrawRangeGizmo(center);
+
+        // 최소 사거리 (이 안에선 이 부품으로 공격 불가)
+        Gizmos.color = new Color(1f, 0.5f, 0f);
+        Gizmos.DrawWireSphere(center, minAttackDistance);
+    }
+
     private void OnValidate()
     {
         if (minAttackDistance > contactDistance)

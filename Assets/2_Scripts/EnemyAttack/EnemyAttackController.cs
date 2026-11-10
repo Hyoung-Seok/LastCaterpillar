@@ -1,12 +1,13 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Enemy))]
 public class EnemyAttackController : MonoBehaviour
 {
     /// <summary>
-    /// 위치 판정 기준 공격(attacks[0]). 기즈모 표시용, 비어 있으면 null
+    /// 등록된 공격 부품 (읽기 전용, 기즈모 표시용). 에디터에선 null 요소가 있을 수 있음
     /// </summary>
-    public EnemyAttack PrimaryAttack => attacks is { Length: > 0 } ? attacks[0] : null;
+    public IReadOnlyList<EnemyAttack> Attacks => attacks;
 
     [SerializeField] private EnemyAttack[] attacks;
 
