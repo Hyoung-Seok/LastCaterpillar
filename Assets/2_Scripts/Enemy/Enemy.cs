@@ -20,8 +20,6 @@ public abstract class Enemy : MonoBehaviour, IRepulsionSource, ISteeringSource, 
 
     [Header("Config")] 
     [SerializeField] protected float maxHp = 100;
-    [SerializeField, Min(0.1f)] protected float damage = 50f;
-    [SerializeField, Min(0.1f)] protected float contactDistance = 3f;
     [SerializeField] protected float baseMoveSpeed = 5f;
     [SerializeField] protected float rotationSpeed;
     [SerializeField] protected float bodyRadius = 0.3f;

@@ -3,6 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(Enemy))]
 public class EnemyAttackController : MonoBehaviour
 {
+    /// <summary>
+    /// 위치 판정 기준 공격(attacks[0]). 기즈모 표시용, 비어 있으면 null
+    /// </summary>
+    public EnemyAttack PrimaryAttack => attacks is { Length: > 0 } ? attacks[0] : null;
+
     [SerializeField] private EnemyAttack[] attacks;
 
     private IAttackTarget _atkTarget;

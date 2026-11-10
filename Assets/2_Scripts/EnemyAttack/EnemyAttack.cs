@@ -3,6 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Enemy))]
 public abstract class EnemyAttack : MonoBehaviour
 {
+    public float ContactDistance => contactDistance;
+    
     [Header("Attack Config")]
     [SerializeField] protected float damage;
     [SerializeField] protected float contactDistance;

@@ -142,7 +142,14 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private void OnDrawGizmosSelected()
     {
         var pos = transform.position + (Vector3.up * sphereYPos);
-        Gizmos.color = Color.brown;
+        var contactDistance = 0f;
+
+        if (nonPhaseAttack != null)
+            contactDistance = nonPhaseAttack.ContactDistance;
+        else if (atkController != null && atkController.PrimaryAttack != null)
+            contactDistance = atkController.PrimaryAttack.ContactDistance;
+        
+        Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(pos, contactDistance);
 
         Gizmos.color = Color.blue;
