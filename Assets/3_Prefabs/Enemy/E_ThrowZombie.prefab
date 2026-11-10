@@ -98,6 +98,7 @@ MonoBehaviour:
   atkStateName: Throw_Atk
   transitionTime: 0.2
   preheatTime: 2.3
+  aimLockdownTime: 2.3
   recoveryTime: 2.3166668
   projectile: {fileID: 3114262854914308054, guid: 493b3ad57ba272e438838ec31b91aebe, type: 3}
   handTf: {fileID: 7166173119368216560}

@@ -98,6 +98,7 @@ MonoBehaviour:
   atkStateName: Melee_Atk
   transitionTime: 0.2
   preheatTime: 0.668
+  aimLockdownTime: 0
   recoveryTime: 0.9453335
 --- !u!54 &6743025194608777410
 Rigidbody:
