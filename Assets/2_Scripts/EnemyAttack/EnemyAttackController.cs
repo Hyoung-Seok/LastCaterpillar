@@ -31,9 +31,12 @@ public class EnemyAttackController : MonoBehaviour
                 // 순회해서 쓸 수 있는 공격이 없을 때
                 if(!TryEnterPreheat(_targetPos, _atkTarget))
                 {
-                    // 첫 공격의 사거리 안이지만, 지금 쓸 수 있는 공격이 하나도 없다
-                    if (attacks[0].IsInAttackPosition(_targetPos))
+                    // 위치는 맞지만 지금 쓸 수 있는 공격이 없음
+                    if (IsAnyAttackInPosition(_targetPos))
+                    {
+                        // 쿨타임이 차는동안 대기할 수 있도록
                         _curPhase = AttackPhase.StandBy;
+                    }
                 }
                 break;
             
@@ -41,8 +44,8 @@ public class EnemyAttackController : MonoBehaviour
                 // 순회해서 쓸 수 있는 공격이 없을 때
                 if(!TryEnterPreheat(_targetPos, _atkTarget))
                 {
-                    // 첫 공격이 사거리 밖을 벗어났다면 접근
-                    if (!attacks[0].IsInAttackPosition(_targetPos))
+                    // 모든 공격이 사거리 밖을 벗어났다면 접근
+                    if (!IsAnyAttackInPosition(_targetPos))
                         _curPhase = AttackPhase.Approach;
                 }
                 break;
@@ -119,11 +122,30 @@ public class EnemyAttackController : MonoBehaviour
         return false;
     }
 
+    private bool IsAnyAttackInPosition(Vector3 targetPos)
+    {
+        foreach (var atk in attacks)
+        {
+            if (atk.IsInAttackPosition(targetPos))
+                return true;
+        }
+
+        return false;
+    }
+
     private void OnValidate()
     {
-        if (attacks == null || attacks.Length == 0 || attacks[0] == null)
+        if (attacks == null || attacks.Length == 0)
         {
             Debug.LogError($"{this}의 attacks는 비어있을 수 없습니다.");
+        }
+        else
+        {
+            for (var i = 0; i < attacks.Length; i++)
+            {
+                if(attacks[i] == null)
+                    Debug.LogError($"{this}의 {i}번 attack이 비어있습니다.");
+            }
         }
     }
 }
