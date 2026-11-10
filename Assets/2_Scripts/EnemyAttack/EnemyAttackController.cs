@@ -10,13 +10,15 @@ public class EnemyAttackController : MonoBehaviour
     private EnemyAttack _curSelectedAttack;
     private Vector3 _targetPos;
     private float _nextTransitionTime;
+    private bool _isAimLocked;
 
     public void SetEnemyAtkTarget(IAttackTarget target)
         => _atkTarget = target;
 
     public bool Tick()
     {
-        _targetPos = _atkTarget.GetSurfacePoint(transform.position);
+        if(!_isAimLocked)
+            _targetPos = _atkTarget.GetSurfacePoint(transform.position);
         
         switch (_curPhase)
         {
@@ -41,12 +43,17 @@ public class EnemyAttackController : MonoBehaviour
                 break;
             
             case AttackPhase.Preheat:
+                if (!_isAimLocked && _nextTransitionTime - _curSelectedAttack.AimLockdownTime <= Time.time)
+                {
+                    _isAimLocked = true;
+                }
                 if (_nextTransitionTime <= Time.time)
                 {
                     _nextTransitionTime = Time.time + _curSelectedAttack.RecoveryTime;
                     _curSelectedAttack.Attack(_targetPos, _atkTarget);
                     
                     _curPhase = AttackPhase.Recovery;
+                    _isAimLocked = false;
                 }
                 break;
             
@@ -78,6 +85,8 @@ public class EnemyAttackController : MonoBehaviour
 
     private bool TryEnterPreheat(Vector3 targetPos, IAttackTarget target)
     {
+        _isAimLocked = false;
+        
         // 순회해서 쓸 수 있는 공격이 있는지 확인
         if (!TryFindCanAttackComponent(targetPos, target, out _curSelectedAttack))
             return false;

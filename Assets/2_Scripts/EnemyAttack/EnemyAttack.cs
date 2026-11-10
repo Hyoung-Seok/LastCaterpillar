@@ -14,9 +14,12 @@ public abstract class EnemyAttack : MonoBehaviour
     [SerializeField, HideInInspector] private string atkStateName;
     [SerializeField, HideInInspector, Min(0)] private float transitionTime;
     [SerializeField, HideInInspector, Min(0)] private float preheatTime = 0.1f;
+    [SerializeField, HideInInspector, Min(0), 
+     Tooltip("던지기 몇 초 전에 조준을 고정할지")] private float aimLockdownTime = 0f;
     [SerializeField, HideInInspector, Min(0)] private float recoveryTime = 0.1f;
     
     public float PreheatTime => preheatTime;
+    public float AimLockdownTime => aimLockdownTime;
     public float RecoveryTime => recoveryTime;
 
     protected Enemy Self;
