@@ -73,7 +73,7 @@ public abstract class EnemyAttack : MonoBehaviour
     {
         if (hasAttackAnimation && !Self.HasAnimState(_atkStateHash))
         {
-            Debug.LogWarning($"{gameObject.GetType().Name} : {atkStateName} 상태가 Animator에 없음!", this);
+            Debug.LogWarning($"{gameObject.name} : {atkStateName} 상태가 Animator에 없음!", this);
             _canPlayAtkAnim = false;
         }
         else
