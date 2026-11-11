@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class EnemyProjectile : MonoBehaviour
@@ -21,7 +20,7 @@ public abstract class EnemyProjectile : MonoBehaviour
 
     protected abstract void OnLand(Vector3 curPos);
     
-    public void Throw(IAttackTarget target, Enemy self, Vector3 start, Vector3 targetPos, 
+    public virtual void Throw(IAttackTarget target, Enemy self, Vector3 start, Vector3 targetPos, 
         float minDistance, float maxDistance, float dmg)
     {
         Target = target;
