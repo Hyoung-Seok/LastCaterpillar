@@ -21,8 +21,6 @@ public class FieldEnemySpawner : MonoBehaviour
     private EnemyRegister _enemyRegister;
     private List<Vector2Int> _spawnPoints = new List<Vector2Int>();
     
-    private const float GoldenAngleRad = 2.39996f; 
-    
     private void Start()
     {
         var cityGenerator = FindAnyObjectByType<CityGenerator>();
@@ -93,15 +91,10 @@ public class FieldEnemySpawner : MonoBehaviour
         for (var i = 0; i < spawnCount; i++)
         {
             var obj = Instantiate(fieldEnemies[Random.Range(0, fieldEnemies.Count)], parent.transform);
+            var offset = GoldenSpiral.GetOffset(i, radiusScale);
+            
             obj.Init(group, group.GetRelayDelay(i, spawnCount));
-
-            var angle = i * GoldenAngleRad;
-            var radius = Mathf.Sqrt(i) * radiusScale;
-            
-            var x = Mathf.Cos(angle) * radius;
-            var z =  Mathf.Sin(angle) * radius;
-            
-            obj.transform.position = new Vector3(pos.x + x, 0, pos.z + z);
+            obj.transform.position = new Vector3(pos.x + offset.x, 0, pos.z + offset.z);
             obj.gameObject.SetActive(true);
         }
     }
