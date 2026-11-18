@@ -15,7 +15,7 @@ public class LingeringProjectile : EnemyProjectile
         base.Throw(target, self, start, targetPos, minDistance, maxDistance, dmg);
         
         var localCenters = new Vector3[zoneCount];
-        var ratio = scatterRadius / Mathf.Sqrt(zoneCount - 1); 
+        var ratio = zoneCount > 1 ? scatterRadius / Mathf.Sqrt(zoneCount - 1) : 0;
         
         for (var i = 0; i < zoneCount; i++)
         {
