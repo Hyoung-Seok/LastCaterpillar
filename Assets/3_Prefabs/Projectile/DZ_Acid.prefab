@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6548734803639084921}
   - component: {fileID: 3840530985553525490}
   m_Layer: 0
-  m_Name: _LingeringZone
+  m_Name: DZ_Acid
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
