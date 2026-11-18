@@ -7,6 +7,7 @@ public class LingeringProjectile : EnemyProjectile
     [SerializeField] private DamageZone zonePrefab;
     [SerializeField, Min(1)] private int zoneCount;
     [SerializeField] private float scatterRadius;
+    [SerializeField] private float heightOffset;
     
     private DamageZone _zone;
     
@@ -29,8 +30,8 @@ public class LingeringProjectile : EnemyProjectile
             localCenters.Add(offset);
         }
 
-        targetPos.y = 0.1f;
-        _zone = Instantiate(zonePrefab, targetPos, Quaternion.identity);
+        var zonePos = EndPos + Vector3.up * heightOffset;
+        _zone = Instantiate(zonePrefab, zonePos, Quaternion.identity);
         _zone.Init(Target, localCenters, Damage);
     }
 

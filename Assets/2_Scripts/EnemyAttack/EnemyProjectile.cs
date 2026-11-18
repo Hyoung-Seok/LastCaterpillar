@@ -11,7 +11,8 @@ public abstract class EnemyProjectile : MonoBehaviour
     protected IAttackTarget Target;
     protected Enemy Self;
     protected float Damage;
-    protected float FlightProgress => _flightDuration > 0f ? Mathf.Clamp01(_elapsedTime / _flightDuration) : 0f; 
+    protected float FlightProgress => _flightDuration > 0f ? Mathf.Clamp01(_elapsedTime / _flightDuration) : 0f;
+    protected Vector3 EndPos => _endPos;
     
     private float _elapsedTime;
     private float _flightDuration;

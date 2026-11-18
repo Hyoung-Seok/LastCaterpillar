@@ -53,6 +53,7 @@ MonoBehaviour:
   zonePrefab: {fileID: 3840530985553525490, guid: 36d2107136fe1c249bb31f86fc9fab56, type: 3}
   zoneCount: 3
   scatterRadius: 10
+  heightOffset: 0.01
 --- !u!33 &1908598269119880985
 MeshFilter:
   m_ObjectHideFlags: 0
