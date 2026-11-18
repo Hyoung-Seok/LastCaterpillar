@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class DamageZone : MonoBehaviour
@@ -11,7 +12,7 @@ public class DamageZone : MonoBehaviour
     [SerializeField] private Renderer rangeAlertObj;
 
     private IAttackTarget _target;
-    private Vector3[] _localCenters;
+    private List<Vector3> _localCenters;
     private float _damage;
     
     private float _nextTickTime;
@@ -22,7 +23,7 @@ public class DamageZone : MonoBehaviour
     private MaterialPropertyBlock _mpb;
     private static readonly int FillId = Shader.PropertyToID("_Fill"); 
     
-    public void Init(IAttackTarget target, Vector3[] centers, float damage)
+    public void Init(IAttackTarget target, List<Vector3> centers, float damage)
     {
         _target = target;
         _localCenters = centers;
@@ -32,7 +33,7 @@ public class DamageZone : MonoBehaviour
         _curTickCount = 0;
         _isTicking = false;
 
-        _alertRenderers = new Renderer[centers.Length];
+        _alertRenderers = new Renderer[centers.Count];
         _mpb = new MaterialPropertyBlock();
         
         CreateRangeLocationAlert();

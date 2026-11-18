@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class LingeringProjectile : EnemyProjectile
@@ -14,16 +15,22 @@ public class LingeringProjectile : EnemyProjectile
     {
         base.Throw(target, self, start, targetPos, minDistance, maxDistance, dmg);
         
-        var localCenters = new Vector3[zoneCount];
+        var localCenters = new List<Vector3>();
         var ratio = zoneCount > 1 ? scatterRadius / Mathf.Sqrt(zoneCount - 1) : 0;
+        var angle = Random.Range(0f, 2 * Mathf.PI);
         
         for (var i = 0; i < zoneCount; i++)
         {
-            localCenters[i] = GoldenSpiral.GetOffset(i, ratio);
+            var offset = GoldenSpiral.GetOffset(i, ratio, angle);
+
+            if (FlowField.Instance.IsBlocked(targetPos + offset))
+                continue;
+            
+            localCenters.Add(offset);
         }
 
         targetPos.y = 0.1f;
-        _zone = Instantiate(zonePrefab, targetPos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f));
+        _zone = Instantiate(zonePrefab, targetPos, Quaternion.identity);
         _zone.Init(Target, localCenters, Damage);
     }
 

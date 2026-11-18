@@ -4,9 +4,9 @@ public static class GoldenSpiral
 {
     private const float GoldenAngleRad = 2.39996323f; 
     
-    public static Vector3 GetOffset(int index, float spreadScale, float yOffset = 0)
+    public static Vector3 GetOffset(int index, float spreadScale, float startAngle = 0, float yOffset = 0)
     {
-        var angle = index * GoldenAngleRad;
+        var angle = index * GoldenAngleRad + startAngle;
         var radius = Mathf.Sqrt(index) * spreadScale;
         
         var x = Mathf.Cos(angle) * radius;
