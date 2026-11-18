@@ -11,11 +11,12 @@ public abstract class EnemyProjectile : MonoBehaviour
     protected IAttackTarget Target;
     protected Enemy Self;
     protected float Damage;
-    protected float FlightProgress => _flightDuration > 0f ? Mathf.Clamp01(_elapsedTime / _flightDuration) : 0f;
+    protected float FlightProgress => FlightDuration > 0f ? Mathf.Clamp01(_elapsedTime / FlightDuration) : 0f; 
+    protected float FlightDuration { get; private set; }
+    protected float RemainingTime => FlightDuration - _elapsedTime;
     protected Vector3 EndPos => _endPos;
-    
+
     private float _elapsedTime;
-    private float _flightDuration;
     private float _arcHeight;
     private Vector3 _startPos;
     private Vector3 _endPos;
@@ -36,7 +37,7 @@ public abstract class EnemyProjectile : MonoBehaviour
         var distance = GetHorizontalDistance(_startPos, _endPos);
         var ratio = Mathf.InverseLerp(minDistance, maxDistance, distance);
         
-        _flightDuration = Mathf.Lerp(flightMinTime, flightMaxTime, ratio);
+        FlightDuration = Mathf.Lerp(flightMinTime, flightMaxTime, ratio);
         _arcHeight = Mathf.Lerp(arcMinHeight, arcMaxHeight, ratio);
 
         _elapsedTime = 0;
@@ -48,11 +49,8 @@ public abstract class EnemyProjectile : MonoBehaviour
     {
         _elapsedTime += Time.deltaTime;
         
-        var t = Mathf.Clamp01(_elapsedTime / _flightDuration);
-        var pos = Vector3.Lerp(_startPos, _endPos, t);
-        var offsetY = 4f * _arcHeight * t * (1f - t);
-
-        pos.y += offsetY;
+        var t = Mathf.Clamp01(_elapsedTime / FlightDuration);
+        var pos = EvaluateArc(_startPos, _endPos, t, _arcHeight);
         transform.position = pos;
 
         if (t >= 1 || FlowField.Instance.IsBlocked(transform.position))
@@ -68,5 +66,15 @@ public abstract class EnemyProjectile : MonoBehaviour
         v.y = 0;
         
         return v.magnitude;
+    }
+
+    protected Vector3 EvaluateArc(Vector3 startPos, Vector3 endPos, float t, float height)
+    {
+        var pos = Vector3.Lerp(startPos, endPos, t);
+        var offsetY = 4f * height * t * (1f - t);
+
+        pos.y += offsetY;
+        
+        return pos;
     }
 }

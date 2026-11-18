@@ -50,8 +50,11 @@ MonoBehaviour:
   flightMaxTime: 1.5
   arcMinHeight: 2
   arcMaxHeight: 5
+  projectileRenderer: {fileID: 1310504816588029563}
   zonePrefab: {fileID: 3840530985553525490, guid: 36d2107136fe1c249bb31f86fc9fab56, type: 3}
+  fragmentPrefab: {fileID: 77658110636865522, guid: ef296f23bc1552b4488e372e4711ccba, type: 3}
   zoneCount: 3
+  separationPoint: 0.6
   scatterRadius: 10
   heightOffset: 0.01
 --- !u!33 &1908598269119880985

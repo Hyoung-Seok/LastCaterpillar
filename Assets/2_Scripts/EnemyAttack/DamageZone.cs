@@ -16,6 +16,8 @@ public class DamageZone : MonoBehaviour
     private float _damage;
     
     private float _nextTickTime;
+    private float _warnDuration;
+    private float _warnElapsed;
     private int _curTickCount;
     private bool _isTicking;
 
@@ -23,11 +25,13 @@ public class DamageZone : MonoBehaviour
     private MaterialPropertyBlock _mpb;
     private static readonly int FillId = Shader.PropertyToID("_Fill"); 
     
-    public void Init(IAttackTarget target, List<Vector3> centers, float damage)
+    public void Init(IAttackTarget target, List<Vector3> centers, float damage, float warningDuration)
     {
         _target = target;
         _localCenters = centers;
         _damage = damage;
+        _warnDuration = warningDuration;
+        _warnElapsed = 0f;
         
         _nextTickTime = 0;
         _curTickCount = 0;
@@ -40,27 +44,22 @@ public class DamageZone : MonoBehaviour
     }
     
     // 실제 대미지 적용 지점
-    public void StartTick()
+    public void Land()
     {
         UpdateAlertRange(1);
         _isTicking = true;
     }
 
-    public void UpdateAlertRange(float t)
-    {
-        if (_alertRenderers == null || _isTicking)
-            return;
-        
-        _mpb.SetFloat(FillId, t);
-        foreach (var r in _alertRenderers)
-        {
-            r.SetPropertyBlock(_mpb);
-        }
-    }
-
     private void Update()
     {
-        if (!_isTicking) return;
+        if (!_isTicking)
+        {
+            _warnElapsed += Time.deltaTime;
+            UpdateAlertRange(Mathf.Clamp01(_warnElapsed / _warnDuration));
+
+            return;
+        }
+        
         if (_nextTickTime > Time.time) return;
         
         CheckAttackTargetInRange();
@@ -85,6 +84,16 @@ public class DamageZone : MonoBehaviour
             obj.transform.localPosition = center;
             obj.transform.localRotation = Quaternion.identity;
             obj.transform.localScale = new Vector3(radius * 2f, 0.01f, radius * 2f);
+        }
+    }
+    
+    private void UpdateAlertRange(float t)
+    {
+        _mpb.SetFloat(FillId, t);
+        
+        foreach (var r in _alertRenderers)
+        {
+            r.SetPropertyBlock(_mpb);
         }
     }
 
