@@ -8,7 +8,7 @@ public class DamageZone : MonoBehaviour
     [SerializeField] private int tickCount;
 
     [Header("Components")] 
-    [SerializeField] private GameObject rangeAlertObj;
+    [SerializeField] private Renderer rangeAlertObj;
 
     private IAttackTarget _target;
     private Vector3[] _localCenters;
@@ -17,6 +17,10 @@ public class DamageZone : MonoBehaviour
     private float _nextTickTime;
     private int _curTickCount;
     private bool _isTicking;
+
+    private Renderer[] _alertRenderers;
+    private MaterialPropertyBlock _mpb;
+    private static readonly int FillId = Shader.PropertyToID("_Fill"); 
     
     public void Init(IAttackTarget target, Vector3[] centers, float damage)
     {
@@ -27,12 +31,31 @@ public class DamageZone : MonoBehaviour
         _nextTickTime = 0;
         _curTickCount = 0;
         _isTicking = false;
+
+        _alertRenderers = new Renderer[centers.Length];
+        _mpb = new MaterialPropertyBlock();
         
         CreateRangeLocationAlert();
     }
     
     // 실제 대미지 적용 지점
-    public void StartTick() => _isTicking = true;
+    public void StartTick()
+    {
+        UpdateAlertRange(1);
+        _isTicking = true;
+    }
+
+    public void UpdateAlertRange(float t)
+    {
+        if (_alertRenderers == null || _isTicking)
+            return;
+        
+        _mpb.SetFloat(FillId, t);
+        foreach (var r in _alertRenderers)
+        {
+            r.SetPropertyBlock(_mpb);
+        }
+    }
 
     private void Update()
     {
@@ -51,10 +74,13 @@ public class DamageZone : MonoBehaviour
     // 착탄 경고 지점 표시 : 이 땐 실제 데미지 X
     private void CreateRangeLocationAlert()
     {
+        var i = 0;
+        
         foreach (var center in _localCenters)
         {
             var obj = Instantiate(rangeAlertObj, transform);
-
+            _alertRenderers[i++] = obj;
+            
             obj.transform.localPosition = center;
             obj.transform.localRotation = Quaternion.identity;
             obj.transform.localScale = new Vector3(radius * 2f, 0.01f, radius * 2f);

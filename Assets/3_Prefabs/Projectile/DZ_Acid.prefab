@@ -47,4 +47,4 @@ MonoBehaviour:
   radius: 2
   tickInterval: 1
   tickCount: 5
-  rangeAlertObj: {fileID: 7851934544895465849, guid: 28cc4436f4831be47b32ea971be55be0, type: 3}
+  rangeAlertObj: {fileID: 2727159658519372998, guid: 28cc4436f4831be47b32ea971be55be0, type: 3}

@@ -11,6 +11,7 @@ public abstract class EnemyProjectile : MonoBehaviour
     protected IAttackTarget Target;
     protected Enemy Self;
     protected float Damage;
+    protected float FlightProgress => _flightDuration > 0f ? Mathf.Clamp01(_elapsedTime / _flightDuration) : 0f; 
     
     private float _elapsedTime;
     private float _flightDuration;
@@ -42,7 +43,7 @@ public abstract class EnemyProjectile : MonoBehaviour
         transform.position = start;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         _elapsedTime += Time.deltaTime;
         

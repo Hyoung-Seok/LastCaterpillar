@@ -27,6 +27,13 @@ public class LingeringProjectile : EnemyProjectile
         _zone.Init(Target, localCenters, Damage);
     }
 
+    protected override void Update()
+    {
+        base.Update();
+        
+        _zone.UpdateAlertRange(FlightProgress);
+    }
+
     protected override void OnLand(Vector3 curPos)
     {
         _zone.StartTick();
