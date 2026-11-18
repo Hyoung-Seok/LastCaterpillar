@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1908598269119880985}
   - component: {fileID: 1310504816588029563}
   m_Layer: 0
-  m_Name: Sphere
+  m_Name: ExplosiveProjectile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
