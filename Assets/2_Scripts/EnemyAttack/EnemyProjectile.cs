@@ -1,39 +1,43 @@
-using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyProjectile : MonoBehaviour
+public abstract class EnemyProjectile : MonoBehaviour
 {
-    [SerializeField, Min(0.1f)] private float explodeRadius = 3f;
+    [Header("Projectile Config")]
     [SerializeField, Min(0.1f)] private float flightMinTime;
     [SerializeField, Min(0.1f)] private float flightMaxTime;
     [SerializeField, Min(0.1f)] private float arcMinHeight;
     [SerializeField, Min(0.1f)] private float arcMaxHeight;
 
-    private IAttackTarget _target;
-    private Enemy _self;
-    private float _damage;
-    private float _elapsedTime = 0;
-    private float _flightDuration;
-    private float _arcHeight;
-    private Vector3 _startPosition;
-    private Vector3 _endPosition;
-    private List<Enemy> _buffer = new List<Enemy>();
+    protected IAttackTarget Target;
+    protected Enemy Self;
+    protected float Damage;
+    protected float FlightProgress => FlightDuration > 0f ? Mathf.Clamp01(_elapsedTime / FlightDuration) : 0f; 
+    protected float FlightDuration { get; private set; }
+    protected float RemainingTime => FlightDuration - _elapsedTime;
+    protected Vector3 EndPos => _endPos;
 
-    public void Throw(IAttackTarget target, Enemy self, Vector3 start, Vector3 targetPos, 
+    private float _elapsedTime;
+    private float _arcHeight;
+    private Vector3 _startPos;
+    private Vector3 _endPos;
+
+    protected abstract void OnLand(Vector3 curPos);
+    
+    public virtual void Throw(IAttackTarget target, Enemy self, Vector3 start, Vector3 targetPos, 
         float minDistance, float maxDistance, float dmg)
     {
-        _target = target;
-        _self = self;
-        _damage = dmg;
+        Target = target;
+        Self = self;
+        Damage = dmg;
         
-        _startPosition = start;
-        _endPosition = targetPos;
-        _endPosition.y = self.transform.position.y;
+        _startPos = start;
+        _endPos = targetPos;
+        _endPos.y = self.transform.position.y;
         
-        var distance = GetHorizontalDistance(_startPosition, _endPosition);
+        var distance = GetHorizontalDistance(_startPos, _endPos);
         var ratio = Mathf.InverseLerp(minDistance, maxDistance, distance);
         
-        _flightDuration = Mathf.Lerp(flightMinTime, flightMaxTime, ratio);
+        FlightDuration = Mathf.Lerp(flightMinTime, flightMaxTime, ratio);
         _arcHeight = Mathf.Lerp(arcMinHeight, arcMaxHeight, ratio);
 
         _elapsedTime = 0;
@@ -41,48 +45,36 @@ public class EnemyProjectile : MonoBehaviour
         transform.position = start;
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         _elapsedTime += Time.deltaTime;
         
-        var t = Mathf.Clamp01(_elapsedTime / _flightDuration);
-        var pos = Vector3.Lerp(_startPosition, _endPosition, t);
-        var offsetY = 4f * _arcHeight * t * (1f - t);
-
-        pos.y += offsetY;
+        var t = Mathf.Clamp01(_elapsedTime / FlightDuration);
+        var pos = EvaluateArc(_startPos, _endPos, t, _arcHeight);
         transform.position = pos;
 
         if (t >= 1 || FlowField.Instance.IsBlocked(transform.position))
-            Explode();
-    }
-    
-    private void Explode()
-    {
-        var curPos = transform.position;
-        var targetSufPos = _target.GetSurfacePoint(curPos);
-        var dis = GetHorizontalDistance(curPos, targetSufPos);
-        
-        if(dis < explodeRadius)
-            _target.TakeDamage(_damage);
-        
-        EnemyRegister.Instance.QueryForRadius(curPos, explodeRadius, _buffer);
-
-        foreach (var e in _buffer)
         {
-            if(ReferenceEquals(e, _self))
-                continue;
-            
-            e.TakeDamage(_damage);
+            OnLand(pos);
+            Destroy(gameObject);
         }
-        
-        Destroy(gameObject);
     }
     
-    private float GetHorizontalDistance(Vector3 start, Vector3 end)
+    protected float GetHorizontalDistance(Vector3 start, Vector3 end)
     {
         var v = start - end;
         v.y = 0;
         
         return v.magnitude;
+    }
+
+    protected Vector3 EvaluateArc(Vector3 startPos, Vector3 endPos, float t, float height)
+    {
+        var pos = Vector3.Lerp(startPos, endPos, t);
+        var offsetY = 4f * height * t * (1f - t);
+
+        pos.y += offsetY;
+        
+        return pos;
     }
 }

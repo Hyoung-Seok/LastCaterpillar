@@ -48,6 +48,15 @@ public abstract class EnemyAttack : MonoBehaviour
         return distance.sqrMagnitude <= contactDistance * contactDistance;
     }
 
+    /// <summary>
+    /// 사거리 기즈모. 소유 적의 OnDrawGizmosSelected에서 호출 (높이를 적 쪽 기준에 맞추기 위해)
+    /// </summary>
+    public virtual void DrawRangeGizmo(Vector3 center)
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(center, contactDistance);
+    }
+
     protected bool IsCoolDownReady() => Time.time >= _nextAttackTime;
     protected void StartCoolDown() => _nextAttackTime = Time.time + coolDown;
     
@@ -64,7 +73,7 @@ public abstract class EnemyAttack : MonoBehaviour
     {
         if (hasAttackAnimation && !Self.HasAnimState(_atkStateHash))
         {
-            Debug.LogWarning($"{gameObject.GetType().Name} : {atkStateName} 상태가 Animator에 없음!", this);
+            Debug.LogWarning($"{gameObject.name} : {atkStateName} 상태가 Animator에 없음!", this);
             _canPlayAtkAnim = false;
         }
         else

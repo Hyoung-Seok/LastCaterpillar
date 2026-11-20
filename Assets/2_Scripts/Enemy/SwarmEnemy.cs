@@ -142,15 +142,20 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
     private void OnDrawGizmosSelected()
     {
         var pos = transform.position + (Vector3.up * sphereYPos);
-        var contactDistance = 0f;
 
+        // 공격 부품별 사거리 (각 부품이 자기 범위를 그림)
         if (nonPhaseAttack != null)
-            contactDistance = nonPhaseAttack.ContactDistance;
-        else if (atkController != null && atkController.PrimaryAttack != null)
-            contactDistance = atkController.PrimaryAttack.ContactDistance;
-        
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(pos, contactDistance);
+        {
+            nonPhaseAttack.DrawRangeGizmo(pos);
+        }
+        else if (atkController != null && atkController.Attacks != null)
+        {
+            foreach (var atk in atkController.Attacks)
+            {
+                if (atk != null)
+                    atk.DrawRangeGizmo(pos);
+            }
+        }
 
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(pos, bodyRadius);
