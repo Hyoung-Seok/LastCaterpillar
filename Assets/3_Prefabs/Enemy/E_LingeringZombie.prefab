@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d3186b63ee3c324ebb8daf54f6e6831, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RangeAttack
-  damage: 80
+  damage: 20
   contactDistance: 30
   coolDown: 5
   hasAttackAnimation: 1
