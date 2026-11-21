@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TimedSelfDestructAttack : EnemyAttack, IPursuitAttack
@@ -28,6 +28,17 @@ public class TimedSelfDestructAttack : EnemyAttack, IPursuitAttack
     
     public override void Attack(Vector3 targetPos, IAttackTarget target)
     {
+        var buffer = new List<Enemy>();
+        EnemyRegister.Instance.QueryForRadius(Self.Position, blastRadius, buffer);
+
+        foreach (var e in buffer)
+        {
+            if(ReferenceEquals(Self, e))
+                continue;
+            
+            e.TakeDamage(damage);
+        }
+        
         if(IsInBlastRange(targetPos))
             target.TakeDamage(damage);
         
