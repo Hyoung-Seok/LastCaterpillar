@@ -3,6 +3,10 @@ using UnityEngine;
 
 public class TimedSelfDestructAttack : EnemyAttack, IPursuitAttack
 {
+    [Header("Components")]
+    [SerializeField] private FuseBlinkVisual fuseBlink;
+    
+    [Header("Self Destruct Config")]
     [SerializeField, Min(0.001f)] private float blastRadius = 2f;
     [SerializeField, Min(0)] private float pursuitDuration = 0;
     [SerializeField, Min(0)] private float pursuitMoveScale = 1f;
@@ -48,6 +52,9 @@ public class TimedSelfDestructAttack : EnemyAttack, IPursuitAttack
     public void OnPursuitEnter()
     {
         Self.PlayAnimationClipByHashCode(_pursuitAnimHash, pursuitAnimTransitionTime);
+        
+        if(fuseBlink != null)
+            fuseBlink.Begin(pursuitDuration);
     }
 
     public bool ShouldFireEarly(Vector3 targetPos)

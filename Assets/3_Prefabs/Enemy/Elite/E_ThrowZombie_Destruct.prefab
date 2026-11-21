@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2205622775212228412}
   - component: {fileID: 7793086235999532570}
   - component: {fileID: 6785022269746493458}
+  - component: {fileID: -1519113357055725805}
   - component: {fileID: 6743025194608777410}
   - component: {fileID: 5235092679465631623}
   m_Layer: 8
@@ -124,11 +125,30 @@ MonoBehaviour:
   preheatTime: 2.2
   aimLockdownTime: 0
   recoveryTime: 0.35000014
+  fuseBlink: {fileID: -1519113357055725805}
   blastRadius: 2
   pursuitDuration: 5
   pursuitMoveScale: 1.5
   pursuitAnimName: RunFast
   pursuitAnimTransitionTime: 0.3
+--- !u!114 &-1519113357055725805
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 641390629251916047}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ca802f03283fe14d96dba5d258ffa41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FuseBlinkVisual
+  renderers:
+  - {fileID: 3851180626769424180}
+  emissionColor: {r: 2, g: 0, b: 0, a: 0}
+  startFreq: 1
+  endFreq: 8
+  sharpness: 2
 --- !u!54 &6743025194608777410
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -331,6 +351,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: -3479922615588753652, guid: 5205a0598ec058f44b01e0caa76479bb, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 9e440ac27e35d184aa922da1c06befcd, type: 2}
     - target: {fileID: -3478013746326755454, guid: 5205a0598ec058f44b01e0caa76479bb, type: 3}
       propertyPath: m_Layer
       value: 8
@@ -539,6 +563,11 @@ PrefabInstance:
 --- !u!95 &3147001394860293545 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 5205a0598ec058f44b01e0caa76479bb, type: 3}
+  m_PrefabInstance: {fileID: 8847023163759837240}
+  m_PrefabAsset: {fileID: 0}
+--- !u!137 &3851180626769424180 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -3479922615588753652, guid: 5205a0598ec058f44b01e0caa76479bb, type: 3}
   m_PrefabInstance: {fileID: 8847023163759837240}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &7166173119368216560 stripped
