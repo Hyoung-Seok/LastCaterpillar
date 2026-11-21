@@ -27,8 +27,6 @@ public class EnemyAttackController : MonoBehaviour
         if(!_isAimLocked)
             _targetPos = _atkTarget.GetSurfacePoint(transform.position);
 
-        var curScale = 1f;
-        
         switch (_curPhase)
         {
             case AttackPhase.Approach:
@@ -42,8 +40,6 @@ public class EnemyAttackController : MonoBehaviour
                         _curPhase = AttackPhase.StandBy;
                     }
                 }
-                
-                curScale = 1;
                 break;
             
             case AttackPhase.StandBy:
@@ -54,8 +50,6 @@ public class EnemyAttackController : MonoBehaviour
                     if (!IsAnyAttackInPosition(_targetPos))
                         _curPhase = AttackPhase.Approach;
                 }
-
-                curScale = 0;
                 break;
             
             case AttackPhase.Preheat:
@@ -87,8 +81,6 @@ public class EnemyAttackController : MonoBehaviour
                     
                     _isAimLocked = false;
                 }
-                
-                curScale = 0;
                 break;
             
             case AttackPhase.Pursuit:
@@ -98,8 +90,6 @@ public class EnemyAttackController : MonoBehaviour
                     _curSelectedAttack.Attack(_targetPos, _atkTarget);
                     _curPhase = AttackPhase.Recovery;
                 }
-                
-                curScale = _curPursuitAttack.PursuitMoveScale;
                 break;
             
             case AttackPhase.Recovery:
@@ -107,12 +97,10 @@ public class EnemyAttackController : MonoBehaviour
                 {
                     _curPhase = AttackPhase.StandBy;
                 }
-
-                curScale = 0;
                 break;
         }
 
-        return curScale;
+        return GetMoveScale(_curPhase);
     }
 
     public bool TryGetLookDirection(out Vector3 lookDirection)
@@ -170,6 +158,19 @@ public class EnemyAttackController : MonoBehaviour
         }
 
         return false;
+    }
+
+    private float GetMoveScale(AttackPhase phase)
+    {
+        return phase switch
+        {
+            AttackPhase.Approach => 1,
+            AttackPhase.StandBy => 0,
+            AttackPhase.Preheat => 0,
+            AttackPhase.Pursuit => _curPursuitAttack.PursuitMoveScale,
+            AttackPhase.Recovery => 0,
+            _ => 1
+        };
     }
 
     private void OnValidate()
