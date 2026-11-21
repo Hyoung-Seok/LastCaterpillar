@@ -14,6 +14,7 @@ public class EnemyAttackController : MonoBehaviour
     private IAttackTarget _atkTarget;
     private AttackPhase _curPhase = AttackPhase.Approach;
     private EnemyAttack _curSelectedAttack;
+    private IPursuitAttack _curPursuitAttack;
     private Vector3 _targetPos;
     private float _nextTransitionTime;
     private bool _isAimLocked;
@@ -21,10 +22,12 @@ public class EnemyAttackController : MonoBehaviour
     public void SetEnemyAtkTarget(IAttackTarget target)
         => _atkTarget = target;
 
-    public bool Tick()
+    public float Tick()
     {
         if(!_isAimLocked)
             _targetPos = _atkTarget.GetSurfacePoint(transform.position);
+
+        var curScale = 1f;
         
         switch (_curPhase)
         {
@@ -39,6 +42,8 @@ public class EnemyAttackController : MonoBehaviour
                         _curPhase = AttackPhase.StandBy;
                     }
                 }
+                
+                curScale = 1;
                 break;
             
             case AttackPhase.StandBy:
@@ -49,6 +54,8 @@ public class EnemyAttackController : MonoBehaviour
                     if (!IsAnyAttackInPosition(_targetPos))
                         _curPhase = AttackPhase.Approach;
                 }
+
+                curScale = 0;
                 break;
             
             case AttackPhase.Preheat:
@@ -56,14 +63,43 @@ public class EnemyAttackController : MonoBehaviour
                 {
                     _isAimLocked = true;
                 }
+
                 if (_nextTransitionTime <= Time.time)
+                {
+                    // 추격 상태를 가진 적의 처리
+                    if (_curSelectedAttack is IPursuitAttack pursuit)
+                    {
+                        _nextTransitionTime = Time.time + pursuit.PursuitDuration;
+                        
+                        _curPursuitAttack = pursuit;
+                        _curPhase = AttackPhase.Pursuit;
+                        
+                        _curPursuitAttack.OnPursuitEnter();
+                    }
+                    // 추격 상태를 가지지 않는 적의 처리
+                    else
+                    {
+                        _nextTransitionTime = Time.time + _curSelectedAttack.RecoveryTime;
+                        _curSelectedAttack.Attack(_targetPos, _atkTarget);
+
+                        _curPhase = AttackPhase.Recovery;
+                    }
+                    
+                    _isAimLocked = false;
+                }
+                
+                curScale = 0;
+                break;
+            
+            case AttackPhase.Pursuit:
+                if (_nextTransitionTime <= Time.time || _curPursuitAttack.ShouldFireEarly(_targetPos))
                 {
                     _nextTransitionTime = Time.time + _curSelectedAttack.RecoveryTime;
                     _curSelectedAttack.Attack(_targetPos, _atkTarget);
-                    
                     _curPhase = AttackPhase.Recovery;
-                    _isAimLocked = false;
                 }
+                
+                curScale = _curPursuitAttack.PursuitMoveScale;
                 break;
             
             case AttackPhase.Recovery:
@@ -71,10 +107,12 @@ public class EnemyAttackController : MonoBehaviour
                 {
                     _curPhase = AttackPhase.StandBy;
                 }
+
+                curScale = 0;
                 break;
         }
 
-        return _curPhase == AttackPhase.Approach;
+        return curScale;
     }
 
     public bool TryGetLookDirection(out Vector3 lookDirection)
