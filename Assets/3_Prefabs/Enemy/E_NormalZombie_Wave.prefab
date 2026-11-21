@@ -50,8 +50,6 @@ MonoBehaviour:
   atkController: {fileID: 0}
   nonPhaseAttack: {fileID: -2761753971536918457}
   maxHp: 100
-  damage: 50
-  contactDistance: 1
   baseMoveSpeed: 5
   rotationSpeed: 200
   bodyRadius: 0.3
@@ -74,12 +72,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b05298c06fab4ff4fb3e060f9e6aa4b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelfDestructAttack
-  damage: 50
+  damage: 30
   contactDistance: 1
+  coolDown: 0
   hasAttackAnimation: 0
   atkStateName: 
   transitionTime: 0
   preheatTime: 0.1
+  aimLockdownTime: 0
   recoveryTime: 0.1
 --- !u!1 &221896705881842866
 GameObject:
