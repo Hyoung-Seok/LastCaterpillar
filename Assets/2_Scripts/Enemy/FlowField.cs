@@ -257,21 +257,24 @@ public class FlowField : MonoBehaviour
         var obstacleIndex = new HashSet<Vector2Int>();
 
         // 장애물에 의해 막힌 셀 검사
-        foreach (Transform child in blockingObstacleParent)
+        if (blockingObstacleParent != null)
         {
-            var b = child.GetComponent<BoxCollider>().bounds;
-            var minCell = WorldToCell(b.min);
-            var maxCell = WorldToCell(b.max);
-
-            for (var x = minCell.x; x <= maxCell.x; x++)
+            foreach (Transform child in blockingObstacleParent)
             {
-                for (var y = minCell.y; y <= maxCell.y; y++)
+                var b = child.GetComponent<BoxCollider>().bounds;
+                var minCell = WorldToCell(b.min);
+                var maxCell = WorldToCell(b.max);
+
+                for (var x = minCell.x; x <= maxCell.x; x++)
                 {
-                    obstacleIndex.Add(new Vector2Int(x, y));
+                    for (var y = minCell.y; y <= maxCell.y; y++)
+                    {
+                        obstacleIndex.Add(new Vector2Int(x, y));
+                    }
                 }
             }
         }
-        
+
         // 통행할 수 없는 셀 캐싱
         for (var x = 0; x < _width; ++x)
         {
