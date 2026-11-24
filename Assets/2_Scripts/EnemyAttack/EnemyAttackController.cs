@@ -14,6 +14,7 @@ public class EnemyAttackController : MonoBehaviour
     private IAttackTarget _atkTarget;
     private AttackPhase _curPhase = AttackPhase.Approach;
     private EnemyAttack _curSelectedAttack;
+    private IPursuitAttack _curPursuitAttack;
     private Vector3 _targetPos;
     private float _nextTransitionTime;
     private bool _isAimLocked;
@@ -21,11 +22,11 @@ public class EnemyAttackController : MonoBehaviour
     public void SetEnemyAtkTarget(IAttackTarget target)
         => _atkTarget = target;
 
-    public bool Tick()
+    public float Tick()
     {
         if(!_isAimLocked)
             _targetPos = _atkTarget.GetSurfacePoint(transform.position);
-        
+
         switch (_curPhase)
         {
             case AttackPhase.Approach:
@@ -56,13 +57,38 @@ public class EnemyAttackController : MonoBehaviour
                 {
                     _isAimLocked = true;
                 }
+
                 if (_nextTransitionTime <= Time.time)
+                {
+                    // 추격 상태를 가진 적의 처리
+                    if (_curSelectedAttack is IPursuitAttack pursuit)
+                    {
+                        _nextTransitionTime = Time.time + pursuit.PursuitDuration;
+                        
+                        _curPursuitAttack = pursuit;
+                        _curPhase = AttackPhase.Pursuit;
+                        
+                        _curPursuitAttack.OnPursuitEnter();
+                    }
+                    // 추격 상태를 가지지 않는 적의 처리
+                    else
+                    {
+                        _nextTransitionTime = Time.time + _curSelectedAttack.RecoveryTime;
+                        _curSelectedAttack.Attack(_targetPos, _atkTarget);
+
+                        _curPhase = AttackPhase.Recovery;
+                    }
+                    
+                    _isAimLocked = false;
+                }
+                break;
+            
+            case AttackPhase.Pursuit:
+                if (_nextTransitionTime <= Time.time || _curPursuitAttack.ShouldFireEarly(_targetPos))
                 {
                     _nextTransitionTime = Time.time + _curSelectedAttack.RecoveryTime;
                     _curSelectedAttack.Attack(_targetPos, _atkTarget);
-                    
                     _curPhase = AttackPhase.Recovery;
-                    _isAimLocked = false;
                 }
                 break;
             
@@ -74,7 +100,7 @@ public class EnemyAttackController : MonoBehaviour
                 break;
         }
 
-        return _curPhase == AttackPhase.Approach;
+        return GetMoveScale(_curPhase);
     }
 
     public bool TryGetLookDirection(out Vector3 lookDirection)
@@ -132,6 +158,19 @@ public class EnemyAttackController : MonoBehaviour
         }
 
         return false;
+    }
+
+    private float GetMoveScale(AttackPhase phase)
+    {
+        return phase switch
+        {
+            AttackPhase.Approach => 1,
+            AttackPhase.StandBy => 0,
+            AttackPhase.Preheat => 0,
+            AttackPhase.Pursuit => _curPursuitAttack.PursuitMoveScale,
+            AttackPhase.Recovery => 0,
+            _ => 1
+        };
     }
 
     private void OnValidate()

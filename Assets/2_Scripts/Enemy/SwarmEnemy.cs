@@ -49,9 +49,12 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
             return;
 
         var canWalk = true;
+        var moveScale = 1f;
+        
         if (atkController != null)
         {
-            canWalk = atkController.Tick();
+            moveScale = atkController.Tick();
+            canWalk = moveScale != 0;
         }
         
         if (IsDead)
@@ -78,7 +81,7 @@ public class SwarmEnemy : Enemy, IRepulsionReceiver
                        Vector3.ClampMagnitude(_sepForce, maxSepForce) + dir).normalized;
         
         using (s_TransformMove.Auto())
-            transform.position += SlideAlongWalls(pos, steerDir * (step * speedScale), f);
+            transform.position += SlideAlongWalls(pos, steerDir * (step * speedScale * moveScale), f);
         
         // 2단계 : 겹침 해소 - dt 없음
         var pos2 = transform.position;
