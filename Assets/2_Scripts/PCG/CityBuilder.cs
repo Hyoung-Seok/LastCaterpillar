@@ -34,7 +34,7 @@ public class CityBuilder : MonoBehaviour
             var facing = bData.Facing ?? Vector2Int.up;
             var rot = Quaternion.LookRotation(new Vector3(facing.x, 0, facing.y));
             
-            Instantiate(obj, center, rot, transform);
+            Instantiate(obj, center, rot, buildingParent);
         }
     }
 
