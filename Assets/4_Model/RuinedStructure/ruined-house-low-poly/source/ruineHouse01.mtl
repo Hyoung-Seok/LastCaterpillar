@@ -1,0 +1,15 @@
+newmtl Betonmaterial
+Kd 1 1 1
+map_Kd BetonWall02.jpg
+
+newmtl BricksWall
+Kd 1 1 1
+map_Kd redWall02.jpg
+
+newmtl HouseFloorInside
+Kd 1 1 1
+map_Kd stoneFloor02.jpg
+
+newmtl MetalDark
+Kd 1 1 1
+map_Kd MettalScrapDark.jpg
