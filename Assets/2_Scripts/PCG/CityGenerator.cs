@@ -32,6 +32,11 @@ public class CityGenerator : MonoBehaviour
 
     [Header("Area Config")]
     [SerializeField] private AreaConfig areaConfig;
+
+    [Header("Ground Config")] 
+    [SerializeField] private Renderer cityGround;
+    [SerializeField, Min(1f)] private float tileSize;
+    [SerializeField] private float groundYPos = 0f;
     
     private Random _prng;
 
@@ -53,6 +58,8 @@ public class CityGenerator : MonoBehaviour
         
         if(isGenerateBuilding)
             cityBuilder.GenerateBuilding(CityLayout, buildingBandDepth);
+        
+        PlaceGround();
     }
 
     public void DestroyStructure()
@@ -149,7 +156,6 @@ public class CityGenerator : MonoBehaviour
         roadGenerator.GenerateCrossRoad(horizontal, vertical, cellSize);
         roadGenerator.GenerateCatWalk(CityLayout);
     }
-
     
     private List<(int startPos, int width)> ChoseRoadLine(int length)
     {
@@ -170,6 +176,27 @@ public class CityGenerator : MonoBehaviour
         }
 
         return result;
+    }
+
+    private void PlaceGround()
+    {
+        if (cityGround == null)
+            return;
+        
+        var sizeX = width * cellSize;
+        var sizeZ = height * cellSize;
+        var halfCellSize = cellSize / 2f;
+        var center = new Vector3((width - 1) * halfCellSize, groundYPos, (height - 1) * halfCellSize);
+        
+        cityGround.transform.SetPositionAndRotation(center, Quaternion.Euler(90f, 0f, 0f));
+        cityGround.transform.localScale = new Vector3(sizeX, sizeZ, 1);
+
+        var mpb = new MaterialPropertyBlock();
+        
+        cityGround.GetPropertyBlock(mpb);
+        mpb.SetVector(Shader.PropertyToID("_BaseMap_ST"), 
+            new Vector4(sizeX / tileSize, sizeZ / tileSize, 0f, 0f));
+        cityGround.SetPropertyBlock(mpb);
     }
     
     private void OnValidate()
